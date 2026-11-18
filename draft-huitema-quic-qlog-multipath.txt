@@ -4,8 +4,9 @@
 
 QUIC                                                          C. Huitema
 Internet-Draft                                      Private Octopus Inc.
-Intended status: Informational                          18 November 2026
-Expires: 22 May 2027
+Intended status: Informational                                  A. Bisht
+Expires: 22 May 2027                                       Cisco Systems
+                                                        18 November 2026
 
 
         QLOG extensions for Multiple Paths for a QUIC Connection
@@ -74,7 +75,7 @@ Table of Contents
    7.  IANA Considerations
    8.  Normative References
    Acknowledgments
-   Author's Address
+   Authors' Addresses
 
 1.  Introduction
 
@@ -184,8 +185,13 @@ Acknowledgments
 
    TODO acknowledge.
 
-Author's Address
+Authors' Addresses
 
    Christian Huitema
    Private Octopus Inc.
    Email: huitema@huitema.net
+
+
+   Altanai Bisht
+   Cisco Systems
+   Email: albisht@cisco.com
