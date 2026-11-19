@@ -96,7 +96,7 @@ TODO.
 
 # Multipath specific frames
 
-TODO.
+TODO. Need to extract the list of frames from RFC 10069.
 
 # Security Considerations {#security}
 
