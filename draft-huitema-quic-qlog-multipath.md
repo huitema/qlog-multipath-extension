@@ -251,6 +251,7 @@ of connection IDs for path 2.
 {
   "time": 16.5,
   "name": "quic:packet_sent",
+  "path_id": 0,
   "data": {
     "header": { "packet_type": "1RTT", "packet_number": 90 },
     "frames": [
@@ -262,6 +263,119 @@ of connection IDs for path 2.
     ]
   }
 }
+~~~
+
+# Per-path congestion control and recovery {#path-recovery}
+
+Each path has its own Application Data packet number space and congestion
+control state ({{Sections 1 and 5.3 of RFC10069}}). The following events
+reuse the names and data fields in {{I-D.ietf-quic-qlog-quic-events}}.
+For an event attributable to one known path, include its unsigned 32-bit
+`path_id` alongside `time`, `name`, and `data`. Path 0 is identified
+explicitly. Omit `path_id` for connection-wide events or when the path
+is unknown.
+
+## Congestion control and RTT
+
+In `quic:recovery_metrics_updated`, `path_id` identifies the path whose
+metrics changed. For example, an update can group `congestion_window`,
+`bytes_in_flight`, `ssthresh`, and `pacing_rate` for one path. In a
+path-scoped update, `packets_in_flight` counts packets across the packet
+number spaces of that path. Emit separate updates for different paths
+and for any connection-wide values, including shared controller state.
+The same scope applies to `quic:recovery_parameters_set` and
+`quic:congestion_state_updated`.
+
+When a PATH_ACK updates `latest_rtt`, `smoothed_rtt`, or another RTT
+metric, `path_id` identifies the path whose estimator was updated.
+The sample can include the return delay on another path
+({{Section 5.4 of RFC10069}}). For example, if a PATH_ACK
+arrives on path 0 for packets sent on path 1, `quic:packet_received`
+reports path 0. The PATH_ACK frame and `quic:packets_acked` identify
+path 1. Group acknowledged packet numbers by path and packet number space.
+
+## Probe timeout, packet loss, and retransmission
+
+For a per-path probe timeout (PTO), `quic:timer_updated` identifies the
+path whose timer was set, expired, or was cancelled. A PTO expiration
+uses `timer_type` of `"pto"` and `event_type` of `"expired"`. An
+implementation that logs a combined loss detection timer can use
+`"loss_timeout"` and include `path_id` when the update concerns one
+known path.
+The current `pto_count` can be recorded in `quic:recovery_metrics_updated`.
+A probe transmission uses `quic:packet_sent` with trigger `"pto_probe"`
+on the path carrying the probe. PTO expiration alone does not establish
+packet loss ({{Section 5.7 of RFC10069}}).
+
+In `quic:packet_lost`, `path_id` identifies the original sending path.
+Together with the sending endpoint, packet number space, and packet
+number, it identifies the packet declared lost. The base `trigger` values
+`"reordering_threshold"` and `"time_threshold"` apply per path.
+An endpoint that discards the state of an abandoned path also declares
+its outstanding packets lost ({{Section 3.4.3 of RFC10069}}).
+For packets first declared lost for this reason, the endpoint SHOULD
+include `path_state_discarded` in the event data and omit `trigger`.
+The field is absent for other loss declarations.
+
+~~~ cddl
+$$quic-packetlost-extension //= (
+    ? path_state_discarded: true
+)
+~~~
+
+In `quic:marked_for_retransmit`, `path_id` identifies the original
+sending path of the data marked after loss detection. Group data from
+different known source paths in separate events. The later
+`quic:packet_sent` identifies the path selected for the new packet.
+STREAM data can be split or combined when sent again. When frame details
+are logged, the stream ID and overlapping byte ranges identify repeated
+data across paths ({{Section 5.6 of RFC10069}}).
+
+## Example of cross-path recovery
+
+In this sender trace excerpt, a PTO on path 1 prompts a probe. A PATH_ACK
+arriving on path 0 acknowledges the probe on path 1. The sender then
+declares packet 42 on path 1 lost by the packet threshold and resends its
+stream bytes on path 0. The new packet also has number 42 in its own
+packet number space.
+
+~~~ json
+[
+  { "time": 0, "name": "quic:packet_sent", "path_id": 1,
+    "data": {
+      "header": { "packet_type": "1RTT", "packet_number": 42 },
+      "frames": [{ "frame_type": "stream", "stream_id": 0,
+                   "offset": 800, "raw": { "length": 800 } }] } },
+  { "time": 160, "name": "quic:timer_updated", "path_id": 1,
+    "data": { "timer_type": "pto", "event_type": "expired",
+              "packet_number_space": "application_data" } },
+  { "time": 160, "name": "quic:packet_sent", "path_id": 1,
+    "data": {
+      "header": { "packet_type": "1RTT", "packet_number": 45 },
+      "trigger": "pto_probe",
+      "frames": [{ "frame_type": "ping" }] } },
+  { "time": 186, "name": "quic:packet_received", "path_id": 0,
+    "data": {
+      "header": { "packet_type": "1RTT", "packet_number": 9 },
+      "frames": [{ "frame_type": "path_ack", "path_id": 1,
+                   "acked_ranges": [[45]] }] } },
+  { "time": 186, "name": "quic:packet_lost", "path_id": 1,
+    "data": {
+      "header": { "packet_type": "1RTT", "packet_number": 42 },
+      "trigger": "reordering_threshold" } },
+  { "time": 186, "name": "quic:recovery_metrics_updated",
+    "path_id": 1,
+    "data": { "congestion_window": 6000, "pto_count": 0 } },
+  { "time": 186, "name": "quic:marked_for_retransmit", "path_id": 1,
+    "data": { "frames": [{ "frame_type": "stream", "stream_id": 0,
+                 "offset": 800, "raw": { "length": 800 } }] } },
+  { "time": 187, "name": "quic:packet_sent", "path_id": 0,
+    "data": {
+      "header": { "packet_type": "1RTT", "packet_number": 42 },
+      "trigger": "retransmit_reordered",
+      "frames": [{ "frame_type": "stream", "stream_id": 0,
+                   "offset": 800, "raw": { "length": 800 } }] } }
+]
 ~~~
 
 # Security Considerations {#security}
