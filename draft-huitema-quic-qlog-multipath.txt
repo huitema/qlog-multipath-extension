@@ -75,16 +75,18 @@ Table of Contents
      4.3.  path_status_updated
      4.4.  Example
    5.  Add a Path identifier to existing QUIC events
-   6.  Multipath specific frames
-     6.1.  PATH_ACK
-     6.2.  PATH_ABANDON
-     6.3.  PATH_STATUS_AVAILABLE and PATH_STATUS_BACKUP
-     6.4.  PATH_NEW_CONNECTION_ID and PATH_RETIRE_CONNECTION_ID
-     6.5.  MAX_PATH_ID, PATHS_BLOCKED, and PATH_CIDS_BLOCKED
-     6.6.  Example
-   7.  Security Considerations
-   8.  IANA Considerations
-   9.  Normative References
+   6.  Multipath transport parameter
+     6.1.  Example
+   7.  Multipath specific frames
+     7.1.  PATH_ACK
+     7.2.  PATH_ABANDON
+     7.3.  PATH_STATUS_AVAILABLE and PATH_STATUS_BACKUP
+     7.4.  PATH_NEW_CONNECTION_ID and PATH_RETIRE_CONNECTION_ID
+     7.5.  MAX_PATH_ID, PATHS_BLOCKED, and PATH_CIDS_BLOCKED
+     7.6.  Example
+   8.  Security Considerations
+   9.  IANA Considerations
+   10. Normative References
    Acknowledgments
    Authors' Addresses
 
@@ -353,10 +355,38 @@ Table of Contents
    The field is outside data, so existing QUIC event data definitions do
    not need to be copied or redefined for each event.  The table above
    specifies the event-by-event semantics and applicability of the
-   common field.  Section 4 defines the new events.  Section 6 defines
+   common field.  Section 4 defines the new events.  Section 7 defines
    the frame encodings.
 
-6.  Multipath specific frames
+6.  Multipath transport parameter
+
+   The initial_max_path_id transport parameter (0x3e) is logged in
+   quic:parameters_set.  The initiator field of that event identifies
+   the endpoint that advertised the value.  The multipath extension is
+   enabled only if both endpoints advertise the parameter (Section 2 of
+   [RFC10069]).
+
+   $$quic-parametersset-extension //= (
+       ? initial_max_path_id: uint32
+   )
+
+   A value of 0 enables the extension without allowing extra paths
+   immediately.  It is distinct from an absent field, which means that
+   the endpoint did not advertise the parameter.
+
+6.1.  Example
+
+   In this excerpt from a client's event list, the client advertises a
+   maximum Path ID of 3 and the server advertises 1.
+
+   [
+     { "time": 0.0, "name": "quic:parameters_set",
+       "data": { "initiator": "local", "initial_max_path_id": 3 } },
+     { "time": 31.2, "name": "quic:parameters_set",
+       "data": { "initiator": "remote", "initial_max_path_id": 1 } }
+   ]
+
+7.  Multipath specific frames
 
    The following CDDL extends the $QuicFrame type socket defined in
    Section 8.13 of [I-D.ietf-quic-qlog-quic-events].  These frame
@@ -376,7 +406,7 @@ Table of Contents
                  PathNewConnectionIDFrame / PathRetireConnectionIDFrame /
                  MaxPathIDFrame / PathsBlockedFrame / PathCIDsBlockedFrame
 
-6.1.  PATH_ACK
+7.1.  PATH_ACK
 
    Both wire types in Section 4.1 of [RFC10069] use the frame type
    path_ack.  The path_id selects the packet number space being
@@ -400,7 +430,7 @@ Table of Contents
        ? raw: RawInfo
    )
 
-6.2.  PATH_ABANDON
+7.2.  PATH_ABANDON
 
    For PATH_ABANDON (0x3e75), path_id identifies the path being closed.
    The error field uses qlog transport error names, including no_error
@@ -421,7 +451,7 @@ Table of Contents
                       "path_unstable_or_poor" /         ; 0x3e76
                       "no_cid_available_for_path"       ; 0x3e77
 
-6.3.  PATH_STATUS_AVAILABLE and PATH_STATUS_BACKUP
+7.3.  PATH_STATUS_AVAILABLE and PATH_STATUS_BACKUP
 
    The frame_type identifies the preference advertised for path_id.  Use
    path_status_available for 0x3e77 and path_status_backup for 0x3e76.
@@ -436,7 +466,7 @@ Table of Contents
        ? raw: RawInfo
    }
 
-6.4.  PATH_NEW_CONNECTION_ID and PATH_RETIRE_CONNECTION_ID
+7.4.  PATH_NEW_CONNECTION_ID and PATH_RETIRE_CONNECTION_ID
 
    These frames use the fields of the base NewConnectionIDFrame and
    RetireConnectionIDFrame, with an additional path_id.  Both the
@@ -465,7 +495,7 @@ Table of Contents
        ? raw: RawInfo
    }
 
-6.5.  MAX_PATH_ID, PATHS_BLOCKED, and PATH_CIDS_BLOCKED
+7.5.  MAX_PATH_ID, PATHS_BLOCKED, and PATH_CIDS_BLOCKED
 
    MAX_PATH_ID (0x3e7a) advertises the largest acceptable Path ID in
    maximum.  PATHS_BLOCKED (0x3e7b) reports the Path ID limit in effect
@@ -494,7 +524,7 @@ Table of Contents
        ? raw: RawInfo
    }
 
-6.6.  Example
+7.6.  Example
 
    In this packet sent on path 0, the PATH_ACK acknowledges packets on
    path 1 and the PATH_CIDS_BLOCKED reports that the sender has run out
@@ -516,11 +546,11 @@ Table of Contents
      }
    }
 
-7.  Security Considerations
+8.  Security Considerations
 
    TODO Security
 
-8.  IANA Considerations
+9.  IANA Considerations
 
    This document registers a new entry in the "qlog event schema URIs"
    registry defined in Section 15 of [I-D.ietf-quic-qlog-main-schema].
@@ -543,7 +573,10 @@ Table of Contents
    mtu_updated, spin_bit_updated, connection_id_updated, tuple_assigned,
    migration_state_updated, frames_parsed, and frames_created.
 
-9.  Normative References
+   This document adds the initial_max_path_id field to the
+   parameters_set event (Section 6).
+
+10.  Normative References
 
    [I-D.ietf-quic-qlog-main-schema]
               Marx, R., Niccolini, L., Seemann, M., and L. Pardue,
