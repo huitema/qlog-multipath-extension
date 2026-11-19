@@ -288,6 +288,38 @@ event-by-event semantics and applicability of the common field.
 {{mp-events}} defines the new events. {{multipath-specific-frames}}
 defines the frame encodings.
 
+# Multipath transport parameter {#mp-parameters}
+
+The `initial_max_path_id` transport parameter (0x3e) is logged in
+`quic:parameters_set`. The `initiator` field of that event identifies
+the endpoint that advertised the value. The multipath extension is
+enabled only if both endpoints advertise the parameter
+({{Section 2 of RFC10069}}).
+
+~~~ cddl
+$$quic-parametersset-extension //= (
+    ? initial_max_path_id: uint32
+)
+~~~
+
+A value of 0 enables the extension without allowing extra paths
+immediately. It is distinct from an absent field, which means that the
+endpoint did not advertise the parameter.
+
+## Example
+
+In this excerpt from a client's event list, the client advertises a
+maximum Path ID of 3 and the server advertises 1.
+
+~~~ json
+[
+  { "time": 0.0, "name": "quic:parameters_set",
+    "data": { "initiator": "local", "initial_max_path_id": 3 } },
+  { "time": 31.2, "name": "quic:parameters_set",
+    "data": { "initiator": "remote", "initial_max_path_id": 1 } }
+]
+~~~
+
 # Multipath specific frames
 
 The following CDDL extends the `$QuicFrame` type socket defined in
@@ -486,6 +518,9 @@ This document modifies the following QUIC events: `packet_sent`, `packet_receive
 `timer_updated`, `mtu_updated`, `spin_bit_updated`, `connection_id_updated`,
 `tuple_assigned`, `migration_state_updated`, `frames_parsed`, and
 `frames_created`.
+
+This document adds the `initial_max_path_id` field to the
+`parameters_set` event ({{mp-parameters}}).
 
 --- back
 
