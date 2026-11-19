@@ -263,30 +263,59 @@ the event-level `path_id` does not replace it. For other QUIC events,
 implementations MUST include `path_id` when they describe a single known
 path, and MUST omit it when they are connection-wide or the path is unknown.
 
-An example packet event is:
-
-~~~ json
-{
-  "time": 123.4,
-  "name": "quic:packet_sent",
-  "path_id": 1,
-  "data": {
-    "header": {
-      "packet_type": "1RTT",
-      "packet_number": 0
-    },
-    "frames": [
-      { "frame_type": "stream", "stream_id": 0, "offset": 0 }
-    ]
-  }
-}
-~~~
-
 The field is outside `data`, so existing QUIC event data definitions do not
 need to be copied or redefined for each event. The table above specifies the
 event-by-event semantics and applicability of the common field.
 {{mp-events}} defines the new events. {{multipath-specific-frames}}
 defines the frame encodings.
+
+## Correlating 1-RTT packet events across paths
+
+Under {{Section 12.3 of RFC9000}}, a sender uses each packet number at
+most once per packet number space in a connection. Connection migration
+preserves the Application Data packet number space. When Multipath QUIC
+is negotiated, each Path ID has its own Application Data packet number
+space ({{Section 1 of RFC10069}}). The same sender can therefore send
+two 1-RTT packets with the same packet number on different paths.
+
+Every event that identifies a specific 1-RTT packet MUST identify its
+path using the event-level `path_id`, including for path 0. To match
+1-RTT events for a given connection and sending direction, a trace consumer
+uses the pair (`path_id`, `packet_number`).
+
+For example, this client sends packet 42 on path 0 and packet 42 on
+path 1. It later declares the packet on path 0 lost.
+
+~~~ json
+[
+  { "time": 10.0, "name": "quic:packet_sent", "path_id": 0,
+    "data": { "header": {
+      "packet_type": "1RTT", "packet_number": 42 } } },
+  { "time": 11.0, "name": "quic:packet_sent", "path_id": 1,
+    "data": { "header": {
+      "packet_type": "1RTT", "packet_number": 42 } } },
+  { "time": 90.0, "name": "quic:packet_lost", "path_id": 0,
+    "data": { "header": {
+      "packet_type": "1RTT", "packet_number": 42 } } }
+]
+~~~
+
+The server receives only the packet on path 1 and records this event.
+
+~~~ json
+{ "time": 25.0, "name": "quic:packet_received", "path_id": 1,
+  "data": { "header": {
+    "packet_type": "1RTT", "packet_number": 42 } } }
+~~~
+
+A sequence diagram links the server's receive event to the client's send
+event for `(1, 42)`. The client's loss event refers to `(0, 42)`.
+
+Initial, Handshake, 0-RTT, and Retry packets use the initial path, so
+events identifying these packets carry `path_id` 0 under the same
+known-path rule. On path 0, Initial and Handshake each have a separate
+packet number space, and 0-RTT shares the Application Data space with
+1-RTT. Retry packets have no packet number ({{Section 12.3 of RFC9000}}).
 
 # Multipath transport parameter {#mp-parameters}
 
