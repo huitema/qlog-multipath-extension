@@ -131,7 +131,7 @@ optional `error_code` and `sequence_number` fields use the qlog
 {{Sections 4.2 and 4.3 of RFC10069}}.
 
 ~~~ cddl
-$ProtocolEventData /= QUICPathCreated / QUICPathAbandoned /
+$ProtocolEventData /= QUICPathCreated / QUICPathAbandoned / QUICPathValidationUpdated /
                       QUICPathStatusUpdated
 ~~~
 
@@ -150,6 +150,23 @@ with `quic:migration_state_updated`.
 ~~~ cddl
 QUICPathCreated = {
     * $$quic-pathcreated-extension
+}
+~~~
+
+## path_validation_updated
+
+`quic:path_validation_updated` records a change in the endpoint's validation state for the indicated Path ID. It complements `path_challenge` and `path_response` frame logging: those frames show wire activity, while this event records whether the local validation procedure started, succeeded, or failed. Log one event for each state transition. The result is local to the logging endpoint and does not assert that the peer has reached the same state.
+
+`trigger`, when present, identifies the observed cause of the transition. `failure_reason` is only present when `state` is `failed`. `error_code` MAY be included when failure is associated with a PATH_ABANDON frame; in that case it is the PATH_ABANDON error code defined by {{Section 4.2 of RFC10069}}.
+
+~~~ cddl
+QUICPathValidationUpdated = {
+    state: "started" / "succeeded" / "failed"
+    ? trigger: "path_challenge_sent" / "path_response_received" /
+              "timeout" / "local_decision"
+    ? failure_reason: "timeout" / "path_abandoned" / "local_error" / "unknown"
+    ? error_code: uint64 .le 4611686018427387903
+    * $$quic-pathvalidationupdated-extension
 }
 ~~~
 
@@ -192,7 +209,7 @@ newer advertisement that repeats the current preference, produces no
 status change event ({{Section 4.3 of RFC10069}}).
 
 ~~~ cddl
-QUICPathStatusUpdated = {
+QUICPathStatusUpdated / QUICPathValidationUpdated = {
     initiator: Initiator
     ? old: QUICPathStatus
     new: QUICPathStatus
@@ -505,7 +522,7 @@ Event schema URI:  `urn:ietf:params:qlog:events:quic#multipath`
 
 Namespace:  `quic`
 
-Event Types:  `path_created`, `path_abandoned`, `path_status_updated`
+Event Types:  `path_created`, `path_validation_updated`, `path_abandoned`, `path_status_updated`
 
 Description:  Event definitions related to the extensions to
 the QUIC transport protocol defined in {{RFC10069}}.
