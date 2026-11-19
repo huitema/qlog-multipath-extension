@@ -123,13 +123,13 @@ Table of Contents
 
    Only implementations of the final, published RFC can use the events
    belonging to the event schema with the URI
-   urn:ietf:params:qlog:events:quic-multipath.  Until such an RFC
+   urn:ietf:params:qlog:events:quic#multipath.  Until such an RFC
    exists, implementations MUST NOT identify themselves using this URI.
 
    Implementations of draft versions of the event schema MUST append the
    string "-" and the corresponding draft number to the URI.  For
    example, draft 00 of this document is identified using the URI
-   urn:ietf:params:qlog:events:quic-multipath-00.
+   urn:ietf:params:qlog:events:quic#multipath-00.
 
 4.  Multipath specific events and event extensions
 
@@ -354,12 +354,8 @@ Table of Contents
    The field is outside data, so existing QUIC event data definitions do
    not need to be copied or redefined for each event.  The table above
    specifies the event-by-event semantics and applicability of the
-   common field.  New event types and frame encodings for RFC 10069
-   remain defined in the sections below.  Only implementations of the
-   published RFC can use the unversioned URN defined in Section 3.
-   Implementations of a draft version MUST append a hyphen and the
-   corresponding draft number to that URN.  For example, draft 00 uses
-   urn:ietf:params:qlog:events:quic#multipath-00.
+   common field.  Section 4 defines the new events.  Section 6 defines
+   the frame encodings.
 
 6.  Multipath specific frames
 

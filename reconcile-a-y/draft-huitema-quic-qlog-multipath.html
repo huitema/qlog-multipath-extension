@@ -1270,12 +1270,12 @@ identifies the extension within the <code>quic</code> namespace, as specified in
 <p id="section-3.1-1">This section is to be removed before publishing as an RFC.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
 <p id="section-3.1-2">Only implementations of the final, published RFC can use the events
    belonging to the event schema with the URI
-   urn:ietf:params:qlog:events:quic-multipath.  Until such an RFC exists,
+   urn:ietf:params:qlog:events:quic#multipath.  Until such an RFC exists,
    implementations <span class="bcp14">MUST NOT</span> identify themselves using this URI.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
 <p id="section-3.1-3">Implementations of draft versions of the event schema <span class="bcp14">MUST</span> append the
    string "-" and the corresponding draft number to the URI.  For
    example, draft 00 of this document is identified using the URI
-   urn:ietf:params:qlog:events:quic-multipath-00.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+   urn:ietf:params:qlog:events:quic#multipath-00.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1554,12 +1554,9 @@ path, and <span class="bcp14">MUST</span> omit it when they are connection-wide 
 </div>
 <p id="section-5-8">The field is outside <code>data</code>, so existing QUIC event data definitions do not
 need to be copied or redefined for each event. The table above specifies the
-event-by-event semantics and applicability of the common field. New event
-types and frame encodings for RFC 10069 remain defined in the sections below.
-Only implementations of the published RFC can use the unversioned URN
-defined in <a href="#event-schema" class="auto internal xref">Section 3</a>. Implementations of a draft version <span class="bcp14">MUST</span>
-append a hyphen and the corresponding draft number to that URN. For
-example, draft 00 uses <code>urn:ietf:params:qlog:events:quic#multipath-00</code>.<a href="#section-5-8" class="pilcrow">¶</a></p>
+event-by-event semantics and applicability of the common field.
+<a href="#mp-events" class="auto internal xref">Section 4</a> defines the new events. <a href="#multipath-specific-frames" class="auto internal xref">Section 6</a>
+defines the frame encodings.<a href="#section-5-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="multipath-specific-frames">
