@@ -1268,14 +1268,13 @@ identifies the extension within the <code>quic</code> namespace, as specified in
 <a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-draft-event-schema-identifi" class="section-name selfRef">Draft Event Schema Identification</a>
         </h3>
 <p id="section-3.1-1">This section is to be removed before publishing as an RFC.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
-<p id="section-3.1-2">Only implementations of the final, published RFC can use the events
-   belonging to the event schema with the URI
-   urn:ietf:params:qlog:events:quic#multipath.  Until such an RFC exists,
-   implementations <span class="bcp14">MUST NOT</span> identify themselves using this URI.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
-<p id="section-3.1-3">Implementations of draft versions of the event schema <span class="bcp14">MUST</span> append the
-   string "-" and the corresponding draft number to the URI.  For
-   example, draft 00 of this document is identified using the URI
-   urn:ietf:params:qlog:events:quic#multipath-00.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+<p id="section-3.1-2">Only implementations of the published RFC can use the unversioned URN
+defined in <a href="#event-schema" class="auto internal xref">Section 3</a>. Until such an RFC exists,
+implementations <span class="bcp14">MUST NOT</span> identify themselves as using this URI.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.1-3">Implementations of draft versions of this document <span class="bcp14">MUST</span>
+append a hyphen and the corresponding draft number to that URN. For
+exampledraft 00 of this document is identified using the URI
+<code>urn:ietf:params:qlog:events:quic#multipath-00</code>.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
