@@ -303,7 +303,7 @@ The server logs one receive event.
 The server's receive event matches the client's send event for `(1, 42)`.
 The client's loss event matches its send event for `(0, 42)`.
 
-Record `path_id` 0 for Initial, Handshake, 0-RTT, and Retry packet events.
+The `path_id` is set to 0 for Initial, Handshake, 0-RTT, and Retry packet events.
 
 # Multipath transport parameter {#mp-parameters}
 
