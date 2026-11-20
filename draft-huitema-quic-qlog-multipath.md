@@ -500,42 +500,46 @@ of connection IDs for path 2.
 
 ## Congestion control and RTT
 
-For congestion control ({{Section 5.3 of RFC10069}}), log each path's
-metrics and any connection-wide values in separate
+For congestion control ({{Section 5.3 of RFC10069}}), each path's
+metrics and any connection-wide values are logged in separate
 `quic:recovery_metrics_updated` events.
 In a per-path event, `packets_in_flight` counts packets across that path's
 packet number spaces. The same scoping rule applies to
 `quic:recovery_parameters_set` and `quic:congestion_state_updated`.
 
 For RTT metrics ({{Section 5.4 of RFC10069}}), `path_id` identifies the
-path whose estimator was updated. Group packet numbers in
-`quic:packets_acked` by acknowledged path and packet number space.
+path whose estimator was updated. The packet numbers in a
+`quic:packets_acked` event belong to one acknowledged path and one
+packet number space.
 
 ## Probe timeout, packet loss, and retransmission
 
 For a probe timeout (PTO, {{Section 5.7 of RFC10069}}),
 `quic:timer_updated` identifies the path whose timer changed. For a
-combined loss detection timer (`timer_type` of `"loss_timeout"`), include
-`path_id` only when the update concerns one known path. Record `pto_count`,
-if logged, in `quic:recovery_metrics_updated`. A `quic:packet_sent` event
-with trigger `"pto_probe"` identifies the path carrying the probe.
+combined loss detection timer (`timer_type` of `"loss_timeout"`), the event
+includes `path_id` only when the update concerns one known path. When
+logged, `pto_count` appears in `quic:recovery_metrics_updated`. A
+`quic:packet_sent` event with trigger `"pto_probe"` identifies the path
+carrying the probe.
 
 For a packet first declared lost when abandoned path state is discarded
 ({{Section 3.4.3 of RFC10069}}), the endpoint SHOULD include
-`path_state_discarded` in `quic:packet_lost` and omit `trigger`. Omit
-`path_state_discarded` for other loss declarations.
+`path_state_discarded` in `quic:packet_lost` and omit `trigger`. The field
+`path_state_discarded` is absent for other loss declarations.
 
 ~~~ cddl
 $$quic-packetlost-extension //= (
+    ; only present if the packet is first declared lost when
+    ; abandoned path state is discarded
     ? path_state_discarded: true
 )
 ~~~
 
-For retransmissions ({{Section 5.6 of RFC10069}}), use a separate
-`quic:marked_for_retransmit` event for each known original sending path.
+For retransmissions ({{Section 5.6 of RFC10069}}), each known original
+sending path has a separate `quic:marked_for_retransmit` event.
 The later `quic:packet_sent` identifies the path carrying the new packet.
-When STREAM frames are logged, match repeated data by stream ID and
-overlapping byte ranges.
+When STREAM frames are logged, readers can match repeated data by stream
+ID and overlapping byte ranges.
 
 ## Example of cross-path recovery
 
