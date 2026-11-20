@@ -5,8 +5,8 @@
 QUIC                                                          C. Huitema
 Internet-Draft                                      Private Octopus Inc.
 Intended status: Informational                                  A. Bisht
-Expires: 23 May 2027                                       Cisco Systems
-                                                        19 November 2026
+Expires: 24 May 2027                                       Cisco Systems
+                                                        20 November 2026
 
 
         QLOG extensions for Multiple Paths for a QUIC Connection
@@ -47,7 +47,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 23 May 2027.
+   This Internet-Draft will expire on 24 May 2027.
 
 Copyright Notice
 
@@ -256,7 +256,7 @@ Table of Contents
    current preference, produces no status change event (Section 4.3 of
    [RFC10069]).
 
-   QUICPathStatusUpdated / QUICPathValidationUpdated = {
+   QUICPathStatusUpdated = {
        initiator: Initiator
        ? old: QUICPathStatus
        new: QUICPathStatus
