@@ -209,7 +209,7 @@ newer advertisement that repeats the current preference, produces no
 status change event ({{Section 4.3 of RFC10069}}).
 
 ~~~ cddl
-QUICPathStatusUpdated / QUICPathValidationUpdated = {
+QUICPathStatusUpdated = {
     initiator: Initiator
     ? old: QUICPathStatus
     new: QUICPathStatus
