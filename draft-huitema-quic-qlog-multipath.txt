@@ -13,7 +13,7 @@ Expires: 24 May 2027                                        Alibaba Inc.
                                                         20 November 2026
 
 
-        QLOG extensions for Multiple Paths for a QUIC Connection
+               QLOG extensions for Multiple Paths in QUIC
                 draft-huitema-quic-qlog-multipath-latest
 
 Abstract
