@@ -250,6 +250,7 @@ when the stated path context is known:
 | --- | --- |
 | `packet_sent`, `packet_received` | Path carrying the packet. |
 | `packet_lost` | Path carrying the lost packet. |
+| `marked_for_retransmit` | Original sending path of the data marked for retransmission ({{path-recovery}}). |
 | `packet_dropped`, `packet_buffered` | Path associated with the packet, if it can be identified at that point. |
 | `packets_acked` | Path of the acknowledged packets, not the path carrying the ACK or PATH_ACK frame. Implementations MUST split events when acknowledged packets belong to different paths. |
 | `recovery_metrics_updated`, `recovery_parameters_set` | Path whose recovery or congestion-control values are reported. |
@@ -497,55 +498,32 @@ of connection IDs for path 2.
 
 # Per-path congestion control and recovery {#path-recovery}
 
-Each path has its own Application Data packet number space and congestion
-control state ({{Sections 1 and 5.3 of RFC10069}}). The following events
-reuse the names and data fields in {{I-D.ietf-quic-qlog-quic-events}}.
-For an event attributable to one known path, include its unsigned 32-bit
-`path_id` alongside `time`, `name`, and `data`. Path 0 is identified
-explicitly. Omit `path_id` for connection-wide events or when the path
-is unknown.
-
 ## Congestion control and RTT
 
-In `quic:recovery_metrics_updated`, `path_id` identifies the path whose
-metrics changed. For example, an update can group `congestion_window`,
-`bytes_in_flight`, `ssthresh`, and `pacing_rate` for one path. In a
-path-scoped update, `packets_in_flight` counts packets across the packet
-number spaces of that path. Emit separate updates for different paths
-and for any connection-wide values, including shared controller state.
-The same scope applies to `quic:recovery_parameters_set` and
-`quic:congestion_state_updated`.
+For congestion control ({{Section 5.3 of RFC10069}}), log each path's
+metrics and any connection-wide values in separate
+`quic:recovery_metrics_updated` events.
+In a per-path event, `packets_in_flight` counts packets across that path's
+packet number spaces. The same scoping rule applies to
+`quic:recovery_parameters_set` and `quic:congestion_state_updated`.
 
-When a PATH_ACK updates `latest_rtt`, `smoothed_rtt`, or another RTT
-metric, `path_id` identifies the path whose estimator was updated.
-The sample can include the return delay on another path
-({{Section 5.4 of RFC10069}}). For example, if a PATH_ACK
-arrives on path 0 for packets sent on path 1, `quic:packet_received`
-reports path 0. The PATH_ACK frame and `quic:packets_acked` identify
-path 1. Group acknowledged packet numbers by path and packet number space.
+For RTT metrics ({{Section 5.4 of RFC10069}}), `path_id` identifies the
+path whose estimator was updated. Group packet numbers in
+`quic:packets_acked` by acknowledged path and packet number space.
 
 ## Probe timeout, packet loss, and retransmission
 
-For a per-path probe timeout (PTO), `quic:timer_updated` identifies the
-path whose timer was set, expired, or was cancelled. A PTO expiration
-uses `timer_type` of `"pto"` and `event_type` of `"expired"`. An
-implementation that logs a combined loss detection timer can use
-`"loss_timeout"` and include `path_id` when the update concerns one
-known path.
-The current `pto_count` can be recorded in `quic:recovery_metrics_updated`.
-A probe transmission uses `quic:packet_sent` with trigger `"pto_probe"`
-on the path carrying the probe. PTO expiration alone does not establish
-packet loss ({{Section 5.7 of RFC10069}}).
+For a probe timeout (PTO, {{Section 5.7 of RFC10069}}),
+`quic:timer_updated` identifies the path whose timer changed. For a
+combined loss detection timer (`timer_type` of `"loss_timeout"`), include
+`path_id` only when the update concerns one known path. Record `pto_count`,
+if logged, in `quic:recovery_metrics_updated`. A `quic:packet_sent` event
+with trigger `"pto_probe"` identifies the path carrying the probe.
 
-In `quic:packet_lost`, `path_id` identifies the original sending path.
-Together with the sending endpoint, packet number space, and packet
-number, it identifies the packet declared lost. The base `trigger` values
-`"reordering_threshold"` and `"time_threshold"` apply per path.
-An endpoint that discards the state of an abandoned path also declares
-its outstanding packets lost ({{Section 3.4.3 of RFC10069}}).
-For packets first declared lost for this reason, the endpoint SHOULD
-include `path_state_discarded` in the event data and omit `trigger`.
-The field is absent for other loss declarations.
+For a packet first declared lost when abandoned path state is discarded
+({{Section 3.4.3 of RFC10069}}), the endpoint SHOULD include
+`path_state_discarded` in `quic:packet_lost` and omit `trigger`. Omit
+`path_state_discarded` for other loss declarations.
 
 ~~~ cddl
 $$quic-packetlost-extension //= (
@@ -553,21 +531,17 @@ $$quic-packetlost-extension //= (
 )
 ~~~
 
-In `quic:marked_for_retransmit`, `path_id` identifies the original
-sending path of the data marked after loss detection. Group data from
-different known source paths in separate events. The later
-`quic:packet_sent` identifies the path selected for the new packet.
-STREAM data can be split or combined when sent again. When frame details
-are logged, the stream ID and overlapping byte ranges identify repeated
-data across paths ({{Section 5.6 of RFC10069}}).
+For retransmissions ({{Section 5.6 of RFC10069}}), use a separate
+`quic:marked_for_retransmit` event for each known original sending path.
+The later `quic:packet_sent` identifies the path carrying the new packet.
+When STREAM frames are logged, match repeated data by stream ID and
+overlapping byte ranges.
 
 ## Example of cross-path recovery
 
-In this sender trace excerpt, a PTO on path 1 prompts a probe. A PATH_ACK
-arriving on path 0 acknowledges the probe on path 1. The sender then
-declares packet 42 on path 1 lost by the packet threshold and resends its
-stream bytes on path 0. The new packet also has number 42 in its own
-packet number space.
+The PATH_ACK arrives on path 0 and acknowledges the probe on path 1.
+Packet 42 on path 0 carries the same stream bytes as the lost packet 42
+on path 1.
 
 ~~~ json
 [
@@ -630,7 +604,8 @@ the QUIC transport protocol defined in {{RFC10069}}.
 Reference:  {{mp-events}} of this document.
 
 This document modifies the following QUIC events: `packet_sent`, `packet_received`, `packet_dropped`,
-`packet_buffered`, `packets_acked`, `packet_lost`, `recovery_metrics_updated`,
+`packet_buffered`, `packets_acked`, `packet_lost`, `marked_for_retransmit`,
+`recovery_metrics_updated`,
 `recovery_parameters_set`, `congestion_state_updated`, `ecn_state_updated`,
 `timer_updated`, `mtu_updated`, `spin_bit_updated`, `connection_id_updated`,
 `tuple_assigned`, `migration_state_updated`, `frames_parsed`, and
