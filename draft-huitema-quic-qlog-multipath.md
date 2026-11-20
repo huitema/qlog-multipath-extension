@@ -34,6 +34,10 @@ author:
     fullname: Altanai Bisht
     organization: Cisco Systems
     email: albisht@cisco.com
+ -
+    fullname: Noriyuki Kurosu
+    organization: Individual
+    email: 3p0rta26@gmail.com
 
 
 normative:
