@@ -267,30 +267,47 @@ the event-level `path_id` does not replace it. For other QUIC events,
 implementations MUST include `path_id` when they describe a single known
 path, and MUST omit it when they are connection-wide or the path is unknown.
 
-An example packet event is:
-
-~~~ json
-{
-  "time": 123.4,
-  "name": "quic:packet_sent",
-  "path_id": 1,
-  "data": {
-    "header": {
-      "packet_type": "1RTT",
-      "packet_number": 0
-    },
-    "frames": [
-      { "frame_type": "stream", "stream_id": 0, "offset": 0 }
-    ]
-  }
-}
-~~~
-
 The field is outside `data`, so existing QUIC event data definitions do not
 need to be copied or redefined for each event. The table above specifies the
 event-by-event semantics and applicability of the common field.
 {{mp-events}} defines the new events. {{multipath-specific-frames}}
 defines the frame encodings.
+
+## Correlating 1-RTT packet events across paths
+
+Every event that identifies a specific 1-RTT packet MUST carry its
+event-level `path_id`, even on path 0. For the packet number spaces
+in {{Section 1 of RFC10069}}, match 1-RTT events by
+(`path_id`, `packet_number`) within one connection and sending direction.
+
+The client logs two sends and one loss.
+
+~~~ json
+[
+  { "time": 10.0, "name": "quic:packet_sent", "path_id": 0,
+    "data": { "header": {
+      "packet_type": "1RTT", "packet_number": 42 } } },
+  { "time": 11.0, "name": "quic:packet_sent", "path_id": 1,
+    "data": { "header": {
+      "packet_type": "1RTT", "packet_number": 42 } } },
+  { "time": 90.0, "name": "quic:packet_lost", "path_id": 0,
+    "data": { "header": {
+      "packet_type": "1RTT", "packet_number": 42 } } }
+]
+~~~
+
+The server logs one receive event.
+
+~~~ json
+{ "time": 25.0, "name": "quic:packet_received", "path_id": 1,
+  "data": { "header": {
+    "packet_type": "1RTT", "packet_number": 42 } } }
+~~~
+
+The server's receive event matches the client's send event for `(1, 42)`.
+The client's loss event matches its send event for `(0, 42)`.
+
+The `path_id` is set to 0 for Initial, Handshake, 0-RTT, and Retry packet events.
 
 # Multipath transport parameter {#mp-parameters}
 
