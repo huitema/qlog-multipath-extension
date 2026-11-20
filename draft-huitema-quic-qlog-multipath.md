@@ -294,11 +294,13 @@ defines the frame encodings.
 
 # Multipath transport parameter {#mp-parameters}
 
-The `initial_max_path_id` transport parameter (0x3e) is logged in
-`quic:parameters_set`. The `initiator` field of that event identifies
-the endpoint that advertised the value. The multipath extension is
-enabled only if both endpoints advertise the parameter
-({{Section 2 of RFC10069}}).
+The `initial_max_path_id` transport parameter (0x3e) gives the highest
+Path ID the advertising endpoint is initially willing to maintain, from
+0 through 4294967295 inclusive ({{Section 2.1 of RFC10069}}).
+Log each endpoint's advertisement in a separate `quic:parameters_set`
+event. The `initiator` is `local` for the logging endpoint's own
+advertisement and `remote` for its peer's advertisement
+({{Section 5.3 of I-D.ietf-quic-qlog-quic-events}}).
 
 ~~~ cddl
 $$quic-parametersset-extension //= (
@@ -306,21 +308,52 @@ $$quic-parametersset-extension //= (
 )
 ~~~
 
-A value of 0 enables the extension without allowing extra paths
-immediately. It is distinct from an absent field, which means that the
-endpoint did not advertise the parameter.
+Multipath is negotiated when both endpoints advertise the parameter
+in a successful handshake ({{Section 2 of RFC10069}}). Record an
+advertised value of 0 explicitly. It signals support while limiting
+the endpoint to the initial path until the limit is raised.
 
-## Example
+If either endpoint omits the parameter on the wire, multipath is not
+negotiated. If a `quic:parameters_set` event omits the field, any
+value previously logged for that `initiator` still applies. If no
+value was logged and the logger captured only some of the handshake
+parameters, the endpoint's advertisement remains unknown.
 
-In this excerpt from a client's event list, the client advertises a
-maximum Path ID of 3 and the server advertises 1.
+Diagnostic logs can retain the advertised value. {{Section 2.1 of RFC10069}}
+prohibits reusing it on a subsequent connection. Omit it from
+`quic:parameters_restored` during 0-RTT resumption and record the new
+handshake's advertisements in `quic:parameters_set`.
+
+## Examples
+
+In this client trace, both endpoints advertise support. The client
+advertises a maximum Path ID of 3 and the server advertises 0. When the
+handshake completes, multipath is enabled with only path 0 initially
+usable.
 
 ~~~ json
 [
   { "time": 0.0, "name": "quic:parameters_set",
     "data": { "initiator": "local", "initial_max_path_id": 3 } },
   { "time": 31.2, "name": "quic:parameters_set",
-    "data": { "initiator": "remote", "initial_max_path_id": 1 } }
+    "data": { "initiator": "remote", "initial_max_path_id": 0 } }
+]
+~~~
+
+In a different connection, only the client advertises the parameter.
+The client's handshake decoder confirms its absence from the server's
+transport parameters in a diagnostic event. Multipath is not negotiated.
+Without that confirmation, the two parameter events alone would leave
+the outcome unknown.
+
+~~~ json
+[
+  { "time": 0.0, "name": "quic:parameters_set",
+    "data": { "initiator": "local", "initial_max_path_id": 3 } },
+  { "time": 24.0, "name": "quic:parameters_set",
+    "data": { "initiator": "remote", "max_idle_timeout": 30000 } },
+  { "time": 24.0, "name": "loglevel:info",
+    "data": { "message": "Server omitted initial_max_path_id." } }
 ]
 ~~~
 
