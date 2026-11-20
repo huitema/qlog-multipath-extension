@@ -271,20 +271,12 @@ defines the frame encodings.
 
 ## Correlating 1-RTT packet events across paths
 
-Under {{Section 12.3 of RFC9000}}, a sender uses each packet number at
-most once per packet number space in a connection. Connection migration
-preserves the Application Data packet number space. When Multipath QUIC
-is negotiated, each Path ID has its own Application Data packet number
-space ({{Section 1 of RFC10069}}). The same sender can therefore send
-two 1-RTT packets with the same packet number on different paths.
+Every event that identifies a specific 1-RTT packet MUST carry its
+event-level `path_id`, even on path 0. For the packet number spaces
+in {{Section 1 of RFC10069}}, match 1-RTT events by
+(`path_id`, `packet_number`) within one connection and sending direction.
 
-Every event that identifies a specific 1-RTT packet MUST identify its
-path using the event-level `path_id`, including for path 0. To match
-1-RTT events for a given connection and sending direction, a trace consumer
-uses the pair (`path_id`, `packet_number`).
-
-For example, this client sends packet 42 on path 0 and packet 42 on
-path 1. It later declares the packet on path 0 lost.
+The client logs two sends and one loss.
 
 ~~~ json
 [
@@ -300,7 +292,7 @@ path 1. It later declares the packet on path 0 lost.
 ]
 ~~~
 
-The server receives only the packet on path 1 and records this event.
+The server logs one receive event.
 
 ~~~ json
 { "time": 25.0, "name": "quic:packet_received", "path_id": 1,
@@ -308,14 +300,11 @@ The server receives only the packet on path 1 and records this event.
     "packet_type": "1RTT", "packet_number": 42 } } }
 ~~~
 
-A sequence diagram links the server's receive event to the client's send
-event for `(1, 42)`. The client's loss event refers to `(0, 42)`.
+The server's receive event matches the client's send event for `(1, 42)`.
+The client's loss event matches its send event for `(0, 42)`.
 
-Initial, Handshake, 0-RTT, and Retry packets use the initial path, so
-events identifying these packets carry `path_id` 0 under the same
-known-path rule. On path 0, Initial and Handshake each have a separate
-packet number space, and 0-RTT shares the Application Data space with
-1-RTT. Retry packets have no packet number ({{Section 12.3 of RFC9000}}).
+Record `path_id` 0 for Initial, Handshake, 0-RTT, and Retry packet events.
+For Retry, omit `packet_number` ({{Section 12.3 of RFC9000}}).
 
 # Multipath transport parameter {#mp-parameters}
 
