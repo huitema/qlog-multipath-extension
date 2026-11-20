@@ -1,5 +1,5 @@
 ---
-title: "QLOG extensions for Multiple Paths for a QUIC Connection"
+title: "QLOG extensions for Multiple Paths in QUIC"
 abbrev: "qlog-multipath"
 category: info
 
