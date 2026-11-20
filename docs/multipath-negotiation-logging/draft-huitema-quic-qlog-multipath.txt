@@ -78,6 +78,7 @@ Table of Contents
      4.4.  Example
    5.  Add a Path identifier to existing QUIC events
    6.  Multipath transport parameter
+     6.1.  Example
    7.  Multipath specific frames
      7.1.  PATH_ACK
      7.2.  PATH_ABANDON
@@ -369,6 +370,18 @@ Table of Contents
    $$quic-parametersset-extension //= (
        ? initial_max_path_id: uint32
    )
+
+6.1.  Example
+
+   In this excerpt from a client's event list, the client advertises a
+   maximum Path ID of 3 and the server advertises 1.
+
+   [
+     { "time": 0.0, "name": "quic:parameters_set",
+       "data": { "initiator": "local", "initial_max_path_id": 3 } },
+     { "time": 31.2, "name": "quic:parameters_set",
+       "data": { "initiator": "remote", "initial_max_path_id": 1 } }
+   ]
 
 7.  Multipath specific frames
 

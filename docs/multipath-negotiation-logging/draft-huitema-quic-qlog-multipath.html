@@ -1191,6 +1191,11 @@ the definition of QLOG events for QUIC connections.<a href="#section-abstract-1"
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
             <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-multipath-transport-paramet" class="internal xref">Multipath transport parameter</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-example-2" class="internal xref">Example</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
             <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-multipath-specific-frames" class="internal xref">Multipath specific frames</a></p>
@@ -1211,7 +1216,7 @@ the definition of QLOG events for QUIC connections.<a href="#section-abstract-1"
                 <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="auto internal xref">7.5</a>.  <a href="#name-max_path_id-paths_blocked-a" class="internal xref">MAX_PATH_ID, PATHS_BLOCKED, and PATH_CIDS_BLOCKED</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.6">
-                <p id="section-toc.1-1.7.2.6.1"><a href="#section-7.6" class="auto internal xref">7.6</a>.  <a href="#name-example-2" class="internal xref">Example</a></p>
+                <p id="section-toc.1-1.7.2.6.1"><a href="#section-7.6" class="auto internal xref">7.6</a>.  <a href="#name-example-3" class="internal xref">Example</a></p>
 </li>
             </ul>
 </li>
@@ -1582,6 +1587,25 @@ $$quic-parametersset-extension //= (
 )
 </pre><a href="#section-6-2" class="pilcrow">¶</a>
 </div>
+<div id="example-1">
+<section id="section-6.1">
+        <h3 id="name-example-2">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-example-2" class="section-name selfRef">Example</a>
+        </h3>
+<p id="section-6.1-1">In this excerpt from a client's event list, the client advertises a
+maximum Path ID of 3 and the server advertises 1.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-6.1-2">
+<pre>
+[
+  { "time": 0.0, "name": "quic:parameters_set",
+    "data": { "initiator": "local", "initial_max_path_id": 3 } },
+  { "time": 31.2, "name": "quic:parameters_set",
+    "data": { "initiator": "remote", "initial_max_path_id": 1 } }
+]
+</pre><a href="#section-6.1-2" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
 </section>
 </div>
 <div id="multipath-specific-frames">
@@ -1757,10 +1781,10 @@ PathCIDsBlockedFrame = {
 </div>
 </section>
 </div>
-<div id="example-1">
+<div id="example-2">
 <section id="section-7.6">
-        <h3 id="name-example-2">
-<a href="#section-7.6" class="section-number selfRef">7.6. </a><a href="#name-example-2" class="section-name selfRef">Example</a>
+        <h3 id="name-example-3">
+<a href="#section-7.6" class="section-number selfRef">7.6. </a><a href="#name-example-3" class="section-name selfRef">Example</a>
         </h3>
 <p id="section-7.6-1">In this packet sent on path 0, the PATH_ACK acknowledges packets on
 path 1 and the PATH_CIDS_BLOCKED reports that the sender has run out
