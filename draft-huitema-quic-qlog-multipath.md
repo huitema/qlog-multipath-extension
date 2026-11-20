@@ -305,6 +305,20 @@ $$quic-parametersset-extension //= (
 )
 ~~~
 
+## Example
+
+In this excerpt from a client's event list, the client advertises a
+maximum Path ID of 3 and the server advertises 1.
+
+~~~ json
+[
+  { "time": 0.0, "name": "quic:parameters_set",
+    "data": { "initiator": "local", "initial_max_path_id": 3 } },
+  { "time": 31.2, "name": "quic:parameters_set",
+    "data": { "initiator": "remote", "initial_max_path_id": 1 } }
+]
+~~~
+
 # Multipath specific frames
 
 The following CDDL extends the `$QuicFrame` type socket defined in
