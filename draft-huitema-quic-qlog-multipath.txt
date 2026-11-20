@@ -8,6 +8,8 @@ Intended status: Informational                                    Y. Liu
 Expires: 24 May 2027                                        Alibaba Inc.
                                                                 A. Bisht
                                                            Cisco Systems
+                                                               N. Kurosu
+                                                              Individual
                                                         20 November 2026
 
 
@@ -651,3 +653,8 @@ Authors' Addresses
    Altanai Bisht
    Cisco Systems
    Email: albisht@cisco.com
+
+
+   Noriyuki Kurosu
+   Individual
+   Email: 3p0rta26@gmail.com
