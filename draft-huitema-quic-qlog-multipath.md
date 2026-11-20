@@ -250,6 +250,7 @@ when the stated path context is known:
 | --- | --- |
 | `packet_sent`, `packet_received` | Path carrying the packet. |
 | `packet_lost` | Path carrying the lost packet. |
+| `marked_for_retransmit` | Original sending path of the data marked for retransmission ({{path-recovery}}). |
 | `packet_dropped`, `packet_buffered` | Path associated with the packet, if it can be identified at that point. |
 | `packets_acked` | Path of the acknowledged packets, not the path carrying the ACK or PATH_ACK frame. Implementations MUST split events when acknowledged packets belong to different paths. |
 | `recovery_metrics_updated`, `recovery_parameters_set` | Path whose recovery or congestion-control values are reported. |
@@ -512,6 +513,97 @@ of connection IDs for path 2.
 }
 ~~~
 
+# Per-path congestion control and recovery {#path-recovery}
+
+## Congestion control and RTT
+
+For congestion control ({{Section 5.3 of RFC10069}}), each path's
+metrics and any connection-wide values are logged in separate
+`quic:recovery_metrics_updated` events.
+In a per-path event, `packets_in_flight` counts packets across that path's
+packet number spaces. The same scoping rule applies to
+`quic:recovery_parameters_set` and `quic:congestion_state_updated`.
+
+For RTT metrics ({{Section 5.4 of RFC10069}}), `path_id` identifies the
+path whose estimator was updated. The packet numbers in a
+`quic:packets_acked` event belong to one acknowledged path and one
+packet number space.
+
+## Probe timeout, packet loss, and retransmission
+
+For a probe timeout (PTO, {{Section 5.7 of RFC10069}}),
+`quic:timer_updated` identifies the path whose timer changed. For a
+combined loss detection timer (`timer_type` of `"loss_timeout"`), the event
+includes `path_id` only when the update concerns one known path. When
+logged, `pto_count` appears in `quic:recovery_metrics_updated`. A
+`quic:packet_sent` event with trigger `"pto_probe"` identifies the path
+carrying the probe.
+
+For a packet first declared lost when abandoned path state is discarded
+({{Section 3.4.3 of RFC10069}}), the endpoint SHOULD include
+`path_state_discarded` in `quic:packet_lost` and omit `trigger`. The field
+`path_state_discarded` is absent for other loss declarations.
+
+~~~ cddl
+$$quic-packetlost-extension //= (
+    ; only present if the packet is first declared lost when
+    ; abandoned path state is discarded
+    ? path_state_discarded: true
+)
+~~~
+
+For retransmissions ({{Section 5.6 of RFC10069}}), a separate `quic:marked_for_retransmit`
+event will be logged for each sending path on which packets are marked
+for retransmission after being sent on that path.
+The retransmitted content, if any, will be sent in new packets, possibly on different paths.
+When STREAM frames are logged, readers can match repeated data by stream
+ID and overlapping byte ranges.
+
+## Example of cross-path recovery
+
+The PATH_ACK arrives on path 0 and acknowledges the probe on path 1.
+Packet 42 on path 0 carries the same stream bytes as the lost packet 42
+on path 1.
+
+~~~ json
+[
+  { "time": 0, "name": "quic:packet_sent", "path_id": 1,
+    "data": {
+      "header": { "packet_type": "1RTT", "packet_number": 42 },
+      "frames": [{ "frame_type": "stream", "stream_id": 0,
+                   "offset": 800, "raw": { "length": 800 } }] } },
+  { "time": 160, "name": "quic:timer_updated", "path_id": 1,
+    "data": { "timer_type": "pto", "event_type": "expired",
+              "packet_number_space": "application_data" } },
+  { "time": 160, "name": "quic:packet_sent", "path_id": 1,
+    "data": {
+      "header": { "packet_type": "1RTT", "packet_number": 45 },
+      "trigger": "pto_probe",
+      "frames": [{ "frame_type": "ping" }] } },
+  { "time": 186, "name": "quic:packet_received", "path_id": 0,
+    "data": {
+      "header": { "packet_type": "1RTT", "packet_number": 9 },
+      "frames": [{ "frame_type": "path_ack", "path_id": 1,
+                   "acked_ranges": [[45]] }] } },
+  { "time": 186, "name": "quic:packet_lost", "path_id": 1,
+    "data": {
+      "header": { "packet_type": "1RTT", "packet_number": 42 },
+      "trigger": "reordering_threshold" } },
+  { "time": 186, "name": "quic:recovery_metrics_updated",
+    "path_id": 1,
+    "data": { "congestion_window": 6000, "pto_count": 0 } },
+  { "time": 186, "name": "quic:marked_for_retransmit", "path_id": 1,
+    "data": { "frames": [{ "frame_type": "stream", "stream_id": 0,
+                 "offset": 800, "raw": { "length": 800 } }] } },
+  { "time": 187, "name": "quic:packet_sent", "path_id": 0,
+    "data": {
+      "header": { "packet_type": "1RTT", "packet_number": 42 },
+      "trigger": "retransmit_reordered",
+      "frames": [{ "frame_type": "stream", "stream_id": 0,
+                   "offset": 800, "raw": { "length": 800 } }] } }
+]
+~~~
+
 # Security Considerations {#security}
 
 TODO Security
@@ -534,7 +626,8 @@ the QUIC transport protocol defined in {{RFC10069}}.
 Reference:  {{mp-events}} of this document.
 
 This document modifies the following QUIC events: `packet_sent`, `packet_received`, `packet_dropped`,
-`packet_buffered`, `packets_acked`, `packet_lost`, `recovery_metrics_updated`,
+`packet_buffered`, `packets_acked`, `packet_lost`, `marked_for_retransmit`,
+`recovery_metrics_updated`,
 `recovery_parameters_set`, `congestion_state_updated`, `ecn_state_updated`,
 `timer_updated`, `mtu_updated`, `spin_bit_updated`, `connection_id_updated`,
 `tuple_assigned`, `migration_state_updated`, `frames_parsed`, and
