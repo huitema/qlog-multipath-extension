@@ -1188,6 +1188,11 @@ the definition of QLOG events for QUIC connections.<a href="#section-abstract-1"
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
             <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-add-a-path-identifier-to-ex" class="internal xref">Add a Path identifier to existing QUIC events</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-correlating-1-rtt-packet-ev" class="internal xref">Correlating 1-RTT packet events across paths</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
             <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-multipath-transport-paramet" class="internal xref">Multipath transport parameter</a></p>
@@ -1545,30 +1550,49 @@ Path ID, the frame's <code>data</code> representation <span class="bcp14">MUST</
 the event-level <code>path_id</code> does not replace it. For other QUIC events,
 implementations <span class="bcp14">MUST</span> include <code>path_id</code> when they describe a single known
 path, and <span class="bcp14">MUST</span> omit it when they are connection-wide or the path is unknown.<a href="#section-5-5" class="pilcrow">¶</a></p>
-<p id="section-5-6">An example packet event is:<a href="#section-5-6" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="section-5-7">
-<pre>
-{
-  "time": 123.4,
-  "name": "quic:packet_sent",
-  "path_id": 1,
-  "data": {
-    "header": {
-      "packet_type": "1RTT",
-      "packet_number": 0
-    },
-    "frames": [
-      { "frame_type": "stream", "stream_id": 0, "offset": 0 }
-    ]
-  }
-}
-</pre><a href="#section-5-7" class="pilcrow">¶</a>
-</div>
-<p id="section-5-8">The field is outside <code>data</code>, so existing QUIC event data definitions do not
+<p id="section-5-6">The field is outside <code>data</code>, so existing QUIC event data definitions do not
 need to be copied or redefined for each event. The table above specifies the
 event-by-event semantics and applicability of the common field.
 <a href="#mp-events" class="auto internal xref">Section 4</a> defines the new events. <a href="#multipath-specific-frames" class="auto internal xref">Section 7</a>
-defines the frame encodings.<a href="#section-5-8" class="pilcrow">¶</a></p>
+defines the frame encodings.<a href="#section-5-6" class="pilcrow">¶</a></p>
+<div id="correlating-1-rtt-packet-events-across-paths">
+<section id="section-5.1">
+        <h3 id="name-correlating-1-rtt-packet-ev">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-correlating-1-rtt-packet-ev" class="section-name selfRef">Correlating 1-RTT packet events across paths</a>
+        </h3>
+<p id="section-5.1-1">Every event that identifies a specific 1-RTT packet <span class="bcp14">MUST</span> carry its
+event-level <code>path_id</code>, even on path 0. For the packet number spaces
+in <span><a href="https://rfc-editor.org/rfc/rfc10069#section-1" class="relref">Section 1</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>, match 1-RTT events by
+(<code>path_id</code>, <code>packet_number</code>) within one connection and sending direction.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1-2">The client logs two sends and one loss.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-5.1-3">
+<pre>
+[
+  { "time": 10.0, "name": "quic:packet_sent", "path_id": 0,
+    "data": { "header": {
+      "packet_type": "1RTT", "packet_number": 42 } } },
+  { "time": 11.0, "name": "quic:packet_sent", "path_id": 1,
+    "data": { "header": {
+      "packet_type": "1RTT", "packet_number": 42 } } },
+  { "time": 90.0, "name": "quic:packet_lost", "path_id": 0,
+    "data": { "header": {
+      "packet_type": "1RTT", "packet_number": 42 } } }
+]
+</pre><a href="#section-5.1-3" class="pilcrow">¶</a>
+</div>
+<p id="section-5.1-4">The server logs one receive event.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-5.1-5">
+<pre>
+{ "time": 25.0, "name": "quic:packet_received", "path_id": 1,
+  "data": { "header": {
+    "packet_type": "1RTT", "packet_number": 42 } } }
+</pre><a href="#section-5.1-5" class="pilcrow">¶</a>
+</div>
+<p id="section-5.1-6">The server's receive event matches the client's send event for <code>(1, 42)</code>.
+The client's loss event matches its send event for <code>(0, 42)</code>.<a href="#section-5.1-6" class="pilcrow">¶</a></p>
+<p id="section-5.1-7">The <code>path_id</code> is set to 0 for Initial, Handshake, 0-RTT, and Retry packet events.<a href="#section-5.1-7" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="mp-parameters">
