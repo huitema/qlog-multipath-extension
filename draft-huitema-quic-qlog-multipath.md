@@ -538,7 +538,7 @@ $$quic-packetlost-extension //= (
 For retransmissions ({{Section 5.6 of RFC10069}}), a separate `quic:marked_for_retransmit`
 event will be logged for each sending path on which packets are marked 
 for retransmission after being sent on that path.
-The later `quic:packet_sent` identifies the path carrying the new packet.
+The retransmitted content, if any, will be sent in new packets, possibly on different paths.
 When STREAM frames are logged, readers can match repeated data by stream
 ID and overlapping byte ranges.
 
