@@ -1884,8 +1884,9 @@ $$quic-packetlost-extension //= (
 </pre><a href="#section-8.2-3" class="pilcrow">¶</a>
 </div>
 <p id="section-8.2-4">For retransmissions (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-5.6" class="relref">Section 5.6</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>), a separate <code>quic:marked_for_retransmit</code>
-sending path has a separate <code>quic:marked_for_retransmit</code> event.
-The later <code>quic:packet_sent</code> identifies the path carrying the new packet.
+event will be logged for each sending path on which packets are marked
+for retransmission after being sent on that path.
+The retransmitted content, if any, will be sent in new packets, possibly on different paths.
 When STREAM frames are logged, readers can match repeated data by stream
 ID and overlapping byte ranges.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
 </section>
