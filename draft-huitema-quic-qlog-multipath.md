@@ -44,19 +44,35 @@ normative:
 
    RFC9000:
    RFC10069:
-   I-D.ietf-quic-qlog-quic-events:
    I-D.ietf-quic-qlog-main-schema:
+   I-D.ietf-quic-qlog-quic-events:
 
 
 informative:
+  DebuggingQuic:
+    title: "Debugging QUIC and HTTP/3 with qlog and qvis"
+    date: "2020"
+    seriesinfo: "NRW '20: Proceedings of the 2020 Applied Networking Research Workshop"
+    author:
+    -
+      ins: R. Marx
+    -
+      ins: M. Piraux
+    -
+      ins: P. Quax
+    -
+      ins: W. Lamotte
 
 ...
 
 --- abstract
 
-This draft define the QLOG elements that have to be added to
-the definition of QLOG events for QUIC connections.
-
+The QLOG specifications defines structured logs for QUIC connections,
+and has proven very useful to debug QUIC implementations and deployments.
+This draft extends the QLOG specification for QUIC events. It add a
+Path ID element to event headers, defines new events to log the
+creation and management of multipla paths, and specifies the logging format
+of new frames introduced in RFC 10069.
 
 --- middle
 
@@ -68,8 +84,31 @@ found in QUIC connections per {{RFC9000}}. The extensions to {{RFC9000}} for
 managing multiple paths for a QUIC connections are defined in {{RFC10069}},
 which introduces new concepts such as path, new events such as creating or
 abandoning paths, and new frames for managing traffic when using multiple
-paths. This draft defines the corresponding QLOG extensions.
+paths.
 
+This draft defines an extension to the QUIC events specification in
+{{I-D.ietf-quic-qlog-quic-events}} to enable logging of QUIC connections that manage
+multiple paths according to {{RFC10069}}.
+
+Debugging tools like qvis have proven very useful when debugging QUIC implementations
+{{DebuggingQuic}}. This document provides a standard way to add specific information
+in QLOG traces so updated tools can properly represent QUIC connections that use
+multiple paths according to {{RFC10069}}. For example, a key function of these
+tools is to correlate packets departures and the arrival of the corresponding
+acknowledgement. For plain QUIC connections, this can be done by examining
+packet numbers. With multipath, there is a packet number space per path, and
+correlation requires examining both packet numbers and the ID of the path on which the
+packet was sent. The required logging information is defined in this document.
+
+
+
+
+This document defines how a `path_id` can be added to event headers in {{path-id-def}},
+adds events describing the management of paths in {{mp-events}},
+explains the effects of adding a `path_id` to events defined in
+{{I-D.ietf-quic-qlog-quic-events}} in {{add-path-id}},
+specifies the logging of multipath specific frames in {{multipath-frames}},
+and that of the multipath transport parameter in {{mp-parameters}}.
 # Conventions and Definitions
 
 {::boilerplate bcp14-tagged}
@@ -97,14 +136,11 @@ append a hyphen and the corresponding draft number to that URN. For
 exampledraft 00 of this document is identified using the URI
 `urn:ietf:params:qlog:events:quic#multipath-00`.
 
-# Multipath specific events and event extensions {#mp-events}
+# Adding a path identifier to event headers {#path-id-def}
 
-The three events in this section have Base importance. They record
-changes to the paths of a connection as seen by the endpoint. Packet
-events record the frames that carry path management signals. A single
-change can involve several frames, and a local decision can precede the
-first frame that signals it.
-
+Managing multiple path per connection requires identifying these paths.
+Per {{RFC10069}}, this is done using a path ID. This path ID
+will be added to all relevant events.
 Each of these events MUST include the following field in its top-level
 `Event` map alongside `time`, `name`, and `data`
 ({{Section 7 of I-D.ietf-quic-qlog-main-schema}}).
@@ -122,16 +158,26 @@ the QUIC connection, is shared by both directions, starts at 0 for the
 initial path, increases monotonically, and is not reused. The range is
 0..2^32-1, inclusive. The field is unsigned: negative values are invalid.
 
-For example, if a packet on path 0 changes the status of path 1, the
-status event has `path_id` 1. The optional qlog `tuple` field identifies
-the network tuple associated with an event. Two Path IDs can share a
-tuple, and a path can change tuples during migration. Tuple details can
-be recorded with `quic:tuple_assigned` ({{I-D.ietf-quic-qlog-quic-events}}).
-
 `path_id` is distinct from qlog's `tuple` / `tuple_id`. A Path ID identifies a
 logical QUIC path; multiple Path IDs can use the same 4-tuple, and one Path ID
 can use a new 4-tuple after migration. Implementations MUST NOT infer a Path
-ID from a tuple identifier.
+ID from a tuple identifier.  Tuple details can
+be recorded with `quic:tuple_assigned` (see {{I-D.ietf-quic-qlog-quic-events}}).
+
+Adding a path ID to an event header indicates that this event is related to
+a specific path. This is explained in {{add-path-id}}.
+
+# Multipath specific events and event extensions {#mp-events}
+
+The three events in this section have Base importance. They record
+changes to the paths of a connection as seen by the endpoint. Packet
+events record the frames that carry path management signals. A single
+change can involve several frames, and a local decision can precede the
+first frame that signals it.
+
+All the events described in this sections affect a single path. The
+corresponding `path_id` MUST be included in the respective event headers,
+as specified in {{path-id-def}}.
 
 The event data types extend the qlog main schema as follows. The
 optional `error_code` and `sequence_number` fields use the qlog
@@ -225,16 +271,17 @@ path 0. Later the client abandons path 1 at the application's request.
     "path_id": 1, "data": { "initiator": "remote", "new": "backup",
                             "sequence_number": 0 } },
   { "time": 97.0, "name": "quic:path_abandoned",
-    "path_id": 1, "data": { "initiator": "local", "error_code": 62 } }
+    "path_id": 1, "data": { "initiator": "local",
+                            "error_code": 62 } }
 ]
 ~~~
 
 
-# Add a Path identifier to existing QUIC events
+# Add a Path identifier to existing QUIC events {#add-path-id}
 
 When a QUIC event describes an operation or state for one known path,
 implementations MUST include `path_id`, including when its value is 0.
-(The `path_id` field is defined in {{mp-events}}.)
+(The `path_id` field is defined in {{path-id-def}}.)
 Implementations
 MUST omit the field when the event is connection-wide or when the associated
 Path ID is not known. Omission does not mean path 0. An implementation MAY
@@ -274,7 +321,7 @@ path, and MUST omit it when they are connection-wide or the path is unknown.
 The field is outside `data`, so existing QUIC event data definitions do not
 need to be copied or redefined for each event. The table above specifies the
 event-by-event semantics and applicability of the common field.
-{{mp-events}} defines the new events. {{multipath-specific-frames}}
+{{mp-events}} defines the new events. {{multipath-frames}}
 defines the frame encodings.
 
 ## Correlating 1-RTT packet events across paths
@@ -345,7 +392,7 @@ maximum Path ID of 3 and the server advertises 1.
 ]
 ~~~
 
-# Multipath specific frames
+# Multipath specific frames {#multipath-frames}
 
 The following CDDL extends the `$QuicFrame` type socket defined in
 {{Section 8.13 of I-D.ietf-quic-qlog-quic-events}}. These frame objects
@@ -361,8 +408,10 @@ fields are logged as decoded values within the limits of {{RFC10069}}.
 
 ~~~ cddl
 $QuicFrame /= PathAckFrame / PathAbandonFrame / PathStatusFrame /
-              PathNewConnectionIDFrame / PathRetireConnectionIDFrame /
-              MaxPathIDFrame / PathsBlockedFrame / PathCIDsBlockedFrame
+              PathNewConnectionIDFrame /
+              PathRetireConnectionIDFrame /
+              MaxPathIDFrame / PathsBlockedFrame /
+              PathCIDsBlockedFrame
 ~~~
 
 ## PATH_ACK
@@ -379,7 +428,8 @@ cumulative counts for the acknowledged path, including counts of zero.
 
 ~~~ cddl
 PathAckFrame = { PathAckFields } /
-               { PathAckFields, ect0: uint64, ect1: uint64, ce: uint64 }
+               { PathAckFields, ect0: uint64, ect1: uint64,
+                 ce: uint64 }
 
 PathAckFields = (
     frame_type: "path_ack"
