@@ -315,21 +315,16 @@ The `path_id` is set to 0 for Initial, Handshake, 0-RTT, and Retry packet events
 
 # Multipath transport parameter {#mp-parameters}
 
-The `initial_max_path_id` transport parameter (0x3e) is logged in
-`quic:parameters_set`. The `initiator` field of that event identifies
-the endpoint that advertised the value. The multipath extension is
-enabled only if both endpoints advertise the parameter
-({{Section 2 of RFC10069}}).
+In `quic:parameters_set`, the `initial_max_path_id` field records the value
+of the transport parameter defined in {{Section 2.1 of RFC10069}}. Include
+this field only if the endpoint identified by `initiator` advertised the
+parameter.
 
 ~~~ cddl
 $$quic-parametersset-extension //= (
     ? initial_max_path_id: uint32
 )
 ~~~
-
-A value of 0 enables the extension without allowing extra paths
-immediately. It is distinct from an absent field, which means that the
-endpoint did not advertise the parameter.
 
 ## Example
 
