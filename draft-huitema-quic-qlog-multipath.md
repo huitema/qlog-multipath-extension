@@ -176,7 +176,7 @@ events record the frames that carry path management signals. A single
 change can involve several frames, and a local decision can precede the
 first frame that signals it.
 
-All the events described in this sections affect a single path. The
+All the events described in this section affect a single path. The
 corresponding `path_id` MUST be included in the respective event headers,
 as specified in {{path-id-def}}.
 
