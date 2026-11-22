@@ -166,7 +166,7 @@ Table of Contents
 
 3.  Adding a path identifier to event headers
 
-   Managing multiple path per connection requires identifying these
+   Managing multiple paths per connection requires identifying these
    paths.  Per [RFC10069], this is done using a path ID.  This path ID
    will be added to events as specified in Section 4 and Section 5.
    Each of these events MUST include the following field in its top-
