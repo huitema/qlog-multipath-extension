@@ -5,12 +5,12 @@
 QUIC                                                          C. Huitema
 Internet-Draft                                      Private Octopus Inc.
 Intended status: Informational                                    Y. Liu
-Expires: 25 May 2027                                        Alibaba Inc.
+Expires: 26 May 2027                                        Alibaba Inc.
                                                                 A. Bisht
                                                            Cisco Systems
                                                                N. Kurosu
                                                               Individual
-                                                        21 November 2026
+                                                        22 November 2026
 
 
                QLOG extensions for Multiple Paths in QUIC
@@ -55,7 +55,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 25 May 2027.
+   This Internet-Draft will expire on 26 May 2027.
 
 Copyright Notice
 
@@ -168,9 +168,10 @@ Table of Contents
 
    Managing multiple path per connection requires identifying these
    paths.  Per [RFC10069], this is done using a path ID.  This path ID
-   will be added to all relevant events.  Each of these events MUST
-   include the following field in its top-level Event map alongside
-   time, name, and data (Section 7 of [I-D.ietf-quic-qlog-main-schema]).
+   will be added to events as specified in Section 4 and Section 5.
+   Each of these events MUST include the following field in its top-
+   level Event map alongside time, name, and data (Section 7 of
+   [I-D.ietf-quic-qlog-main-schema]).
 
    MultipathEventFields = (path_id: uint32)
 
