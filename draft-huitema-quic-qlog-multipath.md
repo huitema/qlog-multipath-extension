@@ -109,6 +109,7 @@ explains the effects of adding a `path_id` to events defined in
 {{I-D.ietf-quic-qlog-quic-events}} in {{add-path-id}},
 specifies the logging of multipath specific frames in {{multipath-frames}},
 and that of the multipath transport parameter in {{mp-parameters}}.
+
 # Conventions and Definitions
 
 {::boilerplate bcp14-tagged}
