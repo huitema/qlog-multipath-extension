@@ -94,7 +94,7 @@ Debugging tools like qvis have proven very useful when debugging QUIC implementa
 {{DebuggingQuic}}. This document provides a standard way to add specific information
 in QLOG traces so updated tools can properly represent QUIC connections that use
 multiple paths according to {{RFC10069}}. For example, a key function of these
-tools is to correlate packets departures and the arrival of the corresponding
+tools is to correlate packet departures and the arrival of the corresponding
 acknowledgement. For plain QUIC connections, this can be done by examining
 packet numbers. With multipath, there is a packet number space per path, and
 correlation requires examining both packet numbers and the ID of the path on which the
