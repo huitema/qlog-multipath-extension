@@ -1,0 +1,1779 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2026-11-22T00:09:04.839486+00:00",
+  "repo": "huitema/qlog-multipath-extension",
+  "labels": [
+    {
+      "name": "accessibility",
+      "description": "Barrier affecting people with disabilities",
+      "color": "f143ab"
+    },
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [
+    {
+      "number": 5,
+      "id": "I_kwDOVzZa388AAAABgjF6zw",
+      "title": "Add path_id to description of current events",
+      "url": "https://github.com/huitema/qlog-multipath-extension/issues/5",
+      "state": "CLOSED",
+      "author": "huitema",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "altanai"
+      ],
+      "labels": [],
+      "body": "We need to add \"path_id\" to the event headers. The key is to find out how to do that using the syntax specified in https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema.",
+      "createdAt": "2026-11-19T00:00:19Z",
+      "updatedAt": "2026-11-19T16:37:08Z",
+      "closedAt": "2026-11-19T16:37:07Z",
+      "comments": [
+        {
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Addressed by merged PR #3. The draft now defines event-level path_id, its applicability to existing QUIC events, and an example. Further schema-validation work is tracked in #20. Closing as completed.",
+          "createdAt": "2026-11-19T16:37:07Z",
+          "updatedAt": "2026-11-19T16:37:07Z"
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "id": "I_kwDOVzZa388AAAABgjHX5g",
+      "title": "Add list of new multipath specific events",
+      "url": "https://github.com/huitema/qlog-multipath-extension/issues/6",
+      "state": "CLOSED",
+      "author": "huitema",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "Yanmei-Liu"
+      ],
+      "labels": [],
+      "body": "We need to defined events like path created/abandoned, path status updated, etc. That is, events for changes in the configuration, that would complement the listing of path frames.",
+      "createdAt": "2026-11-19T00:02:15Z",
+      "updatedAt": "2026-11-19T06:33:59Z",
+      "closedAt": "2026-11-19T06:33:59Z",
+      "comments": []
+    },
+    {
+      "number": 7,
+      "id": "I_kwDOVzZa388AAAABgjJS8Q",
+      "title": "Add logging syntax for multipath specific frames",
+      "url": "https://github.com/huitema/qlog-multipath-extension/issues/7",
+      "state": "CLOSED",
+      "author": "huitema",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "Yanmei-Liu"
+      ],
+      "labels": [],
+      "body": "RFC 10069 defines a set of new frames. We need to add logging definitions for each of them, using the syntax defined in https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema, similar to what is done in https://datatracker.ietf.org/doc/draft-ietf-quic-qlog-quic-events/",
+      "createdAt": "2026-11-19T00:04:53Z",
+      "updatedAt": "2026-11-19T04:32:29Z",
+      "closedAt": "2026-11-19T04:32:29Z",
+      "comments": []
+    },
+    {
+      "number": 9,
+      "id": "I_kwDOVzZa388AAAABgjftdw",
+      "title": "Fill up the security section",
+      "url": "https://github.com/huitema/qlog-multipath-extension/issues/9",
+      "state": "OPEN",
+      "author": "huitema",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "We need to be serious about this. Analyse privacy issues, for example.",
+      "createdAt": "2026-11-19T00:35:10Z",
+      "updatedAt": "2026-11-19T20:09:13Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Based on https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15#section-14 \nI feel these things should be covered in this section \n\n1. Privacy where traces can link addresses and networks across paths and CID rotation, revealing connectivity changes and usage patterns.\n2. on the same thought process protecting sensitive fields by things like omitting stateless reset tokens from routine captures and shared traces, including raw frame copies.\n3. Also Minimization by limiting captured details, protect access and exports, and define retention limits.\n4. Since I have been burned so very often by OOM so resource exhaustion should also be addressed by things like bound log volume maybe ?\n\n\nfinally logging should not weaken validation or other QUIC security checks so something to addressing that too ",
+          "createdAt": "2026-11-19T20:09:13Z",
+          "updatedAt": "2026-11-19T20:09:13Z"
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "id": "I_kwDOVzZa388AAAABgnhtgw",
+      "title": "Clarify per-path congestion control, PTO, loss, and retransmission in qlog",
+      "url": "https://github.com/huitema/qlog-multipath-extension/issues/12",
+      "state": "OPEN",
+      "author": "Yanmei-Liu",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The base QUIC qlog events already record congestion control and recovery. Building on #5 and #3, specify which path owns a metric, a PTO, a loss declaration, and data marked for retransmission. For example, path 1 can lose a packet and path 0 can carry the same stream bytes in a new packet.\n\nInclude a trace example and explain how to log outstanding packets declared lost when an abandoned path\u2019s state is discarded. [RFC 10069 \u00a7\u00a75.3\u20135.7](https://www.rfc-editor.org/rfc/rfc10069.html#section-5.3)\n",
+      "createdAt": "2026-11-19T06:33:42Z",
+      "updatedAt": "2026-11-19T06:33:42Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 16,
+      "id": "I_kwDOVzZa388AAAABgo1zTQ",
+      "title": "The title is too long",
+      "url": "https://github.com/huitema/qlog-multipath-extension/issues/16",
+      "state": "CLOSED",
+      "author": "huitema",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "The current title is \"QLOG extensions for Multiple Paths for a QUIC Connection\". It might be wise to get something shorter.",
+      "createdAt": "2026-11-19T08:12:05Z",
+      "updatedAt": "2026-11-20T22:59:37Z",
+      "closedAt": "2026-11-20T22:59:36Z",
+      "comments": [
+        {
+          "author": "Yanmei-Liu",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I'd suggest \"QLOG extensions for Multipath QUIC\" :)\nor \"QLOG extensions for Multiple Paths in QUIC\"",
+          "createdAt": "2026-11-19T08:17:50Z",
+          "updatedAt": "2026-11-19T08:17:50Z"
+        },
+        {
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "body": "OK.Two nice suggestions. I like \"Multipath QUIC\" but we had lots of feedback about that when preparing RFC 10069. That feedback gave us the title \"Managing Multiple Paths for a QUIC Connection\". So I would pick \"QLOG extensions for Multiple Paths in QUIC\". Unless someone has a better idea!",
+          "createdAt": "2026-11-20T05:35:06Z",
+          "updatedAt": "2026-11-20T05:35:06Z"
+        }
+      ]
+    },
+    {
+      "number": 17,
+      "id": "I_kwDOVzZa388AAAABgxIK-Q",
+      "title": "Confirm use of quic#multipath instead of quic-multipath for the schema URI",
+      "url": "https://github.com/huitema/qlog-multipath-extension/issues/17",
+      "state": "CLOSED",
+      "author": "altanai",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "huitema"
+      ],
+      "labels": [],
+      "body": "The event schema URI has changed from:\n\n```text\nurn:ietf:params:qlog:events:quic-multipath\n```\n\nto:\n\n```text\nurn:ietf:params:qlog:events:quic#multipath\n```\n\nThe latest `main` already uses the fragment form in the Event Schema Definition, draft-version example, and IANA entry. Opening this issue to confirm the intended identifier and record the reason for the change.\n\n[Section 8 of qlog main schema -15](https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15#section-8) requires an extension identifier in the schema URI fragment after `#`. [Section 8.1](https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15#section-8.1) recommends the IETF URN form for schemas defined in RFCs. Here, `quic` is the existing namespace and `multipath` identifies its extension.\n\nCould we confirm the intended forms are:\n\n- Final RFC: `urn:ietf:params:qlog:events:quic#multipath`\n- Draft 00: `urn:ietf:params:qlog:events:quic#multipath-00`\n\n\n<img width=\"699\" height=\"210\" alt=\"image\" src=\"https://github.com/user-attachments/assets/f62e280c-f157-4194-93e4-5aef3db5bc48\" />\n",
+      "createdAt": "2026-11-19T16:16:08Z",
+      "updatedAt": "2026-11-19T18:20:53Z",
+      "closedAt": "2026-11-19T18:20:53Z",
+      "comments": [
+        {
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I had this issues drafted yesterday but the updated main no longer need any change since somehow these changes were made last evening pretty swiftly. \nunto @huitema  to validate and close this ",
+          "createdAt": "2026-11-19T17:28:57Z",
+          "updatedAt": "2026-11-19T17:28:57Z"
+        },
+        {
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "body": "Yes, this is already fixed. Closing the issue.",
+          "createdAt": "2026-11-19T18:20:53Z",
+          "updatedAt": "2026-11-19T18:20:53Z"
+        }
+      ]
+    },
+    {
+      "number": 18,
+      "id": "I_kwDOVzZa388AAAABgxYKoA",
+      "title": "Define how qlog records multipath negotiation and initial path limits.",
+      "url": "https://github.com/huitema/qlog-multipath-extension/issues/18",
+      "state": "OPEN",
+      "author": "altanai",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Log multipath negotiation through quic:parameters_set  like a typed mapping for `initial_max_path_id` in `quic:parameters_set`. this is so that a trace should make it possible to understand whether multipath was negotiated and which initial limit each endpoint advertised.\n\nSuggested additions:\n\n- Extend `$$quic-parametersset-extension` with `initial_max_path_id`, using the RFC 10069 range of 0 through 4294967295.\n- Preserve the base event\u2019s `initiator` semantics so local and remote advertisements can be distinguished.\n- Explain that a parameter present on the wire with value `0` still advertises support. Distinguish absence on the wire from a value omitted because the logger did not capture it.\n- Include examples for both endpoints advertising support, an advertisement with value `0`, and one endpoint not advertising the parameter.\n\nReferences: [RFC 10069 \u00a72](https://www.rfc-editor.org/rfc/rfc10069.html#section-2), [\u00a72.1](https://www.rfc-editor.org/rfc/rfc10069.html#section-2.1), and [qlog QUIC events \u00a75.3](https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-quic-events-14#section-5.3).",
+      "createdAt": "2026-11-19T16:29:47Z",
+      "updatedAt": "2026-11-19T17:12:04Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "body": "RFC 10069 prohibits remembering this kind off parameter for use in a subsequent connection. It should not be presented as a valid restored parameter that enables multipath for 0-RTT. This does not prohibit retaining it in diagnostic logs.",
+          "createdAt": "2026-11-19T17:11:50Z",
+          "updatedAt": "2026-11-19T17:11:50Z"
+        }
+      ]
+    },
+    {
+      "number": 19,
+      "id": "I_kwDOVzZa388AAAABgxY0Xg",
+      "title": "Define how path validation outcomes are logged",
+      "url": "https://github.com/huitema/qlog-multipath-extension/issues/19",
+      "state": "OPEN",
+      "author": "altanai",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The draft explicitly allows `quic:path_created` to be emitted while validation is still pending. A reader therefore needs a defined way to determine when validation succeeds, fails, or is unnecessary because the tuple was previously validated. Advertised `available` or `backup` status expresses a usage preference and does not establish validation success.\n\nSuggested additions:\n\n- Specify how to log validation start, success, and failure for a given Path ID and tuple, including the endpoint\u2019s perspective.\n- Explain how existing `quic:migration_state_updated` probing states, `quic:timer_updated` with `path_validation`, and PATH_CHALLENGE/PATH_RESPONSE packet events should be used. Define an additional field or event only if the existing events cannot express the outcome.\n- Distinguish establishing an additional path from migrating an existing Path ID to a new tuple. In particular, avoid requiring `migration_complete` for additional-path establishment, since its base semantics include discarding the old path.\n- Cover reuse of an already validated tuple, and include success and failure examples showing the relationship to `path_created` and `path_abandoned`.\n\nReferences: [RFC 10069 \u00a73.1](https://www.rfc-editor.org/rfc/rfc10069.html#section-3.1), [qlog QUIC events \u00a75.21](https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-quic-events-14#section-5.21), and [\u00a75.22](https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-quic-events-14#section-5.22).\n\nRelated: #5.",
+      "createdAt": "2026-11-19T16:30:21Z",
+      "updatedAt": "2026-11-20T22:14:29Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "flub",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I'm kind of inclined to think that path validation (in RFC9000 terms, kind of easier to think of as 4-tuple validation I guess) is not a multipath concern and the only thing this draft needs to take care of is that a path is mapped to a 4-tuple at all times.",
+          "createdAt": "2026-11-20T22:14:29Z",
+          "updatedAt": "2026-11-20T22:14:29Z"
+        }
+      ]
+    },
+    {
+      "number": 20,
+      "id": "I_kwDOVzZa388AAAABgxZWsQ",
+      "title": "Make event-level path_id requirements machine-checkable",
+      "url": "https://github.com/huitema/qlog-multipath-extension/issues/20",
+      "state": "CLOSED",
+      "author": "altanai",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "altanai"
+      ],
+      "labels": [],
+      "body": "So far the draft says certain events need a path_id, and that it must be an unsigned 32-bit number. But declaring that field on its own doesn\u2019t show a validator how to check a complete event or which event types require it. Hence I suggest we provide \n-  schema composition, validation profile, or validation guidance connecting `MultipathEventFields` to the complete events to which it applies.\n- Clarify which requirements are checked by CDDL and which require semantic checks, such as whether an event describes one known path or connection-wide state.\n- Demonstrate that the field appears alongside `time`, `name`, and `data`, with the correct unsigned 32-bit range.\n- Include valid boundary examples (`0` and `4294967295`) and invalid examples (negative values, `4294967296`, a missing required field, and a field incorrectly placed inside `data`).\n- Account for the permitted use of `common_fields` when validating the effective field value.\n- Add a reproducible check for the combined main, QUIC, and multipath schemas and these examples; document the semantic checks separately where needed.\n\nReferences: [qlog main schema \u00a77](https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15#section-7) and [\u00a78.2](https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15#section-8.2).\n\nRelated: #5.",
+      "createdAt": "2026-11-19T16:30:49Z",
+      "updatedAt": "2026-11-20T19:00:19Z",
+      "closedAt": "2026-11-20T19:00:19Z",
+      "comments": []
+    },
+    {
+      "number": 24,
+      "id": "I_kwDOVzZa388AAAABgz0Dhg",
+      "title": "Explain how to correlate 1-RTT packet events by path ID and packet number",
+      "url": "https://github.com/huitema/qlog-multipath-extension/issues/24",
+      "state": "CLOSED",
+      "author": "Yanmei-Liu",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "A tool such as qvis draws a line from a packet\u2019s send event at one endpoint to its receive event at the peer. With Multipath QUIC, each path has its own Application Data packet number space. A client can send packet 42 on path 0 and another packet 42 on path 1. If the server receives only the second packet, matching on packet number alone can draw a line to the wrong send event. [RFC 10069](https://datatracker.ietf.org/doc/html/rfc10069)\n\nThe draft should explain that, for a given connection and sending direction, a trace consumer matches 1-RTT packet events using `(path_id, packet_number)`. In the example above, the server\u2019s receive event for `(1, 42)` matches the client\u2019s send event for `(1, 42)`. A loss event for `(0, 42)` refers to the other packet.\n\nRequire the event-level `path_id` on every event that reports a specific 1-RTT packet, including `quic:packet_sent`, `quic:packet_received`, and `quic:packet_lost`. This includes 1-RTT packets on path 0.\n\nFor Initial, Handshake, 0-RTT, and Retry packets, the path is always 0. Should producers record `path_id: 0` explicitly for these packet types, or may consumers infer it from the packet type? Retry has no packet number, so only the path-labeling question applies to it. [RFC 9000, Section 12.3](https://www.rfc-editor.org/rfc/rfc9000.html#section-12.3)\n\nRelated to #3 and #20.\n",
+      "createdAt": "2026-11-19T18:53:56Z",
+      "updatedAt": "2026-11-20T15:13:26Z",
+      "closedAt": "2026-11-20T15:13:26Z",
+      "comments": []
+    },
+    {
+      "number": 29,
+      "id": "I_kwDOVzZa388AAAABhKiYyA",
+      "title": "Make examples better",
+      "url": "https://github.com/huitema/qlog-multipath-extension/issues/29",
+      "state": "OPEN",
+      "author": "altanai",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "https://github.com/huitema/qlog-multipath-extension/blob/main/draft-huitema-quic-qlog-multipath.md#example\n\nsection can be enhanced with a short ascii sequence diagram \n\nAlso we should add more comprehensive examples so implementers can see the share of qlog  under various use cases",
+      "createdAt": "2026-11-20T22:17:24Z",
+      "updatedAt": "2026-11-20T22:56:39Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "body": " Expanding on my issue. from the 2 examples \n\n1. Path 1 is created, the peer marks it backup, and the local endpoint abandons it. what is there now about 2 sends and 1 loss is good lifecycle example \n```\n[\n  { \"time\": 10.0, \"name\": \"quic:packet_sent\", \"path_id\": 0,\n    \"data\": { \"header\": {\n      \"packet_type\": \"1RTT\", \"packet_number\": 42 } } },\n  { \"time\": 11.0, \"name\": \"quic:packet_sent\", \"path_id\": 1,\n    \"data\": { \"header\": {\n      \"packet_type\": \"1RTT\", \"packet_number\": 42 } } },\n  { \"time\": 90.0, \"name\": \"quic:packet_lost\", \"path_id\": 0,\n    \"data\": { \"header\": {\n      \"packet_type\": \"1RTT\", \"packet_number\": 42 } } }\n]\n```\nI proposed another example for the lifecycle and two packet receives. Both packets arrive on path 0 and carry the same backup advertisement for path 1. The first produces a status update for path 1. The second is logged as another packet receive, with no additional status update.\n\n\nExample number 2 : Packet number 42 appears on paths 0 and 1, the loss is matched to path 0, while the peer\u2019s receive matches path 1.This shows why tools need both path_id and packet number to match 1-RTT events within a connection and sending direction so this is fine",
+          "createdAt": "2026-11-20T22:56:39Z",
+          "updatedAt": "2026-11-20T22:56:39Z"
+        }
+      ]
+    }
+  ],
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDOVzZa388AAAABQNrKTg",
+      "title": "Adding a few words to draft abstract and intro.",
+      "url": "https://github.com/huitema/qlog-multipath-extension/pull/1",
+      "state": "MERGED",
+      "author": "huitema",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Very simple. Mostly, I am testing the PR mechanism.",
+      "createdAt": "2026-11-18T19:55:07Z",
+      "updatedAt": "2026-11-18T20:05:51Z",
+      "baseRepository": "huitema/qlog-multipath-extension",
+      "baseRefName": "main",
+      "baseRefOid": "6655e7b23c98a20ec19c0e81b0b68e1ef26c2fb4",
+      "headRepository": "huitema/qlog-multipath-extension",
+      "headRefName": "first-test-of-draft",
+      "headRefOid": "af84509ff346a7ac4a63233632438e416a8465e8",
+      "closedAt": "2026-11-18T20:05:51Z",
+      "mergedAt": "2026-11-18T20:05:51Z",
+      "mergedBy": "huitema",
+      "mergeCommit": {
+        "oid": "8813b0bb070ba093a7fa709926b9d2e8ae872f9c"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 2,
+      "id": "PR_kwDOVzZa388AAAABQOdHZQ",
+      "title": "Registration of URN.",
+      "url": "https://github.com/huitema/qlog-multipath-extension/pull/2",
+      "state": "MERGED",
+      "author": "huitema",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Adding registration of a specific URN for these extensions.",
+      "createdAt": "2026-11-18T20:50:04Z",
+      "updatedAt": "2026-11-18T20:50:44Z",
+      "baseRepository": "huitema/qlog-multipath-extension",
+      "baseRefName": "main",
+      "baseRefOid": "8813b0bb070ba093a7fa709926b9d2e8ae872f9c",
+      "headRepository": "huitema/qlog-multipath-extension",
+      "headRefName": "first-test-of-draft",
+      "headRefOid": "be333a2ac9ba301acf147812126d4da945074449",
+      "closedAt": "2026-11-18T20:50:44Z",
+      "mergedAt": "2026-11-18T20:50:44Z",
+      "mergedBy": "huitema",
+      "mergeCommit": {
+        "oid": "6889a95e9ff22690b1a010d179d1db2c1d9d2cf7"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 3,
+      "id": "PR_kwDOVzZa388AAAABQPv1lw",
+      "title": "Define event-level path_id for RFC 10069",
+      "url": "https://github.com/huitema/qlog-multipath-extension/pull/3",
+      "state": "MERGED",
+      "author": "altanai",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "altanai"
+      ],
+      "labels": [],
+      "body": "## Summary\r\nDefine `path_id` as an event-level qlog field and map it to the Path ID defined in RFC 10069.\r\n\r\n## Details\r\n- Specify `path_id` as an unsigned 32-bit integer.\r\n- Define its semantics and applicability for existing QUIC events, including packet, recovery, migration, and frame-processing events.\r\n- Keep event-level path context distinct from Path ID values carried by frames.\r\n\r\nAlso added a packet event example",
+      "createdAt": "2026-11-18T22:31:59Z",
+      "updatedAt": "2026-11-19T07:01:51Z",
+      "baseRepository": "huitema/qlog-multipath-extension",
+      "baseRefName": "main",
+      "baseRefOid": "9053fb3c15232ae859c516513e8c71cf679d562f",
+      "headRepository": "altanai/qlog-multipath-extension",
+      "headRefName": "codex/rfc10069-path-id",
+      "headRefOid": "3a9a79d3a2cb9ba4c14831b68f54e5689374238a",
+      "closedAt": "2026-11-19T07:01:51Z",
+      "mergedAt": "2026-11-19T07:01:51Z",
+      "mergedBy": "huitema",
+      "mergeCommit": {
+        "oid": "36f216c03c151b08a5af0070f8da920610094135"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOVzZa388AAAABY67zeQ",
+          "commit": {
+            "abbreviatedOid": "142cd60"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "Looks good. Tiny bit verbose, but that's definitely a good first step. Just one nit, below.",
+          "createdAt": "2026-11-19T00:23:09Z",
+          "updatedAt": "2026-11-19T00:24:25Z",
+          "comments": [
+            {
+              "originalPosition": 101,
+              "body": "Yes, but are these events that we create or events that we update? Maybe specify \"updated\" in the header, and we will have another section for the new event types that @Yanmei-Liu is working on.",
+              "createdAt": "2026-11-19T00:23:09Z",
+              "updatedAt": "2026-11-19T00:24:25Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABY98Jkw",
+          "commit": {
+            "abbreviatedOid": "142cd60"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "Preparing a couple of minor changes",
+          "createdAt": "2026-11-19T06:48:12Z",
+          "updatedAt": "2026-11-19T06:50:20Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "```suggestion\n## Add a Path identifier to existing QUIC events\n```",
+              "createdAt": "2026-11-19T06:48:12Z",
+              "updatedAt": "2026-11-19T06:50:20Z"
+            },
+            {
+              "originalPosition": 95,
+              "body": "```suggestion\nThis document modifies the following QUIC events: `packet_sent`, `packet_received`, `packet_dropped`,\n```",
+              "createdAt": "2026-11-19T06:49:52Z",
+              "updatedAt": "2026-11-19T06:50:21Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABY-EfVQ",
+          "commit": {
+            "abbreviatedOid": "3a9a79d"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "Approving, but I need to work on the merge conflict",
+          "createdAt": "2026-11-19T07:01:01Z",
+          "updatedAt": "2026-11-19T07:01:01Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABY-E_lg",
+          "commit": {
+            "abbreviatedOid": "3a9a79d"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-19T07:01:43Z",
+          "updatedAt": "2026-11-19T07:01:43Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "id": "PR_kwDOVzZa388AAAABQPxq1g",
+      "title": "Add Altanai Bisht as co-author",
+      "url": "https://github.com/huitema/qlog-multipath-extension/pull/4",
+      "state": "MERGED",
+      "author": "altanai",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "altanai"
+      ],
+      "labels": [],
+      "body": "## Summary\nAdd Altanai Bisht to the draft's author metadata as a co-author.\n\nThis is an isolated author-list change based on `main`; the `path_id` proposal remains in its separate pull request.",
+      "createdAt": "2026-11-18T22:34:30Z",
+      "updatedAt": "2026-11-18T23:15:12Z",
+      "baseRepository": "huitema/qlog-multipath-extension",
+      "baseRefName": "main",
+      "baseRefOid": "6889a95e9ff22690b1a010d179d1db2c1d9d2cf7",
+      "headRepository": "altanai/qlog-multipath-extension",
+      "headRefName": "codex/add-altanai-coauthor",
+      "headRefOid": "f73467b1016118748b45c8d4933da2d11342431e",
+      "closedAt": "2026-11-18T23:15:12Z",
+      "mergedAt": "2026-11-18T23:15:12Z",
+      "mergedBy": "huitema",
+      "mergeCommit": {
+        "oid": "6e90c64c0d1a79d013b4bcbee0441b270824b4c4"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOVzZa388AAAABY6Twqg",
+          "commit": {
+            "abbreviatedOid": "f73467b"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-18T23:15:02Z",
+          "updatedAt": "2026-11-18T23:15:02Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "id": "PR_kwDOVzZa388AAAABQQ8Cdw",
+      "title": "Add minimal text to check github pages update.",
+      "url": "https://github.com/huitema/qlog-multipath-extension/pull/8",
+      "state": "OPEN",
+      "author": "huitema",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "This is really a no-op PR. I am trying to see whether the git pages publishing works.",
+      "createdAt": "2026-11-19T00:26:06Z",
+      "updatedAt": "2026-11-19T00:32:39Z",
+      "baseRepository": "huitema/qlog-multipath-extension",
+      "baseRefName": "main",
+      "baseRefOid": "6e90c64c0d1a79d013b4bcbee0441b270824b4c4",
+      "headRepository": "huitema/qlog-multipath-extension",
+      "headRefName": "check-draft-header",
+      "headRefOid": "1224309311af1cd7d14a8bad38b1c9db89091df6",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "body": "No need for this PR. The page publishing issue is fixed!",
+          "createdAt": "2026-11-19T00:32:39Z",
+          "updatedAt": "2026-11-19T00:32:39Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 10,
+      "id": "PR_kwDOVzZa388AAAABQR-GpQ",
+      "title": "Define qlog events for multipath path creation, abandonment, and status",
+      "url": "https://github.com/huitema/qlog-multipath-extension/pull/10",
+      "state": "MERGED",
+      "author": "Yanmei-Liu",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #6.\n\nPacket events show when a path-management signal was sent or received. These three Base-level events record when the logging endpoint changed its path configuration.\n\n- `quic:path_created` records when the client initiates a path or the server accepts it. Address validation can still be pending.\n- `quic:path_abandoned` records the endpoint's first decision to abandon a Path ID, including an unused one. The initiator distinguishes a local decision from one prompted by the peer.\n- `quic:path_status_updated` records changes to either endpoint's advertised preference. A status frame can arrive on path 0, set path 1 to backup, and later be repeated. The trace records one update for path 1.\n\nAll three events use the affected path's top-level `path_id`, consistent with #3. The draft supplies the CDDL data definitions, a client-side example, and the IANA event list. The schema URI uses the `#multipath` fragment prescribed for an extension of the `quic` namespace. [qlog main schema \u00a78](https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15#section-8)\n\nThe draft built as text and HTML. All three examples validated against their CDDL data types and the combined `$ProtocolEventData` choice. Additional checks covered required fields, status values, and integer limits.\n",
+      "createdAt": "2026-11-19T02:15:13Z",
+      "updatedAt": "2026-11-19T06:34:11Z",
+      "baseRepository": "huitema/qlog-multipath-extension",
+      "baseRefName": "main",
+      "baseRefOid": "6e90c64c0d1a79d013b4bcbee0441b270824b4c4",
+      "headRepository": "huitema/qlog-multipath-extension",
+      "headRefName": "feat/events",
+      "headRefOid": "aaf0f901f9b0ecc7ec8770596edee7f559dcd7e9",
+      "closedAt": "2026-11-19T06:33:57Z",
+      "mergedAt": "2026-11-19T06:33:57Z",
+      "mergedBy": "huitema",
+      "mergeCommit": {
+        "oid": "9053fb3c15232ae859c516513e8c71cf679d562f"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOVzZa388AAAABY8EH_A",
+          "commit": {
+            "abbreviatedOid": "c80d5b4"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "Great start, thanks. Can we make sure that the URN is at the right place, and that the path ID is defined as a 32 bit integer? ",
+          "createdAt": "2026-11-19T02:46:29Z",
+          "updatedAt": "2026-11-19T04:45:42Z",
+          "comments": [
+            {
+              "originalPosition": 34,
+              "body": "The URN definition should be in the top section, not in the \"draft event\" section that will be deleted upon publication!",
+              "createdAt": "2026-11-19T02:46:29Z",
+              "updatedAt": "2026-11-19T04:45:42Z"
+            },
+            {
+              "originalPosition": 63,
+              "body": "We do not use varint in qlog. This probably should be an int32.",
+              "createdAt": "2026-11-19T02:48:19Z",
+              "updatedAt": "2026-11-19T04:45:42Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABY9JUjg",
+          "commit": {
+            "abbreviatedOid": "aaf0f90"
+          },
+          "author": "Yanmei-Liu",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-19T05:17:48Z",
+          "updatedAt": "2026-11-19T05:17:48Z",
+          "comments": [
+            {
+              "originalPosition": 34,
+              "body": "In aaf0f90, I clarified the definition of `urn:ietf:params:qlog:events:quic#multipath` in the permanent \u201cEvent Schema Definition\u201d section. The draft-only subsection now refers back to that definition and explains the version suffix, with `-00` as the example. Could you take another look at the placement?",
+              "createdAt": "2026-11-19T05:17:48Z",
+              "updatedAt": "2026-11-19T05:17:48Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABY9JY9Q",
+          "commit": {
+            "abbreviatedOid": "aaf0f90"
+          },
+          "author": "Yanmei-Liu",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-19T05:17:56Z",
+          "updatedAt": "2026-11-19T05:17:56Z",
+          "comments": [
+            {
+              "originalPosition": 63,
+              "body": "I removed `QUICPathVarInt` in aaf0f90 and made `path_id` explicit in the CDDL as a required top-level `uint32` on all three events. This covers the full unsigned 32-bit Path ID range in RFC 10069. The `error_code` and `sequence_number` fields can exceed 32 bits, so they use qlog\u2019s `uint64` with the RFC limit of 2^62 \u2212 1. Could you review the updated types and let me know if this addresses your concern?",
+              "createdAt": "2026-11-19T05:17:56Z",
+              "updatedAt": "2026-11-19T05:17:56Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABY90EEw",
+          "commit": {
+            "abbreviatedOid": "aaf0f90"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "Thanks.\n\nUsing \"quic#multipath\" is nice. It seems like the right way to say that we are incrementing the definitions in the QUIC name space.\n\nWe may need to revisit some of the definition after discussing with a wider audience, but this is a very good start.",
+          "createdAt": "2026-11-19T06:33:48Z",
+          "updatedAt": "2026-11-19T06:33:48Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "id": "PR_kwDOVzZa388AAAABQSOW9Q",
+      "title": "Define qlog representations for RFC 10069 multipath frames",
+      "url": "https://github.com/huitema/qlog-multipath-extension/pull/11",
+      "state": "MERGED",
+      "author": "Yanmei-Liu",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #7.\n\nThis change extends `$QuicFrame` with qlog representations for every frame in RFC 10069, Table 3. A frame's `path_id` identifies the path named on the wire, which can differ from the path carrying the packet. The packet example shows a PATH_ACK for path 1 and a PATH_CIDS_BLOCKED for path 2 travelling together on path 0.\n\nBoth PATH_ACK encodings use the base qlog ACK range and delay conventions. The ECN form carries all three counters, including zeros. The definitions also cover per-path status and connection ID sequence numbers, the maximum and blocked Path ID limits, and the named and unknown PATH_ABANDON transport errors. [RFC 10069, Section 4](https://www.rfc-editor.org/rfc/rfc10069.html#section-4) \u00b7 [Base qlog frame definitions](https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-quic-events-14#section-8.13)\n\nThe draft built as text and HTML. Validation combined this CDDL with the published qlog main schema (-15) and QUIC events (-14). All 10 wire type values were covered. The validator accepted 17 valid frame cases and the example packet payload, and rejected 10 invalid cases.\n",
+      "createdAt": "2026-11-19T02:43:26Z",
+      "updatedAt": "2026-11-19T04:32:27Z",
+      "baseRepository": "huitema/qlog-multipath-extension",
+      "baseRefName": "main",
+      "baseRefOid": "6e90c64c0d1a79d013b4bcbee0441b270824b4c4",
+      "headRepository": "huitema/qlog-multipath-extension",
+      "headRefName": "feat/frames",
+      "headRefOid": "21a0ea53657ec6c56b1234f5e5e0bf81ffe78156",
+      "closedAt": "2026-11-19T04:32:27Z",
+      "mergedAt": "2026-11-19T04:32:27Z",
+      "mergedBy": "huitema",
+      "mergeCommit": {
+        "oid": "fddabc5b5e958734fd2b3aaaf0bd1d2823bacb57"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOVzZa388AAAABY8zstw",
+          "commit": {
+            "abbreviatedOid": "21a0ea5"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "Looks like a very good first version!",
+          "createdAt": "2026-11-19T04:32:17Z",
+          "updatedAt": "2026-11-19T04:32:17Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "id": "PR_kwDOVzZa388AAAABQUbmBA",
+      "title": "Describe per-path congestion control and recovery in qlog",
+      "url": "https://github.com/huitema/qlog-multipath-extension/pull/13",
+      "state": "OPEN",
+      "author": "Yanmei-Liu",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #12. Complements the event-level `path_id` proposal in #3.\n\nSpecify which path owns a congestion-control metric, RTT estimate, PTO, loss declaration, and retransmission decision. The sender trace shows a PTO probe on path 1, its acknowledgment arriving on path 0, and the lost stream bytes being sent again on path 0. Both data packets have number 42, so the example also shows why the sending path is needed to identify a packet.\n\nThe only proposed new data field is the optional `path_state_discarded: true` on `quic:packet_lost`. It identifies packets first declared lost when the endpoint discards an abandoned path\u2019s state. [RFC 10069 \u00a73.4.3](https://www.rfc-editor.org/rfc/rfc10069.html#section-3.4.3)\n\nBuilt the text and HTML draft with xml2rfc. Checked the nine example events, validated their payloads and frame objects against the combined qlog CDDL, and tested the new field's presence, omission, and invalid values.\n",
+      "createdAt": "2026-11-19T06:38:15Z",
+      "updatedAt": "2026-11-21T01:50:43Z",
+      "baseRepository": "huitema/qlog-multipath-extension",
+      "baseRefName": "main",
+      "baseRefOid": "5f260052513f5c8a7f22fc78d5669100b2e6cdac",
+      "headRepository": "huitema/qlog-multipath-extension",
+      "headRefName": "feat/path-metrics",
+      "headRefOid": "cf6c4fda3b1e457eadf1e470fc84c47b4716d540",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "Yanmei-Liu",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Sure, no rush.",
+          "createdAt": "2026-11-19T08:05:03Z",
+          "updatedAt": "2026-11-19T08:05:03Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOVzZa388AAAABY-co5A",
+          "commit": {
+            "abbreviatedOid": "347dbce"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "I thin that's a bit premature. Can we first review and merge the \"reconcile\" PR, and then rework this on top of the merged draft?",
+          "createdAt": "2026-11-19T07:39:45Z",
+          "updatedAt": "2026-11-19T07:39:45Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZOuzNg",
+          "commit": {
+            "abbreviatedOid": "030fb07"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-20T05:50:01Z",
+          "updatedAt": "2026-11-20T05:50:01Z",
+          "comments": [
+            {
+              "originalPosition": 321,
+              "body": "We should probably not use the imperative form \"log each path's metrics.\" We are writing this documents for the developers programming their code to write the log, but not only for them. We are also writing for the network admin reading the log, and having to understand them. So maybe something like:\n~~~\nFor congestion control ({{Section 5.3 of RFC10069}}), each path's\nmetrics and any connection-wide values are logged in separate\n`quic:recovery_metrics_updated` events.\n~~~\n",
+              "createdAt": "2026-11-20T05:50:01Z",
+              "updatedAt": "2026-11-20T05:50:01Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZOvk7Q",
+          "commit": {
+            "abbreviatedOid": "030fb07"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-20T05:51:25Z",
+          "updatedAt": "2026-11-20T05:51:25Z",
+          "comments": [
+            {
+              "originalPosition": 357,
+              "body": "Same issue: do not use the imperative form, as it makes the document specialized for log writers. We are also doing it for log readers.",
+              "createdAt": "2026-11-20T05:51:25Z",
+              "updatedAt": "2026-11-20T05:51:25Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZOxGyg",
+          "commit": {
+            "abbreviatedOid": "030fb07"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-20T05:54:36Z",
+          "updatedAt": "2026-11-20T05:54:36Z",
+          "comments": [
+            {
+              "originalPosition": 369,
+              "body": "Please look at the examples of stating the constraints such as \"Omit\n`path_state_discarded` for other loss declarations.\" Apart from not using the imperative tone, you could also write something like:\n\n\n~~~ cddl\n$$quic-packetlost-extension //= (\n    ; only present if abandoned path state is discarded\n    ? path_state_discarded: true\n)\n~~~\n",
+              "createdAt": "2026-11-20T05:54:36Z",
+              "updatedAt": "2026-11-20T05:54:36Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZVQPwA",
+          "commit": {
+            "abbreviatedOid": "c8c31ba"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-20T15:17:33Z",
+          "updatedAt": "2026-11-20T15:17:34Z",
+          "comments": [
+            {
+              "originalPosition": 51,
+              "body": "```suggestion\nFor retransmissions ({{Section 5.6 of RFC10069}}), a separate `quic:marked_for_retransmit`\n```",
+              "createdAt": "2026-11-20T15:17:33Z",
+              "updatedAt": "2026-11-20T15:17:34Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZVSYpw",
+          "commit": {
+            "abbreviatedOid": "c8c31ba"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-20T15:20:05Z",
+          "updatedAt": "2026-11-20T15:20:05Z",
+          "comments": [
+            {
+              "originalPosition": 52,
+              "body": "```suggestion\nevent will be logged for each sending path on which packets are marked \nfor retransmission after being sent on that path.\n```",
+              "createdAt": "2026-11-20T15:20:05Z",
+              "updatedAt": "2026-11-20T15:20:05Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZVWb9w",
+          "commit": {
+            "abbreviatedOid": "05d2cb8"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-20T15:24:41Z",
+          "updatedAt": "2026-11-20T15:24:41Z",
+          "comments": [
+            {
+              "originalPosition": 54,
+              "body": "```suggestion\nThe retransmitted content, if any, will be sent in new packets, possibly on different paths.\n```",
+              "createdAt": "2026-11-20T15:24:41Z",
+              "updatedAt": "2026-11-20T15:24:41Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZVYx4A",
+          "commit": {
+            "abbreviatedOid": "1f6d5d0"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "Looks OK.",
+          "createdAt": "2026-11-20T15:27:34Z",
+          "updatedAt": "2026-11-20T15:27:34Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZVaUjQ",
+          "commit": {
+            "abbreviatedOid": "1f6d5d0"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-20T15:29:28Z",
+          "updatedAt": "2026-11-20T15:29:29Z",
+          "comments": [
+            {
+              "originalPosition": 52,
+              "body": "```suggestion\nevent will be logged for each sending path on which packets are marked\n```",
+              "createdAt": "2026-11-20T15:29:29Z",
+              "updatedAt": "2026-11-20T15:29:29Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZVbZqA",
+          "commit": {
+            "abbreviatedOid": "cf6c4fd"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-20T15:30:49Z",
+          "updatedAt": "2026-11-20T15:30:49Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZbjTYA",
+          "commit": {
+            "abbreviatedOid": "cf6c4fd"
+          },
+          "author": "flub",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-21T01:01:34Z",
+          "updatedAt": "2026-11-21T01:28:26Z",
+          "comments": [
+            {
+              "originalPosition": 26,
+              "body": "This seems weirdly worded to me, it suggests the acknowledged path and packet number space can all be different things. But I think these are all trying to say the same in other words?\n\nWhy not something simpler like: \"The packet numbers in a quic:packets_acked event all all belong to the same path\"? Or does that not say the same here?",
+              "createdAt": "2026-11-21T01:01:34Z",
+              "updatedAt": "2026-11-21T01:28:26Z"
+            },
+            {
+              "originalPosition": 53,
+              "body": "```suggestion\nFor retransmission ({{Section 5.6 of RFC10069}}), a `quic:marked_for_retransmit` event will be logged for the path on which the packet was lost.\n```\n\nI find the original ambiguous to read. It seems like it is asking to emit quic:marked_for_retransmit multiple times.",
+              "createdAt": "2026-11-21T01:27:00Z",
+              "updatedAt": "2026-11-21T01:28:26Z"
+            },
+            {
+              "originalPosition": 56,
+              "body": "I'm half tempted to omit this entirely. This is already specified by RFC 10069 and this doesn't help much here.",
+              "createdAt": "2026-11-21T01:28:06Z",
+              "updatedAt": "2026-11-21T01:28:26Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZb4Sjw",
+          "commit": {
+            "abbreviatedOid": "cf6c4fd"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "We may need to simplify further. We should never need to repeat text that is already present in the QUIC events draft, we need only to specify what changes.",
+          "createdAt": "2026-11-21T01:45:38Z",
+          "updatedAt": "2026-11-21T01:48:28Z",
+          "comments": [
+            {
+              "originalPosition": 56,
+              "body": "Yes, we don't need it. It is already stated in the quic events draft.",
+              "createdAt": "2026-11-21T01:45:38Z",
+              "updatedAt": "2026-11-21T01:48:28Z"
+            },
+            {
+              "originalPosition": 53,
+              "body": "Yes. we only need to say that when the extension is used, the packets described as needing retransmissions where packet sent on the designated path_id.",
+              "createdAt": "2026-11-21T01:46:47Z",
+              "updatedAt": "2026-11-21T01:48:28Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 14,
+      "id": "PR_kwDOVzZa388AAAABQU0Sqw",
+      "title": "Reconcile two contributions after merge conflicts",
+      "url": "https://github.com/huitema/qlog-multipath-extension/pull/14",
+      "state": "MERGED",
+      "author": "huitema",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Both @Yanmei-Liu and @altanai made contributions, one defining the new events and packet types, the other defining the modification to existing QUIC events. The github merge of course made a mess of things. This PR attempts to reconcile contributions.",
+      "createdAt": "2026-11-19T07:13:21Z",
+      "updatedAt": "2026-11-19T08:10:04Z",
+      "baseRepository": "huitema/qlog-multipath-extension",
+      "baseRefName": "main",
+      "baseRefOid": "36f216c03c151b08a5af0070f8da920610094135",
+      "headRepository": "huitema/qlog-multipath-extension",
+      "headRefName": "reconcile-a-y",
+      "headRefOid": "12a454b1c82ebd83f98b34125605fcd111bc2044",
+      "closedAt": "2026-11-19T08:07:38Z",
+      "mergedAt": "2026-11-19T08:07:38Z",
+      "mergedBy": "huitema",
+      "mergeCommit": {
+        "oid": "6a7a9fda136146b18910b628add3029d14c2fd5b"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOVzZa388AAAABY-MVVg",
+          "commit": {
+            "abbreviatedOid": "e4dfa71"
+          },
+          "author": "github-actions",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-19T07:13:47Z",
+          "updatedAt": "2026-11-19T07:13:47Z",
+          "comments": [
+            {
+              "originalPosition": 127,
+              "body": "````suggestion\nimplementations MUST include `path_id`, including when its value is 0.\n````",
+              "createdAt": "2026-11-19T07:13:47Z",
+              "updatedAt": "2026-11-19T07:13:47Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABY-aGqg",
+          "commit": {
+            "abbreviatedOid": "117c281"
+          },
+          "author": "Yanmei-Liu",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "Thanks, Christian. The merged draft looks good to me overall. I\u2019ve marked the three remaining inconsistencies with suggested changes. Could you take another look at those spots?",
+          "createdAt": "2026-11-19T07:35:23Z",
+          "updatedAt": "2026-11-19T07:41:17Z",
+          "comments": [
+            {
+              "originalPosition": 187,
+              "body": "The three new path events now appear above this paragraph, while the frame definitions follow it. Could we point to each section directly?\n\n```suggestion\nevent-by-event semantics and applicability of the common field.\n{{mp-events}} defines the new events. {{multipath-specific-frames}}\ndefines the frame encodings.\n```",
+              "createdAt": "2026-11-19T07:35:23Z",
+              "updatedAt": "2026-11-19T07:35:23Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABY-chjQ",
+          "commit": {
+            "abbreviatedOid": "117c281"
+          },
+          "author": "Yanmei-Liu",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-19T07:39:34Z",
+          "updatedAt": "2026-11-19T07:40:15Z",
+          "comments": [
+            {
+              "originalPosition": 1,
+              "body": "The packet is sent on path 0. Could we record that on the event itself? The PATH_ACK acknowledges path 1, and PATH_CIDS_BLOCKED refers to path 2.\n\n```suggestion\n  \"name\": \"quic:packet_sent\",\n  \"path_id\": 0,\n```",
+              "createdAt": "2026-11-19T07:39:34Z",
+              "updatedAt": "2026-11-19T07:40:15Z"
+            },
+            {
+              "originalPosition": 2,
+              "body": "Could we use the same schema URI here as in the permanent definition and the IANA entry? This restores the wording from #10 and gives draft implementations one identifier to put in `event_schemas`.\n\n```suggestion\nOnly implementations of the published RFC can use the unversioned URN\ndefined in {{event-schema}}. Implementations of a draft version MUST\nappend a hyphen and the corresponding draft number to that URN. For\nexample, draft 00 uses `urn:ietf:params:qlog:events:quic#multipath-00`.\n```",
+              "createdAt": "2026-11-19T07:40:01Z",
+              "updatedAt": "2026-11-19T07:40:15Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABY-dVdw",
+          "commit": {
+            "abbreviatedOid": "117c281"
+          },
+          "author": "Yanmei-Liu",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-19T07:40:59Z",
+          "updatedAt": "2026-11-19T07:40:59Z",
+          "comments": [
+            {
+              "originalPosition": 193,
+              "body": "Could we remove this second copy of the versioning rule when applying the draft-identification suggestion? That keeps the rule in the section marked for removal at publication. [Companion suggestion](https://github.com/huitema/qlog-multipath-extension/pull/14#discussion_r4625688842)\n\n```suggestion\n\n# Multipath specific frames\n```",
+              "createdAt": "2026-11-19T07:40:59Z",
+              "updatedAt": "2026-11-19T07:40:59Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABY-d7rA",
+          "commit": {
+            "abbreviatedOid": "117c281"
+          },
+          "author": "Yanmei-Liu",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-19T07:41:58Z",
+          "updatedAt": "2026-11-19T07:41:58Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABY-jj0Q",
+          "commit": {
+            "abbreviatedOid": "117c281"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-19T07:51:02Z",
+          "updatedAt": "2026-11-19T07:51:02Z",
+          "comments": [
+            {
+              "originalPosition": 187,
+              "body": "Done.",
+              "createdAt": "2026-11-19T07:51:02Z",
+              "updatedAt": "2026-11-19T07:51:02Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABY-lGxA",
+          "commit": {
+            "abbreviatedOid": "117c281"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-19T07:53:28Z",
+          "updatedAt": "2026-11-19T07:53:28Z",
+          "comments": [
+            {
+              "originalPosition": 193,
+              "body": "I think I removed it.",
+              "createdAt": "2026-11-19T07:53:28Z",
+              "updatedAt": "2026-11-19T07:53:28Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABY-m7DQ",
+          "commit": {
+            "abbreviatedOid": "117c281"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-19T07:56:09Z",
+          "updatedAt": "2026-11-19T07:56:09Z",
+          "comments": [
+            {
+              "originalPosition": 2,
+              "body": "I think this was fixed. I will review again,",
+              "createdAt": "2026-11-19T07:56:09Z",
+              "updatedAt": "2026-11-19T07:56:09Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 15,
+      "id": "PR_kwDOVzZa388AAAABQVNCeg",
+      "title": "Add Yanmei Liu as a co-author",
+      "url": "https://github.com/huitema/qlog-multipath-extension/pull/15",
+      "state": "MERGED",
+      "author": "Yanmei-Liu",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I\u2019d like to join the draft as a co-author following my work on the multipath event and frame definitions in #10 and #11.\n\nI\u2019ve listed us as Christian Huitema, Yanmei Liu, and Altanai Bisht. @altanai, would that order work for you?\n",
+      "createdAt": "2026-11-19T07:48:17Z",
+      "updatedAt": "2026-11-20T00:38:49Z",
+      "baseRepository": "huitema/qlog-multipath-extension",
+      "baseRefName": "main",
+      "baseRefOid": "36f216c03c151b08a5af0070f8da920610094135",
+      "headRepository": "huitema/qlog-multipath-extension",
+      "headRefName": "docs/add-yanmei-liu-as-coauthor",
+      "headRefOid": "1c8eae74135b69ffa740c01c47160a6269e17a74",
+      "closedAt": "2026-11-20T00:38:49Z",
+      "mergedAt": "2026-11-20T00:38:49Z",
+      "mergedBy": "huitema",
+      "mergeCommit": {
+        "oid": "5f260052513f5c8a7f22fc78d5669100b2e6cdac"
+      },
+      "comments": [
+        {
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Hey Yanmei Liu\r\nAlthough I was prepared to work whole heartedly to earn my name as second author but I dont mind number 3 too. \r\ngo ahead with Christian Huitema, Yanmei Liu, and Altanai Bisht ",
+          "createdAt": "2026-11-20T00:02:02Z",
+          "updatedAt": "2026-11-20T00:02:02Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOVzZa388AAAABZMG-8g",
+          "commit": {
+            "abbreviatedOid": "1c8eae7"
+          },
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-20T00:02:23Z",
+          "updatedAt": "2026-11-20T00:02:23Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZMc0Ew",
+          "commit": {
+            "abbreviatedOid": "1c8eae7"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-20T00:38:40Z",
+          "updatedAt": "2026-11-20T00:38:40Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 21,
+      "id": "PR_kwDOVzZa388AAAABQdrUIg",
+      "title": "Log the initial_max_path_id transport parameter in parameters_set",
+      "url": "https://github.com/huitema/qlog-multipath-extension/pull/21",
+      "state": "MERGED",
+      "author": "mp0rta",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The draft covers the RFC 10069 frames and path events, but not the `initial_max_path_id` transport parameter ([RFC 10069 \u00a72.1](https://www.rfc-editor.org/rfc/rfc10069.html#section-2.1)).\n\nThis adds it as an optional `uint32` field of the existing `quic:parameters_set` event, through `$$quic-parametersset-extension`. `quic:parameters_restored` is not changed, since the parameter is not remembered for a subsequent connection.\n\nThe draft built as text and HTML. The example validated against the combined qlog CDDL. For the new field, 0 and 2^32-1 were accepted; a text value, 2^32 and -1 were rejected.",
+      "createdAt": "2026-11-19T17:31:33Z",
+      "updatedAt": "2026-11-19T18:28:08Z",
+      "baseRepository": "huitema/qlog-multipath-extension",
+      "baseRefName": "main",
+      "baseRefOid": "6a7a9fda136146b18910b628add3029d14c2fd5b",
+      "headRepository": "mp0rta/qlog-multipath-extension",
+      "headRefName": "params-initial-max-path-id",
+      "headRefOid": "b9deb3b148cca70b56e0929afb4cf7ecb7eccc9f",
+      "closedAt": "2026-11-19T18:28:08Z",
+      "mergedAt": "2026-11-19T18:28:08Z",
+      "mergedBy": "huitema",
+      "mergeCommit": {
+        "oid": "d4024d32c4c97531cbcbceefa40d97d70dcbd22f"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOVzZa388AAAABZH2Zdg",
+          "commit": {
+            "abbreviatedOid": "b9deb3b"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "Thanks for the input, @mp0rta. Yes, we need to add a new value in the parameters list, and also make sure that all implementations use the same string to identify it.",
+          "createdAt": "2026-11-19T18:27:59Z",
+          "updatedAt": "2026-11-19T18:27:59Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 22,
+      "id": "PR_kwDOVzZa388AAAABQdzHmw",
+      "title": "Add machine-checkable path_id validation",
+      "url": "https://github.com/huitema/qlog-multipath-extension/pull/22",
+      "state": "CLOSED",
+      "author": "altanai",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "intended for the issue #20.\r\n\r\nAdd a CDDL overlay that constrains `path_id` on complete qlog events and trace common fields while preserving the main and QUIC event schemas. Include semantic validation cases for unsigned 32-bit boundaries, common-field inheritance and consistency, missing IDs for known path context, and invalid placement inside `data`.\r\n\r\nThe overlay is meant to be compiled in the same CDDL unit as the qlog main schema, QUIC event schema, and multipath schema. The Python checker covers semantic rules CDDL cannot express.\r\n\r\nValidation: `python3 scripts/check_path_id_validation.py` \u2014 10 cases passed.",
+      "createdAt": "2026-11-19T17:39:57Z",
+      "updatedAt": "2026-11-19T18:43:33Z",
+      "baseRepository": "huitema/qlog-multipath-extension",
+      "baseRefName": "main",
+      "baseRefOid": "6a7a9fda136146b18910b628add3029d14c2fd5b",
+      "headRepository": "altanai/qlog-multipath-extension",
+      "headRefName": "codex/rfc10069-path-id",
+      "headRefOid": "a5964a0c06426a103153a16286b7fc877b859ba3",
+      "closedAt": "2026-11-19T18:38:06Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "body": "This should likley goto a separate POC repo I reckon . \r\nclosing this here ",
+          "createdAt": "2026-11-19T18:38:06Z",
+          "updatedAt": "2026-11-19T18:43:33Z"
+        },
+        {
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Moved the checker and its example cases into a standalone POC: https://github.com/altanai/qlog-path-id-validation-poc. The README documents that this is a small semantic-checking experiment and does not compile the combined qlog CDDL schemas.",
+          "createdAt": "2026-11-19T18:42:49Z",
+          "updatedAt": "2026-11-19T18:42:59Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 23,
+      "id": "PR_kwDOVzZa388AAAABQewZ9A",
+      "title": "Add path validation lifecycle qlog event",
+      "url": "https://github.com/huitema/qlog-multipath-extension/pull/23",
+      "state": "OPEN",
+      "author": "altanai",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "altanai"
+      ],
+      "labels": [],
+      "body": "Add `quic:path_validation_updated` to report local path validation transitions, including optional trigger, failure reason, and PATH_ABANDON error code. Register the event type alongside the existing multipath path lifecycle events.",
+      "createdAt": "2026-11-19T18:49:38Z",
+      "updatedAt": "2026-11-20T22:17:56Z",
+      "baseRepository": "huitema/qlog-multipath-extension",
+      "baseRefName": "main",
+      "baseRefOid": "d4024d32c4c97531cbcbceefa40d97d70dcbd22f",
+      "headRepository": "huitema/qlog-multipath-extension",
+      "headRefName": "codex/path-validation-events",
+      "headRefOid": "83bb9769ce82eef26cf8aa07d580c913ef97ff3a",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "body": "gives qlog a way to record the endpoint\u2019s validation state.",
+          "createdAt": "2026-11-19T19:29:03Z",
+          "updatedAt": "2026-11-19T19:29:03Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOVzZa388AAAABZJjmNg",
+          "commit": {
+            "abbreviatedOid": "39987aa"
+          },
+          "author": "flub",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-19T20:21:36Z",
+          "updatedAt": "2026-11-19T20:22:40Z",
+          "comments": [
+            {
+              "originalPosition": 21,
+              "body": "I'm not sure if \"started\" is needed here, but that's an opinion only held lightly.",
+              "createdAt": "2026-11-19T20:21:36Z",
+              "updatedAt": "2026-11-19T20:22:40Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZNFthQ",
+          "commit": {
+            "abbreviatedOid": "39987aa"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "I am not sure about that one. The validation really is by tuple, not by path. We already have a \"migration state updated\" event in the main QUIC schema:\n\n[5.21. ](https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-quic-events.html#section-5.21)[migration_state_updated](https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-quic-events.html#name-migration_state_updated)\n\nValidation is not listed per se, but it is pretty much the same as \"migration_complete\".",
+          "createdAt": "2026-11-20T02:00:04Z",
+          "updatedAt": "2026-11-20T02:00:04Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZOAgVQ",
+          "commit": {
+            "abbreviatedOid": "39987aa"
+          },
+          "author": "Yanmei-Liu",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "Thank you for making the local endpoint\u2019s validation outcome explicit. I\u2019ve left three inline suggestions on identifying the tuple, keeping the CDDL parseable, and interpreting the outcome.",
+          "createdAt": "2026-11-20T04:11:56Z",
+          "updatedAt": "2026-11-20T04:11:57Z",
+          "comments": [
+            {
+              "originalPosition": 15,
+              "body": "Could we log the `tuple` being validated alongside `path_id`? Migration can change the tuple under one Path ID, and a new Path ID can reuse a validated tuple. `migration_complete` implies the old path was discarded, but it can stay active when an additional path is validated. [RFC 10069 \u00a73.1](https://www.rfc-editor.org/rfc/rfc10069.html#section-3.1), [\u00a73.1.2](https://www.rfc-editor.org/rfc/rfc10069.html#section-3.1.2), [qlog \u00a75.21](https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-quic-events-14#section-5.21).",
+              "createdAt": "2026-11-20T04:11:56Z",
+              "updatedAt": "2026-11-20T04:13:24Z"
+            },
+            {
+              "originalPosition": 38,
+              "body": "CDDL allows only one rule name to the left of `=`. `QUICPathValidationUpdated` already has its own definition above. [RFC 8610, Appendix B](https://www.rfc-editor.org/rfc/rfc8610.html#appendix-B).\n\n```suggestion\nQUICPathStatusUpdated = {\n```",
+              "createdAt": "2026-11-20T04:11:56Z",
+              "updatedAt": "2026-11-20T04:13:26Z"
+            },
+            {
+              "originalPosition": 17,
+              "body": "Could `succeeded` require receiving a matching `PATH_RESPONSE`, and `failed` mean the endpoint gave up an outstanding validation attempt? A match can validate the address while the 1200-byte MTU check is still pending. `PATH_ABANDON` can close an unused Path ID, so its error code alone says why the path closed. [RFC 9000 \u00a78.2.3](https://www.rfc-editor.org/rfc/rfc9000.html#section-8.2.3), [\u00a78.2.4](https://www.rfc-editor.org/rfc/rfc9000.html#section-8.2.4), [RFC 10069 \u00a73.1](https://www.rfc-editor.org/rfc/rfc10069.html#section-3.1), [\u00a73.4](https://www.rfc-editor.org/rfc/rfc10069.html#section-3.4), [\u00a74.2.1](https://www.rfc-editor.org/rfc/rfc10069.html#section-4.2.1).",
+              "createdAt": "2026-11-20T04:11:57Z",
+              "updatedAt": "2026-11-20T04:13:28Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZONE3g",
+          "commit": {
+            "abbreviatedOid": "39987aa"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "CHANGES_REQUESTED",
+          "body": "I don't think we should create a multipath event for the validation. Validation is per tuple, and we already have an event in the quic log definition. We should reuse that event, extend it if necessary, but not create our own.",
+          "createdAt": "2026-11-20T04:40:40Z",
+          "updatedAt": "2026-11-20T04:48:45Z",
+          "comments": [
+            {
+              "originalPosition": 25,
+              "body": "path abandoned is not a validation failure. It is recorded in its own event, so we should not duplicate it here.",
+              "createdAt": "2026-11-20T04:40:40Z",
+              "updatedAt": "2026-11-20T04:48:45Z"
+            },
+            {
+              "originalPosition": 15,
+              "body": "This should be tied to the section of 10069 defining validation. But I am dubious that we need a new event here, because we already have the quic event \"[migration_state_updated](https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-quic-events-14#name-migration_state_updated). We should not create duplicates of the quic level events. We may want to extend them with new information if needed. Don't we say that these events should carry a path ID in the event header?",
+              "createdAt": "2026-11-20T04:45:20Z",
+              "updatedAt": "2026-11-20T04:48:45Z"
+            },
+            {
+              "originalPosition": 21,
+              "body": "We usually say \"initiated\". But we really should not attach this to the path. This is a tuple event.",
+              "createdAt": "2026-11-20T04:46:22Z",
+              "updatedAt": "2026-11-20T04:48:45Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZaK0YQ",
+          "commit": {
+            "abbreviatedOid": "83bb976"
+          },
+          "author": "flub",
+          "authorAssociation": "COLLABORATOR",
+          "state": "CHANGES_REQUESTED",
+          "body": "Only trying to change my review here, as said elsewhere I agree that that this is a 4-tuple event and not directly a multipath concern. Multipath only needs to map a 4-tuple to a path at all times.",
+          "createdAt": "2026-11-20T22:17:56Z",
+          "updatedAt": "2026-11-20T22:17:56Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 25,
+      "id": "PR_kwDOVzZa388AAAABQe4uBQ",
+      "title": "Explain how to correlate 1-RTT packets across paths",
+      "url": "https://github.com/huitema/qlog-multipath-extension/pull/25",
+      "state": "MERGED",
+      "author": "Yanmei-Liu",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #24.\n\nWithin one connection and sending direction, match 1-RTT qlog events by `(path_id, packet_number)`. Include the event-level `path_id` even on path 0. [RFC 10069 \u00a71](https://www.rfc-editor.org/rfc/rfc10069.html#section-1)\n\nIn the example, the server's receive event matches the client's send of `(1, 42)`. The client's loss event matches its send of `(0, 42)`.\n\nRecord `path_id: 0` for Initial, Handshake, 0-RTT, and Retry packet events. Omit `packet_number` for Retry. [RFC 9000 \u00a712.3](https://www.rfc-editor.org/rfc/rfc9000.html#section-12.3)\n\nRendered the draft as text and HTML, validated the four example events against the qlog and multipath CDDL, and checked both packet matches.\n",
+      "createdAt": "2026-11-19T18:59:07Z",
+      "updatedAt": "2026-11-20T15:13:25Z",
+      "baseRepository": "huitema/qlog-multipath-extension",
+      "baseRefName": "main",
+      "baseRefOid": "d4024d32c4c97531cbcbceefa40d97d70dcbd22f",
+      "headRepository": "huitema/qlog-multipath-extension",
+      "headRefName": "docs/1rtt-packet-correlation",
+      "headRefOid": "0bfc24f78608c632ff17463970852a38eb02687c",
+      "closedAt": "2026-11-20T15:13:25Z",
+      "mergedAt": "2026-11-20T15:13:25Z",
+      "mergedBy": "huitema",
+      "mergeCommit": {
+        "oid": "9749c30af8bcffa98eb269cb1d9cdc21c3fbec5d"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOVzZa388AAAABZOr7zg",
+          "commit": {
+            "abbreviatedOid": "9cbf4c7"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-20T05:44:07Z",
+          "updatedAt": "2026-11-20T05:44:07Z",
+          "comments": [
+            {
+              "originalPosition": 50,
+              "body": "The last line is not necessary. The syntax in the QUIC events draft says:\n~~~\n    ; only if packet_type === \"initial\" || \"handshake\" || \"0RTT\" ||\n    ;                         \"1RTT\"\n    ? packet_number_length: uint8\n~~~\nWe don't need to repeat that there is no packet number for Retry. Or for Version Negotiation.\n",
+              "createdAt": "2026-11-20T05:44:07Z",
+              "updatedAt": "2026-11-20T05:44:07Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZVLCWw",
+          "commit": {
+            "abbreviatedOid": "30179a2"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-20T15:11:37Z",
+          "updatedAt": "2026-11-20T15:11:37Z",
+          "comments": [
+            {
+              "originalPosition": 63,
+              "body": "```suggestion\nThe `path_id` is set to 0 for Initial, Handshake, 0-RTT, and Retry packet events.\n```",
+              "createdAt": "2026-11-20T15:11:37Z",
+              "updatedAt": "2026-11-20T15:11:37Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZVMfRw",
+          "commit": {
+            "abbreviatedOid": "0bfc24f"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "Looks good.",
+          "createdAt": "2026-11-20T15:13:15Z",
+          "updatedAt": "2026-11-20T15:13:15Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 26,
+      "id": "PR_kwDOVzZa388AAAABQk9G8w",
+      "title": "Clarify how qlog records multipath negotiation",
+      "url": "https://github.com/huitema/qlog-multipath-extension/pull/26",
+      "state": "OPEN",
+      "author": "Yanmei-Liu",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #18.\n\nIn `quic:parameters_set`, the optional `initial_max_path_id` field records the value advertised by the endpoint identified by `initiator`. The draft now points directly to [Section 2.1 of RFC 10069](https://www.rfc-editor.org/rfc/rfc10069.html#section-2.1) for the transport parameter definition.\n",
+      "createdAt": "2026-11-20T03:58:11Z",
+      "updatedAt": "2026-11-20T05:37:21Z",
+      "baseRepository": "huitema/qlog-multipath-extension",
+      "baseRefName": "main",
+      "baseRefOid": "5f260052513f5c8a7f22fc78d5669100b2e6cdac",
+      "headRepository": "huitema/qlog-multipath-extension",
+      "headRefName": "docs/multipath-negotiation-logging",
+      "headRefOid": "562f452c26cdeb7b63ee622f8544734ba2935553",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOVzZa388AAAABZOIqQg",
+          "commit": {
+            "abbreviatedOid": "9cdce35"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "CHANGES_REQUESTED",
+          "body": "No, we should not do that. The \"multipath\" log extension should just say how variables are logged, and which element of RFC 10069 they represent. Maybe add a pointer to the section of 10069 where this is described, but do not repeat or paraphrase the text.",
+          "createdAt": "2026-11-20T04:30:21Z",
+          "updatedAt": "2026-11-20T04:32:31Z",
+          "comments": [
+            {
+              "originalPosition": 30,
+              "body": "I don't think we should have that level of detail. Your text is repeating the content of RFC 10029, and we should not do that. The text that it replaces was falling in the same trap. It would be sufficient to say that `initial_max_path_id: uint32` records the content of the `initial_max_path_id` TP sent by the initiator, and is only present if the TP was advertised by the initiator.",
+              "createdAt": "2026-11-20T04:30:21Z",
+              "updatedAt": "2026-11-20T04:32:31Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZOhfzA",
+          "commit": {
+            "abbreviatedOid": "9cdce35"
+          },
+          "author": "Yanmei-Liu",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-20T05:21:39Z",
+          "updatedAt": "2026-11-20T05:21:40Z",
+          "comments": [
+            {
+              "originalPosition": 30,
+              "body": "I\u2019ve removed the redundant text.",
+              "createdAt": "2026-11-20T05:21:39Z",
+              "updatedAt": "2026-11-20T05:21:40Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZOo_3Q",
+          "commit": {
+            "abbreviatedOid": "562f452"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "Yes. Good example of focusing on the essential!",
+          "createdAt": "2026-11-20T05:37:21Z",
+          "updatedAt": "2026-11-20T05:37:21Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 27,
+      "id": "PR_kwDOVzZa388AAAABQtp2cg",
+      "title": "Add co-author",
+      "url": "https://github.com/huitema/qlog-multipath-extension/pull/27",
+      "state": "MERGED",
+      "author": "mp0rta",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I'd like to join the draft as a co-author, following the `initial_max_path_id` transport parameter text in #21. \nI've added myself at the end of the author list, after Altanai Bisht.",
+      "createdAt": "2026-11-20T16:17:43Z",
+      "updatedAt": "2026-11-20T20:11:04Z",
+      "baseRepository": "huitema/qlog-multipath-extension",
+      "baseRefName": "main",
+      "baseRefOid": "9749c30af8bcffa98eb269cb1d9cdc21c3fbec5d",
+      "headRepository": "mp0rta/qlog-multipath-extension",
+      "headRefName": "add-coauthor",
+      "headRefOid": "37f275f07401087a4c7bae0e84b567314ef0edbc",
+      "closedAt": "2026-11-20T20:11:04Z",
+      "mergedAt": "2026-11-20T20:11:04Z",
+      "mergedBy": "huitema",
+      "mergeCommit": {
+        "oid": "e4ac6095d0e1b83fc15549209042613a890a3c23"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOVzZa388AAAABZYlHAg",
+          "commit": {
+            "abbreviatedOid": "37f275f"
+          },
+          "author": "Yanmei-Liu",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-20T19:47:47Z",
+          "updatedAt": "2026-11-20T19:47:47Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZY0rZw",
+          "commit": {
+            "abbreviatedOid": "37f275f"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-20T20:10:56Z",
+          "updatedAt": "2026-11-20T20:10:56Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 28,
+      "id": "PR_kwDOVzZa388AAAABQw3Y-g",
+      "title": "Update the title to QLOG extensions for Multiple Paths in QUIC",
+      "url": "https://github.com/huitema/qlog-multipath-extension/pull/28",
+      "state": "MERGED",
+      "author": "huitema",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes #16",
+      "createdAt": "2026-11-20T20:40:30Z",
+      "updatedAt": "2026-11-20T22:59:42Z",
+      "baseRepository": "huitema/qlog-multipath-extension",
+      "baseRefName": "main",
+      "baseRefOid": "e4ac6095d0e1b83fc15549209042613a890a3c23",
+      "headRepository": "huitema/qlog-multipath-extension",
+      "headRefName": "update-title",
+      "headRefOid": "9ff5e974b8419672db29cae3e97614d2ebf9cb30",
+      "closedAt": "2026-11-20T22:59:35Z",
+      "mergedAt": "2026-11-20T22:59:35Z",
+      "mergedBy": "huitema",
+      "mergeCommit": {
+        "oid": "f8ef13c452fab9f85c85c1a34e1b941975384c27"
+      },
+      "comments": [
+        {
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "body": "shorter title sounds good.. stamped ",
+          "createdAt": "2026-11-20T22:14:52Z",
+          "updatedAt": "2026-11-20T22:14:52Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOVzZa388AAAABZaGlew",
+          "commit": {
+            "abbreviatedOid": "9ff5e97"
+          },
+          "author": "flub",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-20T22:11:00Z",
+          "updatedAt": "2026-11-20T22:11:00Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZaJOoA",
+          "commit": {
+            "abbreviatedOid": "9ff5e97"
+          },
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-20T22:15:02Z",
+          "updatedAt": "2026-11-20T22:15:02Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 30,
+      "id": "PR_kwDOVzZa388AAAABQ8WPWw",
+      "title": "Rework abstract, introduction, path-id section.",
+      "url": "https://github.com/huitema/qlog-multipath-extension/pull/30",
+      "state": "OPEN",
+      "author": "huitema",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "This is mostly an editorial PR:\n\n* rework the abstract\n* rework the introduction, adding a reference to tools for motivation, and adding a paragraph on the organization of the document.\n* move the text defining path_id to its own section\n\n",
+      "createdAt": "2026-11-21T20:16:02Z",
+      "updatedAt": "2026-11-21T20:16:38Z",
+      "baseRepository": "huitema/qlog-multipath-extension",
+      "baseRefName": "main",
+      "baseRefOid": "f8ef13c452fab9f85c85c1a34e1b941975384c27",
+      "headRepository": "huitema/qlog-multipath-extension",
+      "headRefName": "path-id-upfront",
+      "headRefOid": "3ec7066644c038b95d9c9b6feb49fe480fc92bdc",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    }
+  ]
+}
