@@ -71,7 +71,7 @@ The QLOG specifications defines structured logs for QUIC connections,
 and has proven very useful to debug QUIC implementations and deployments.
 This draft extends the QLOG specification for QUIC events. It add a
 Path ID element to event headers, defines new events to log the
-creation and management of multipla paths, and specifies the logging format
+creation and management of multiple paths, and specifies the logging format
 of new frames introduced in RFC 10069.
 
 --- middle
