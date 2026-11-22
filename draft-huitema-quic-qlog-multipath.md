@@ -138,7 +138,7 @@ exampledraft 00 of this document is identified using the URI
 
 # Adding a path identifier to event headers {#path-id-def}
 
-Managing multiple path per connection requires identifying these paths.
+Managing multiple paths per connection requires identifying these paths.
 Per {{RFC10069}}, this is done using a path ID. This path ID
 will be added to events as specified in {{mp-events}} and {{add-path-id}}.
 Each of these events MUST include the following field in its top-level
