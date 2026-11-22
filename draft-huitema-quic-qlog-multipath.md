@@ -140,7 +140,7 @@ exampledraft 00 of this document is identified using the URI
 
 Managing multiple path per connection requires identifying these paths.
 Per {{RFC10069}}, this is done using a path ID. This path ID
-will be added to all relevant events.
+will be added to events as specified in {{mp-events}} and {{add-path-id}}.
 Each of these events MUST include the following field in its top-level
 `Event` map alongside `time`, `name`, and `data`
 ({{Section 7 of I-D.ietf-quic-qlog-main-schema}}).
