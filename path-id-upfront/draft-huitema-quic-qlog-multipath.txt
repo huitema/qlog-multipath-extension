@@ -74,30 +74,31 @@ Copyright Notice
 Table of Contents
 
    1.  Introduction
-   2.  Event Schema Definition
-     2.1.  Draft Event Schema Identification
-   3.  Adding a path identifier to event headers
-   4.  Multipath specific events and event extensions
-     4.1.  path_created
-     4.2.  path_abandoned
-     4.3.  path_status_updated
-     4.4.  Example
-   5.  Add a Path identifier to existing QUIC events
-     5.1.  Correlating 1-RTT packet events across paths
-   6.  Multipath transport parameter
-     6.1.  Example
-   7.  Multipath specific frames
-     7.1.  PATH_ACK
-     7.2.  PATH_ABANDON
-     7.3.  PATH_STATUS_AVAILABLE and PATH_STATUS_BACKUP
-     7.4.  PATH_NEW_CONNECTION_ID and PATH_RETIRE_CONNECTION_ID
-     7.5.  MAX_PATH_ID, PATHS_BLOCKED, and PATH_CIDS_BLOCKED
-     7.6.  Example
-   8.  Security Considerations
-   9.  IANA Considerations
-   10. References
-     10.1.  Normative References
-     10.2.  Informative References
+   2.  Conventions and Definitions
+   3.  Event Schema Definition
+     3.1.  Draft Event Schema Identification
+   4.  Adding a path identifier to event headers
+   5.  Multipath specific events and event extensions
+     5.1.  path_created
+     5.2.  path_abandoned
+     5.3.  path_status_updated
+     5.4.  Example
+   6.  Add a Path identifier to existing QUIC events
+     6.1.  Correlating 1-RTT packet events across paths
+   7.  Multipath transport parameter
+     7.1.  Example
+   8.  Multipath specific frames
+     8.1.  PATH_ACK
+     8.2.  PATH_ABANDON
+     8.3.  PATH_STATUS_AVAILABLE and PATH_STATUS_BACKUP
+     8.4.  PATH_NEW_CONNECTION_ID and PATH_RETIRE_CONNECTION_ID
+     8.5.  MAX_PATH_ID, PATHS_BLOCKED, and PATH_CIDS_BLOCKED
+     8.6.  Example
+   9.  Security Considerations
+   10. IANA Considerations
+   11. References
+     11.1.  Normative References
+     11.2.  Informative References
    Acknowledgments
    Authors' Addresses
 
@@ -129,12 +130,13 @@ Table of Contents
    required logging information is defined in this document.
 
    This document defines how a path_id can be added to event headers in
-   Section 3, adds events describing the management of paths in
-   Section 4, explains the effects of adding a path_id to events defined
-   in [I-D.ietf-quic-qlog-quic-events] in Section 5, specifies the
-   logging of multipath specific frames in Section 7, and that of the
-   multipath transport parameter in Section 6. # Conventions and
-   Definitions
+   Section 4, adds events describing the management of paths in
+   Section 5, explains the effects of adding a path_id to events defined
+   in [I-D.ietf-quic-qlog-quic-events] in Section 6, specifies the
+   logging of multipath specific frames in Section 8, and that of the
+   multipath transport parameter in Section 7.
+
+2.  Conventions and Definitions
 
    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
@@ -142,7 +144,7 @@ Table of Contents
    BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
 
-2.  Event Schema Definition
+3.  Event Schema Definition
 
    This document extends the quic namespace of
    [I-D.ietf-quic-qlog-quic-events] to cover the multipath extension
@@ -151,12 +153,12 @@ Table of Contents
    identifies the extension within the quic namespace, as specified in
    Section 8.1 of [I-D.ietf-quic-qlog-main-schema].
 
-2.1.  Draft Event Schema Identification
+3.1.  Draft Event Schema Identification
 
    This section is to be removed before publishing as an RFC.
 
    Only implementations of the published RFC can use the unversioned URN
-   defined in Section 2.  Until such an RFC exists, implementations MUST
+   defined in Section 3.  Until such an RFC exists, implementations MUST
    NOT identify themselves as using this URI.
 
    Implementations of draft versions of this document MUST append a
@@ -164,11 +166,11 @@ Table of Contents
    exampledraft 00 of this document is identified using the URI
    urn:ietf:params:qlog:events:quic#multipath-00.
 
-3.  Adding a path identifier to event headers
+4.  Adding a path identifier to event headers
 
    Managing multiple paths per connection requires identifying these
    paths.  Per [RFC10069], this is done using a path ID.  This path ID
-   will be added to events as specified in Section 4 and Section 5.
+   will be added to events as specified in Section 5 and Section 6.
    Each of these events MUST include the following field in its top-
    level Event map alongside time, name, and data (Section 7 of
    [I-D.ietf-quic-qlog-main-schema]).
@@ -193,9 +195,9 @@ Table of Contents
    [I-D.ietf-quic-qlog-quic-events]).
 
    Adding a path ID to an event header indicates that this event is
-   related to a specific path.  This is explained in Section 5.
+   related to a specific path.  This is explained in Section 6.
 
-4.  Multipath specific events and event extensions
+5.  Multipath specific events and event extensions
 
    The three events in this section have Base importance.  They record
    changes to the paths of a connection as seen by the endpoint.  Packet
@@ -205,7 +207,7 @@ Table of Contents
 
    All the events described in this sections affect a single path.  The
    corresponding path_id MUST be included in the respective event
-   headers, as specified in Section 3.
+   headers, as specified in Section 4.
 
    The event data types extend the qlog main schema as follows.  The
    optional error_code and sequence_number fields use the qlog uint64
@@ -215,7 +217,7 @@ Table of Contents
    $ProtocolEventData /= QUICPathCreated / QUICPathAbandoned /
                          QUICPathStatusUpdated
 
-4.1.  path_created
+5.1.  path_created
 
    quic:path_created is emitted once when the endpoint starts using a
    Path ID for a new path.  For an additional path, the client logs the
@@ -232,7 +234,7 @@ Table of Contents
        * $$quic-pathcreated-extension
    }
 
-4.2.  path_abandoned
+5.2.  path_abandoned
 
    quic:path_abandoned is emitted once when the endpoint abandons the
    indicated Path ID under Section 3.4 of [RFC10069].  The initiator is
@@ -251,7 +253,7 @@ Table of Contents
        * $$quic-pathabandoned-extension
    }
 
-4.3.  path_status_updated
+5.3.  path_status_updated
 
    quic:path_status_updated is emitted when the endpoint changes the
    path usage preference it advertises (initiator is local), or records
@@ -279,7 +281,7 @@ Table of Contents
 
    QUICPathStatus = "available" / "backup"
 
-4.4.  Example
+5.4.  Example
 
    In this excerpt from a client's event list, the client opens path 1.
    It then receives the peer's first preference for path 1 in a packet
@@ -297,11 +299,11 @@ Table of Contents
                                "error_code": 62 } }
    ]
 
-5.  Add a Path identifier to existing QUIC events
+6.  Add a Path identifier to existing QUIC events
 
    When a QUIC event describes an operation or state for one known path,
    implementations MUST include path_id, including when its value is 0.
-   (The path_id field is defined in Section 3.)  Implementations MUST
+   (The path_id field is defined in Section 4.)  Implementations MUST
    omit the field when the event is connection-wide or when the
    associated Path ID is not known.  Omission does not mean path 0.  An
    implementation MAY place path_id in common_fields only when the same
@@ -378,10 +380,10 @@ Table of Contents
    The field is outside data, so existing QUIC event data definitions do
    not need to be copied or redefined for each event.  The table above
    specifies the event-by-event semantics and applicability of the
-   common field.  Section 4 defines the new events.  Section 7 defines
+   common field.  Section 5 defines the new events.  Section 8 defines
    the frame encodings.
 
-5.1.  Correlating 1-RTT packet events across paths
+6.1.  Correlating 1-RTT packet events across paths
 
    Every event that identifies a specific 1-RTT packet MUST carry its
    event-level path_id, even on path 0.  For the packet number spaces in
@@ -414,7 +416,7 @@ Table of Contents
    The path_id is set to 0 for Initial, Handshake, 0-RTT, and Retry
    packet events.
 
-6.  Multipath transport parameter
+7.  Multipath transport parameter
 
    The initial_max_path_id transport parameter (0x3e) is logged in
    quic:parameters_set.  The initiator field of that event identifies
@@ -430,7 +432,7 @@ Table of Contents
    immediately.  It is distinct from an absent field, which means that
    the endpoint did not advertise the parameter.
 
-6.1.  Example
+7.1.  Example
 
    In this excerpt from a client's event list, the client advertises a
    maximum Path ID of 3 and the server advertises 1.
@@ -442,7 +444,7 @@ Table of Contents
        "data": { "initiator": "remote", "initial_max_path_id": 1 } }
    ]
 
-7.  Multipath specific frames
+8.  Multipath specific frames
 
    The following CDDL extends the $QuicFrame type socket defined in
    Section 8.13 of [I-D.ietf-quic-qlog-quic-events].  These frame
@@ -464,7 +466,7 @@ Table of Contents
                  MaxPathIDFrame / PathsBlockedFrame /
                  PathCIDsBlockedFrame
 
-7.1.  PATH_ACK
+8.1.  PATH_ACK
 
    Both wire types in Section 4.1 of [RFC10069] use the frame type
    path_ack.  The path_id selects the packet number space being
@@ -489,7 +491,7 @@ Table of Contents
        ? raw: RawInfo
    )
 
-7.2.  PATH_ABANDON
+8.2.  PATH_ABANDON
 
    For PATH_ABANDON (0x3e75), path_id identifies the path being closed.
    The error field uses qlog transport error names, including no_error
@@ -510,7 +512,7 @@ Table of Contents
                       "path_unstable_or_poor" /         ; 0x3e76
                       "no_cid_available_for_path"       ; 0x3e77
 
-7.3.  PATH_STATUS_AVAILABLE and PATH_STATUS_BACKUP
+8.3.  PATH_STATUS_AVAILABLE and PATH_STATUS_BACKUP
 
    The frame_type identifies the preference advertised for path_id.  Use
    path_status_available for 0x3e77 and path_status_backup for 0x3e76.
@@ -525,7 +527,7 @@ Table of Contents
        ? raw: RawInfo
    }
 
-7.4.  PATH_NEW_CONNECTION_ID and PATH_RETIRE_CONNECTION_ID
+8.4.  PATH_NEW_CONNECTION_ID and PATH_RETIRE_CONNECTION_ID
 
    These frames use the fields of the base NewConnectionIDFrame and
    RetireConnectionIDFrame, with an additional path_id.  Both the
@@ -554,7 +556,7 @@ Table of Contents
        ? raw: RawInfo
    }
 
-7.5.  MAX_PATH_ID, PATHS_BLOCKED, and PATH_CIDS_BLOCKED
+8.5.  MAX_PATH_ID, PATHS_BLOCKED, and PATH_CIDS_BLOCKED
 
    MAX_PATH_ID (0x3e7a) advertises the largest acceptable Path ID in
    maximum.  PATHS_BLOCKED (0x3e7b) reports the Path ID limit in effect
@@ -583,7 +585,7 @@ Table of Contents
        ? raw: RawInfo
    }
 
-7.6.  Example
+8.6.  Example
 
    In this packet sent on path 0, the PATH_ACK acknowledges packets on
    path 1 and the PATH_CIDS_BLOCKED reports that the sender has run out
@@ -605,11 +607,11 @@ Table of Contents
      }
    }
 
-8.  Security Considerations
+9.  Security Considerations
 
    TODO Security
 
-9.  IANA Considerations
+10.  IANA Considerations
 
    This document registers a new entry in the "qlog event schema URIs"
    registry defined in Section 15 of [I-D.ietf-quic-qlog-main-schema].
@@ -623,7 +625,7 @@ Table of Contents
    Description: Event definitions related to the extensions to the QUIC
    transport protocol defined in [RFC10069].
 
-   Reference: Section 4 of this document.
+   Reference: Section 5 of this document.
 
    This document modifies the following QUIC events: packet_sent,
    packet_received, packet_dropped, packet_buffered, packets_acked,
@@ -633,11 +635,11 @@ Table of Contents
    migration_state_updated, frames_parsed, and frames_created.
 
    This document adds the initial_max_path_id field to the
-   parameters_set event (Section 6).
+   parameters_set event (Section 7).
 
-10.  References
+11.  References
 
-10.1.  Normative References
+11.1.  Normative References
 
    [I-D.ietf-quic-qlog-main-schema]
               Marx, R., Niccolini, L., Seemann, M., and L. Pardue,
@@ -674,7 +676,7 @@ Table of Contents
               DOI 10.17487/RFC10069, November 2026,
               <https://www.rfc-editor.org/rfc/rfc10069>.
 
-10.2.  Informative References
+11.2.  Informative References
 
    [DebuggingQuic]
               Marx, R., Piraux, M., Quax, P., and W. Lamotte, "Debugging
