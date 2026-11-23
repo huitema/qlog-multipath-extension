@@ -1658,11 +1658,10 @@ The client's loss event matches its send event for <code>(0, 42)</code>.<a href=
       <h2 id="name-multipath-transport-paramet">
 <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-multipath-transport-paramet" class="section-name selfRef">Multipath transport parameter</a>
       </h2>
-<p id="section-7-1">The <code>initial_max_path_id</code> transport parameter (0x3e) is logged in
-<code>quic:parameters_set</code>. The <code>initiator</code> field of that event identifies
-the endpoint that advertised the value. The multipath extension is
-enabled only if both endpoints advertise the parameter
-(<span><a href="https://rfc-editor.org/rfc/rfc10069#section-2" class="relref">Section 2</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>).<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-1">In <code>quic:parameters_set</code>, the <code>initial_max_path_id</code> field records the value
+of the transport parameter defined in <span><a href="https://rfc-editor.org/rfc/rfc10069#section-2.1" class="relref">Section 2.1</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>. Include
+this field only if the endpoint identified by <code>initiator</code> advertised the
+parameter.<a href="#section-7-1" class="pilcrow">¶</a></p>
 <div class="lang-cddl sourcecode" id="section-7-2">
 <pre>
 $$quic-parametersset-extension //= (
@@ -1670,9 +1669,6 @@ $$quic-parametersset-extension //= (
 )
 </pre><a href="#section-7-2" class="pilcrow">¶</a>
 </div>
-<p id="section-7-3">A value of 0 enables the extension without allowing extra paths
-immediately. It is distinct from an absent field, which means that the
-endpoint did not advertise the parameter.<a href="#section-7-3" class="pilcrow">¶</a></p>
 <div id="example-1">
 <section id="section-7.1">
         <h3 id="name-example-2">
