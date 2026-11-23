@@ -5,12 +5,12 @@
 QUIC                                                          C. Huitema
 Internet-Draft                                      Private Octopus Inc.
 Intended status: Informational                                    Y. Liu
-Expires: 26 May 2027                                        Alibaba Inc.
+Expires: 27 May 2027                                        Alibaba Inc.
                                                                 A. Bisht
                                                            Cisco Systems
                                                                N. Kurosu
                                                               Individual
-                                                        22 November 2026
+                                                        23 November 2026
 
 
                QLOG extensions for Multiple Paths in QUIC
@@ -18,12 +18,11 @@ Expires: 26 May 2027                                        Alibaba Inc.
 
 Abstract
 
-   The QLOG specifications defines structured logs for QUIC connections,
-   and has proven very useful to debug QUIC implementations and
-   deployments.  This draft extends the QLOG specification for QUIC
-   events.  It add a Path ID element to event headers, defines new
-   events to log the creation and management of multiple paths, and
-   specifies the logging format of new frames introduced in RFC 10069.
+   The qlog specifications define structured logs for QUIC connections.
+   This draft extends the qlog specification for QUIC events.  It adds a
+   Path ID element to event headers, defines new events to log the
+   creation and management of multiple paths, and specifies the logging
+   format of new frames introduced in RFC 10069.
 
 About This Document
 
@@ -55,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 26 May 2027.
+   This Internet-Draft will expire on 27 May 2027.
 
 Copyright Notice
 
