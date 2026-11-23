@@ -139,7 +139,7 @@ optional `error_code` and `sequence_number` fields use the qlog
 {{Sections 4.2 and 4.3 of RFC10069}}.
 
 ~~~ cddl
-$ProtocolEventData /= QUICPathCreated / QUICPathAbandoned / QUICPathValidationUpdated /
+$ProtocolEventData /= QUICPathCreated / QUICPathAbandoned /
                       QUICPathStatusUpdated
 ~~~
 
@@ -158,23 +158,6 @@ with `quic:migration_state_updated`.
 ~~~ cddl
 QUICPathCreated = {
     * $$quic-pathcreated-extension
-}
-~~~
-
-## path_validation_updated
-
-`quic:path_validation_updated` records a change in the endpoint's validation state for the indicated Path ID. It complements `path_challenge` and `path_response` frame logging: those frames show wire activity, while this event records whether the local validation procedure started, succeeded, or failed. Log one event for each state transition. The result is local to the logging endpoint and does not assert that the peer has reached the same state.
-
-`trigger`, when present, identifies the observed cause of the transition. `failure_reason` is only present when `state` is `failed`. `error_code` MAY be included when failure is associated with a PATH_ABANDON frame; in that case it is the PATH_ABANDON error code defined by {{Section 4.2 of RFC10069}}.
-
-~~~ cddl
-QUICPathValidationUpdated = {
-    state: "started" / "succeeded" / "failed"
-    ? trigger: "path_challenge_sent" / "path_response_received" /
-              "timeout" / "local_decision"
-    ? failure_reason: "timeout" / "path_abandoned" / "local_error" / "unknown"
-    ? error_code: uint64 .le 4611686018427387903
-    * $$quic-pathvalidationupdated-extension
 }
 ~~~
 
@@ -329,6 +312,64 @@ The server's receive event matches the client's send event for `(1, 42)`.
 The client's loss event matches its send event for `(0, 42)`.
 
 The `path_id` is set to 0 for Initial, Handshake, 0-RTT, and Retry packet events.
+
+## Logging validation during migration
+
+Path validation applies to the network tuple, as described in
+{{Section 3.1 of RFC10069}} and {{Section 8.2 of RFC9000}}. When an
+endpoint probes a candidate tuple for migration of an existing path, it
+can log the probe using the `probing_*` states of
+`quic:migration_state_updated`. The event-level `path_id` identifies the
+path, and `data.tuple_id` can identify the candidate tuple. Use
+`quic:tuple_assigned` to record the tuple details.
+
+`probing_successful` records that the endpoint received a matching
+`PATH_RESPONSE` for the probe and can consider the tuple for migration.
+`migration_complete` records completion of the switch to that tuple.
+The Path ID stays the same throughout the migration
+({{Section 3.1.2 of RFC10069}}).
+
+In this excerpt, a client probes a new tuple `t1` for path 1 and then
+completes migration to it. The probing result and the migration result
+are separate states of the same event type.
+
+~~~ json
+[
+  { "time": 30.0, "name": "quic:tuple_assigned", "path_id": 1,
+    "data": {
+      "tuple_id": "t1",
+      "tuple_local": { "address_v4": { "ip": "192.0.2.2", "port": 44300 } },
+      "tuple_remote": { "address_v4": { "ip": "198.51.100.1", "port": 443 } }
+    } },
+  { "time": 30.1, "name": "quic:migration_state_updated", "path_id": 1,
+    "data": { "new": "probing_started", "tuple_id": "t1" } },
+  { "time": 45.0, "name": "quic:migration_state_updated", "path_id": 1,
+    "data": { "new": "probing_successful", "tuple_id": "t1" } },
+  { "time": 48.0, "name": "quic:migration_state_updated", "path_id": 1,
+    "data": { "new": "migration_complete", "tuple_id": "t1" } }
+]
+~~~
+
+## Adding a path on a validated tuple
+
+An endpoint can reuse a previously validated tuple for a new Path ID
+({{Section 3.1 of RFC10069}}). In this client trace, path 0 already uses
+validated tuple `t0`. The client opens path 1 using the same local and
+remote IP addresses and UDP ports. Both paths can remain active.
+The client logs `quic:path_created` for path 1 and uses
+`quic:tuple_assigned` to associate path 1 with the existing tuple `t0`.
+
+~~~ json
+[
+  { "time": 12.0, "name": "quic:path_created", "path_id": 1, "data": {} },
+  { "time": 12.1, "name": "quic:tuple_assigned", "path_id": 1,
+    "data": {
+      "tuple_id": "t0",
+      "tuple_local": { "address_v4": { "ip": "192.0.2.1", "port": 44300 } },
+      "tuple_remote": { "address_v4": { "ip": "198.51.100.1", "port": 443 } }
+    } }
+]
+~~~
 
 # Multipath transport parameter {#mp-parameters}
 
@@ -547,7 +588,7 @@ Event schema URI:  `urn:ietf:params:qlog:events:quic#multipath`
 
 Namespace:  `quic`
 
-Event Types:  `path_created`, `path_validation_updated`, `path_abandoned`, `path_status_updated`
+Event Types:  `path_created`, `path_abandoned`, `path_status_updated`
 
 Description:  Event definitions related to the extensions to
 the QUIC transport protocol defined in {{RFC10069}}.
