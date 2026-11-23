@@ -52,7 +52,7 @@ informative:
   DebuggingQuic:
     title: "Debugging QUIC and HTTP/3 with qlog and qvis"
     date: "2020"
-    seriesinfo: "NRW '20: Proceedings of the 2020 Applied Networking Research Workshop"
+    seriesinfo: "ANRW '20: Proceedings of the 2020 Applied Networking Research Workshop"
     author:
     -
       ins: R. Marx
@@ -69,7 +69,7 @@ informative:
 
 The QLOG specifications defines structured logs for QUIC connections,
 and has proven very useful to debug QUIC implementations and deployments.
-This draft extends the QLOG specification for QUIC events. It add a
+This draft extends the QLOG specification for QUIC events. It adds a
 Path ID element to event headers, defines new events to log the
 creation and management of multiple paths, and specifies the logging format
 of new frames introduced in RFC 10069.
@@ -97,7 +97,7 @@ multiple paths according to {{RFC10069}}. For example, a key function of these
 tools is to correlate packet departures and the arrival of the corresponding
 acknowledgement. For plain QUIC connections, this can be done by examining
 packet numbers. With multipath, there is a packet number space per path, and
-correlation requires examining both packet numbers and the ID of the path on which the
+correlation for 1RTT packets requires examining both packet numbers and the ID of the path on which the
 packet was sent. The required logging information is defined in this document.
 
 
