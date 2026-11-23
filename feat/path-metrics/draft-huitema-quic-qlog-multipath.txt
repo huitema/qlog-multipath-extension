@@ -5,10 +5,10 @@
 QUIC                                                          C. Huitema
 Internet-Draft                                      Private Octopus Inc.
 Intended status: Informational                                    Y. Liu
-Expires: 24 May 2027                                        Alibaba Inc.
+Expires: 27 May 2027                                        Alibaba Inc.
                                                                 A. Bisht
                                                            Cisco Systems
-                                                        20 November 2026
+                                                        23 November 2026
 
 
         QLOG extensions for Multiple Paths for a QUIC Connection
@@ -49,7 +49,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 24 May 2027.
+   This Internet-Draft will expire on 27 May 2027.
 
 Copyright Notice
 
@@ -568,9 +568,8 @@ Table of Contents
    quic:recovery_parameters_set and quic:congestion_state_updated.
 
    For RTT metrics (Section 5.4 of [RFC10069]), path_id identifies the
-   path whose estimator was updated.  The packet numbers in a
-   quic:packets_acked event belong to one acknowledged path and one
-   packet number space.
+   path whose estimator was updated.  All packets acknowledged in a
+   quic:packets_acked event were sent on the path identified by path_id.
 
 8.2.  Probe timeout, packet loss, and retransmission
 
@@ -593,13 +592,9 @@ Table of Contents
        ? path_state_discarded: true
    )
 
-   For retransmissions (Section 5.6 of [RFC10069]), a separate
-   quic:marked_for_retransmit event will be logged for each sending path
-   on which packets are marked for retransmission after being sent on
-   that path.  The retransmitted content, if any, will be sent in new
-   packets, possibly on different paths.  When STREAM frames are logged,
-   readers can match repeated data by stream ID and overlapping byte
-   ranges.
+   In a quic:marked_for_retransmit event (Section 5.6 of [RFC10069]),
+   path_id identifies the path on which the data marked for
+   retransmission was originally sent.
 
 8.3.  Example of cross-path recovery
 
