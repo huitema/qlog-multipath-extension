@@ -508,9 +508,8 @@ packet number spaces. The same scoping rule applies to
 `quic:recovery_parameters_set` and `quic:congestion_state_updated`.
 
 For RTT metrics ({{Section 5.4 of RFC10069}}), `path_id` identifies the
-path whose estimator was updated. The packet numbers in a
-`quic:packets_acked` event belong to one acknowledged path and one
-packet number space.
+path whose estimator was updated. All packets acknowledged in a
+`quic:packets_acked` event were sent on the path identified by `path_id`.
 
 ## Probe timeout, packet loss, and retransmission
 
@@ -535,12 +534,9 @@ $$quic-packetlost-extension //= (
 )
 ~~~
 
-For retransmissions ({{Section 5.6 of RFC10069}}), a separate `quic:marked_for_retransmit`
-event will be logged for each sending path on which packets are marked
-for retransmission after being sent on that path.
-The retransmitted content, if any, will be sent in new packets, possibly on different paths.
-When STREAM frames are logged, readers can match repeated data by stream
-ID and overlapping byte ranges.
+In a `quic:marked_for_retransmit` event ({{Section 5.6 of RFC10069}}),
+`path_id` identifies the path on which the data marked for retransmission
+was originally sent.
 
 ## Example of cross-path recovery
 
