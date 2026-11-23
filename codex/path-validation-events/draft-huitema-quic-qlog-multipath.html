@@ -1049,7 +1049,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Huitema &amp; Bisht</td>
-<td class="center">Expires 24 May 2027</td>
+<td class="center">Expires 27 May 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1062,12 +1062,12 @@ svg {
 <dd class="internet-draft">draft-huitema-quic-qlog-multipath-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-11-20" class="published">20 November 2026</time>
+<time datetime="2026-11-23" class="published">23 November 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-05-24">24 May 2027</time></dd>
+<dd class="expires"><time datetime="2027-05-27">27 May 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1121,7 +1121,7 @@ the definition of QLOG events for QUIC connections.<a href="#section-abstract-1"
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 24 May 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 27 May 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1171,21 +1171,26 @@ the definition of QLOG events for QUIC connections.<a href="#section-abstract-1"
                 <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-path_created" class="internal xref">path_created</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
-                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-path_validation_updated" class="internal xref">path_validation_updated</a></p>
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-path_abandoned" class="internal xref">path_abandoned</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
-                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-path_abandoned" class="internal xref">path_abandoned</a></p>
+                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-path_status_updated" class="internal xref">path_status_updated</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4">
-                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="auto internal xref">4.4</a>.  <a href="#name-path_status_updated" class="internal xref">path_status_updated</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.5">
-                <p id="section-toc.1-1.4.2.5.1"><a href="#section-4.5" class="auto internal xref">4.5</a>.  <a href="#name-example" class="internal xref">Example</a></p>
+                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="auto internal xref">4.4</a>.  <a href="#name-example" class="internal xref">Example</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
             <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-add-a-path-identifier-to-ex" class="internal xref">Add a Path identifier to existing QUIC events</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-logging-validation-during-m" class="internal xref">Logging validation during migration</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-adding-a-path-on-a-validate" class="internal xref">Adding a path on a validated tuple</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
             <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-multipath-transport-paramet" class="internal xref">Multipath transport parameter</a></p>
@@ -1330,7 +1335,7 @@ optional <code>error_code</code> and <code>sequence_number</code> fields use the
 Sections <a href="https://rfc-editor.org/rfc/rfc10069#section-4.2" class="relref">4.2</a> and <a href="https://rfc-editor.org/rfc/rfc10069#section-4.3" class="relref">4.3</a> of <span>[<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>.<a href="#section-4-8" class="pilcrow">¶</a></p>
 <div class="lang-cddl sourcecode" id="section-4-9">
 <pre>
-$ProtocolEventData /= QUICPathCreated / QUICPathAbandoned / QUICPathValidationUpdated /
+$ProtocolEventData /= QUICPathCreated / QUICPathAbandoned /
                       QUICPathStatusUpdated
 </pre><a href="#section-4-9" class="pilcrow">¶</a>
 </div>
@@ -1357,71 +1362,50 @@ QUICPathCreated = {
 </div>
 </section>
 </div>
-<div id="pathvalidationupdated">
-<section id="section-4.2">
-        <h3 id="name-path_validation_updated">
-<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-path_validation_updated" class="section-name selfRef">path_validation_updated</a>
-        </h3>
-<p id="section-4.2-1"><code>quic:path_validation_updated</code> records a change in the endpoint's validation state for the indicated Path ID. It complements <code>path_challenge</code> and <code>path_response</code> frame logging: those frames show wire activity, while this event records whether the local validation procedure started, succeeded, or failed. Log one event for each state transition. The result is local to the logging endpoint and does not assert that the peer has reached the same state.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
-<p id="section-4.2-2"><code>trigger</code>, when present, identifies the observed cause of the transition. <code>failure_reason</code> is only present when <code>state</code> is <code>failed</code>. <code>error_code</code> <span class="bcp14">MAY</span> be included when failure is associated with a PATH_ABANDON frame; in that case it is the PATH_ABANDON error code defined by <span><a href="https://rfc-editor.org/rfc/rfc10069#section-4.2" class="relref">Section 4.2</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
-<div class="lang-cddl sourcecode" id="section-4.2-3">
-<pre>
-QUICPathValidationUpdated = {
-    state: "started" / "succeeded" / "failed"
-    ? trigger: "path_challenge_sent" / "path_response_received" /
-              "timeout" / "local_decision"
-    ? failure_reason: "timeout" / "path_abandoned" / "local_error" / "unknown"
-    ? error_code: uint64 .le 4611686018427387903
-    * $$quic-pathvalidationupdated-extension
-}
-</pre><a href="#section-4.2-3" class="pilcrow">¶</a>
-</div>
-</section>
-</div>
 <div id="pathabandoned">
-<section id="section-4.3">
+<section id="section-4.2">
         <h3 id="name-path_abandoned">
-<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-path_abandoned" class="section-name selfRef">path_abandoned</a>
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-path_abandoned" class="section-name selfRef">path_abandoned</a>
         </h3>
-<p id="section-4.3-1"><code>quic:path_abandoned</code> is emitted once when the endpoint abandons the
+<p id="section-4.2-1"><code>quic:path_abandoned</code> is emitted once when the endpoint abandons the
 indicated Path ID under <span><a href="https://rfc-editor.org/rfc/rfc10069#section-3.4" class="relref">Section 3.4</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>. The <code>initiator</code> is
 <code>local</code> when the endpoint decides to close the path and <code>remote</code> when it
 acts on the peer's PATH_ABANDON. These values use the <code>Initiator</code> type
 from <span>[<a href="#I-D.ietf-quic-qlog-quic-events" class="cite xref">I-D.ietf-quic-qlog-quic-events</a>]</span>. If known, <code>error_code</code> records
-the numeric PATH_ABANDON error code for that decision.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
-<p id="section-4.3-2">An unused Path ID can be abandoned without a preceding <code>path_created</code>.
+the numeric PATH_ABANDON error code for that decision.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2-2">An unused Path ID can be abandoned without a preceding <code>path_created</code>.
 A repeated or reciprocal PATH_ABANDON and the eventual release of retained
-path state do not produce additional abandonment events.<a href="#section-4.3-2" class="pilcrow">¶</a></p>
-<div class="lang-cddl sourcecode" id="section-4.3-3">
+path state do not produce additional abandonment events.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
+<div class="lang-cddl sourcecode" id="section-4.2-3">
 <pre>
 QUICPathAbandoned = {
     initiator: Initiator
     ? error_code: uint64 .le 4611686018427387903
     * $$quic-pathabandoned-extension
 }
-</pre><a href="#section-4.3-3" class="pilcrow">¶</a>
+</pre><a href="#section-4.2-3" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="pathstatusupdated">
-<section id="section-4.4">
+<section id="section-4.3">
         <h3 id="name-path_status_updated">
-<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-path_status_updated" class="section-name selfRef">path_status_updated</a>
+<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-path_status_updated" class="section-name selfRef">path_status_updated</a>
         </h3>
-<p id="section-4.4-1"><code>quic:path_status_updated</code> is emitted when the endpoint changes the path
+<p id="section-4.3-1"><code>quic:path_status_updated</code> is emitted when the endpoint changes the path
 usage preference it advertises (<code>initiator</code> is <code>local</code>), or records a
 change in the peer's advertised preference (<code>initiator</code> is <code>remote</code>).
 Each endpoint expresses its own preference for how its peer should use
 the path (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-3.3" class="relref">Section 3.3</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>). A sender can choose how to
-schedule packets independently of the advertised preference.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
-<p id="section-4.4-2"><code>new</code> gives the updated preference. If included, <code>old</code> gives the previous
+schedule packets independently of the advertised preference.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+<p id="section-4.3-2"><code>new</code> gives the updated preference. If included, <code>old</code> gives the previous
 preference for the same Path ID and initiator. Omit <code>old</code> when no previous
 preference is known. The first advertisement can precede path creation.
 <code>sequence_number</code>, if present, is the Path Status Sequence Number of the
 advertisement. An ignored out-of-order or duplicate advertisement, or a
 newer advertisement that repeats the current preference, produces no
-status change event (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-4.3" class="relref">Section 4.3</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>).<a href="#section-4.4-2" class="pilcrow">¶</a></p>
-<div class="lang-cddl sourcecode" id="section-4.4-3">
+status change event (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-4.3" class="relref">Section 4.3</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>).<a href="#section-4.3-2" class="pilcrow">¶</a></p>
+<div class="lang-cddl sourcecode" id="section-4.3-3">
 <pre>
 QUICPathStatusUpdated = {
     initiator: Initiator
@@ -1432,19 +1416,19 @@ QUICPathStatusUpdated = {
 }
 
 QUICPathStatus = "available" / "backup"
-</pre><a href="#section-4.4-3" class="pilcrow">¶</a>
+</pre><a href="#section-4.3-3" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="example">
-<section id="section-4.5">
+<section id="section-4.4">
         <h3 id="name-example">
-<a href="#section-4.5" class="section-number selfRef">4.5. </a><a href="#name-example" class="section-name selfRef">Example</a>
+<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-example" class="section-name selfRef">Example</a>
         </h3>
-<p id="section-4.5-1">In this excerpt from a client's event list, the client opens path 1.
+<p id="section-4.4-1">In this excerpt from a client's event list, the client opens path 1.
 It then receives the peer's first preference for path 1 in a packet on
-path 0. Later the client abandons path 1 at the application's request.<a href="#section-4.5-1" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="section-4.5-2">
+path 0. Later the client abandons path 1 at the application's request.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-4.4-2">
 <pre>
 [
   { "time": 12.0, "name": "quic:path_created",
@@ -1455,7 +1439,7 @@ path 0. Later the client abandons path 1 at the application's request.<a href="#
   { "time": 97.0, "name": "quic:path_abandoned",
     "path_id": 1, "data": { "initiator": "local", "error_code": 62 } }
 ]
-</pre><a href="#section-4.5-2" class="pilcrow">¶</a>
+</pre><a href="#section-4.4-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -1588,6 +1572,72 @@ need to be copied or redefined for each event. The table above specifies the
 event-by-event semantics and applicability of the common field.
 <a href="#mp-events" class="auto internal xref">Section 4</a> defines the new events. <a href="#multipath-specific-frames" class="auto internal xref">Section 7</a>
 defines the frame encodings.<a href="#section-5-8" class="pilcrow">¶</a></p>
+<div id="logging-validation-during-migration">
+<section id="section-5.1">
+        <h3 id="name-logging-validation-during-m">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-logging-validation-during-m" class="section-name selfRef">Logging validation during migration</a>
+        </h3>
+<p id="section-5.1-1">Path validation applies to the network tuple, as described in
+<span><a href="https://rfc-editor.org/rfc/rfc10069#section-3.1" class="relref">Section 3.1</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span> and <span><a href="https://rfc-editor.org/rfc/rfc9000#section-8.2" class="relref">Section 8.2</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>. When an
+endpoint probes a candidate tuple for migration of an existing path, it
+can log the probe using the <code>probing_*</code> states of
+<code>quic:migration_state_updated</code>. The event-level <code>path_id</code> identifies the
+path, and <code>data.tuple_id</code> can identify the candidate tuple. Use
+<code>quic:tuple_assigned</code> to record the tuple details.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1-2"><code>probing_successful</code> records that the endpoint received a matching
+<code>PATH_RESPONSE</code> for the probe and can consider the tuple for migration.
+<code>migration_complete</code> records completion of the switch to that tuple.
+The Path ID stays the same throughout the migration
+(<span><a href="https://rfc-editor.org/rfc/rfc10069#section-3.1.2" class="relref">Section 3.1.2</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>).<a href="#section-5.1-2" class="pilcrow">¶</a></p>
+<p id="section-5.1-3">In this excerpt, a client probes a new tuple <code>t1</code> for path 1 and then
+completes migration to it. The probing result and the migration result
+are separate states of the same event type.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-5.1-4">
+<pre>
+[
+  { "time": 30.0, "name": "quic:tuple_assigned", "path_id": 1,
+    "data": {
+      "tuple_id": "t1",
+      "tuple_local": { "address_v4": { "ip": "192.0.2.2", "port": 44300 } },
+      "tuple_remote": { "address_v4": { "ip": "198.51.100.1", "port": 443 } }
+    } },
+  { "time": 30.1, "name": "quic:migration_state_updated", "path_id": 1,
+    "data": { "new": "probing_started", "tuple_id": "t1" } },
+  { "time": 45.0, "name": "quic:migration_state_updated", "path_id": 1,
+    "data": { "new": "probing_successful", "tuple_id": "t1" } },
+  { "time": 48.0, "name": "quic:migration_state_updated", "path_id": 1,
+    "data": { "new": "migration_complete", "tuple_id": "t1" } }
+]
+</pre><a href="#section-5.1-4" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="adding-a-path-on-a-validated-tuple">
+<section id="section-5.2">
+        <h3 id="name-adding-a-path-on-a-validate">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-adding-a-path-on-a-validate" class="section-name selfRef">Adding a path on a validated tuple</a>
+        </h3>
+<p id="section-5.2-1">An endpoint can reuse a previously validated tuple for a new Path ID
+(<span><a href="https://rfc-editor.org/rfc/rfc10069#section-3.1" class="relref">Section 3.1</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>). In this client trace, path 0 already uses
+validated tuple <code>t0</code>. The client opens path 1 using the same local and
+remote IP addresses and UDP ports. Both paths can remain active.
+The client logs <code>quic:path_created</code> for path 1 and uses
+<code>quic:tuple_assigned</code> to associate path 1 with the existing tuple <code>t0</code>.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-5.2-2">
+<pre>
+[
+  { "time": 12.0, "name": "quic:path_created", "path_id": 1, "data": {} },
+  { "time": 12.1, "name": "quic:tuple_assigned", "path_id": 1,
+    "data": {
+      "tuple_id": "t0",
+      "tuple_local": { "address_v4": { "ip": "192.0.2.1", "port": 44300 } },
+      "tuple_remote": { "address_v4": { "ip": "198.51.100.1", "port": 443 } }
+    } }
+]
+</pre><a href="#section-5.2-2" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
 </section>
 </div>
 <div id="mp-parameters">
@@ -1852,7 +1902,7 @@ of connection IDs for path 2.<a href="#section-7.6-1" class="pilcrow">¶</a></p>
 registry defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15#section-15" class="relref">Section 15</a> of [<a href="#I-D.ietf-quic-qlog-main-schema" class="cite xref">I-D.ietf-quic-qlog-main-schema</a>]</span>.<a href="#section-9-1" class="pilcrow">¶</a></p>
 <p id="section-9-2">Event schema URI:  <code>urn:ietf:params:qlog:events:quic#multipath</code><a href="#section-9-2" class="pilcrow">¶</a></p>
 <p id="section-9-3">Namespace:  <code>quic</code><a href="#section-9-3" class="pilcrow">¶</a></p>
-<p id="section-9-4">Event Types:  <code>path_created</code>, <code>path_validation_updated</code>, <code>path_abandoned</code>, <code>path_status_updated</code><a href="#section-9-4" class="pilcrow">¶</a></p>
+<p id="section-9-4">Event Types:  <code>path_created</code>, <code>path_abandoned</code>, <code>path_status_updated</code><a href="#section-9-4" class="pilcrow">¶</a></p>
 <p id="section-9-5">Description:  Event definitions related to the extensions to
 the QUIC transport protocol defined in <span>[<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>.<a href="#section-9-5" class="pilcrow">¶</a></p>
 <p id="section-9-6">Reference:  <a href="#mp-events" class="auto internal xref">Section 4</a> of this document.<a href="#section-9-6" class="pilcrow">¶</a></p>
