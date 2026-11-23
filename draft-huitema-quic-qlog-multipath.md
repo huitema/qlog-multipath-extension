@@ -570,8 +570,8 @@ of connection IDs for path 2.
 
 # Security Considerations {#security}
 
-TODO Security
-
+The security and privacy considerations discussed in {{Section 14 of QLOG-MAIN}}
+apply to this document as well.
 
 # IANA Considerations {#iana}
 
