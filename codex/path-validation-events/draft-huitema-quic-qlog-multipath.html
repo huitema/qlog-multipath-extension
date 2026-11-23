@@ -4,9 +4,11 @@
 <meta charset="utf-8">
 <meta content="Common,Latin" name="scripts">
 <meta content="initial-scale=1.0" name="viewport">
-<title>QLOG extensions for Multiple Paths for a QUIC Connection</title>
+<title>QLOG extensions for Multiple Paths in QUIC</title>
 <meta content="Christian Huitema" name="author">
+<meta content="Yanmei Liu" name="author">
 <meta content="Altanai Bisht" name="author">
+<meta content="Noriyuki Kurosu" name="author">
 <meta content="
        This draft define the QLOG elements that have to be added to
 the definition of QLOG events for QUIC connections. 
@@ -1048,7 +1050,7 @@ svg {
 <td class="right">November 2026</td>
 </tr></thead>
 <tfoot><tr>
-<td class="left">Huitema &amp; Bisht</td>
+<td class="left">Huitema, et al.</td>
 <td class="center">Expires 27 May 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
@@ -1075,13 +1077,21 @@ svg {
 <div class="org">Private Octopus Inc.</div>
 </div>
 <div class="author">
+      <div class="author-name">Y. Liu</div>
+<div class="org">Alibaba Inc.</div>
+</div>
+<div class="author">
       <div class="author-name">A. Bisht</div>
 <div class="org">Cisco Systems</div>
+</div>
+<div class="author">
+      <div class="author-name">N. Kurosu</div>
+<div class="org">Individual</div>
 </div>
 </dd>
 </dl>
 </div>
-<h1 id="title">QLOG extensions for Multiple Paths for a QUIC Connection</h1>
+<h1 id="title">QLOG extensions for Multiple Paths in QUIC</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">This draft define the QLOG elements that have to be added to
@@ -1185,10 +1195,13 @@ the definition of QLOG events for QUIC connections.<a href="#section-abstract-1"
             <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-add-a-path-identifier-to-ex" class="internal xref">Add a Path identifier to existing QUIC events</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
-                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-logging-validation-during-m" class="internal xref">Logging validation during migration</a></p>
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-correlating-1-rtt-packet-ev" class="internal xref">Correlating 1-RTT packet events across paths</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
-                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-adding-a-path-on-a-validate" class="internal xref">Adding a path on a validated tuple</a></p>
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-logging-validation-during-m" class="internal xref">Logging validation during migration</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
+                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="auto internal xref">5.3</a>.  <a href="#name-adding-a-path-on-a-validate" class="internal xref">Adding a path on a validated tuple</a></p>
 </li>
             </ul>
 </li>
@@ -1548,51 +1561,70 @@ Path ID, the frame's <code>data</code> representation <span class="bcp14">MUST</
 the event-level <code>path_id</code> does not replace it. For other QUIC events,
 implementations <span class="bcp14">MUST</span> include <code>path_id</code> when they describe a single known
 path, and <span class="bcp14">MUST</span> omit it when they are connection-wide or the path is unknown.<a href="#section-5-5" class="pilcrow">¶</a></p>
-<p id="section-5-6">An example packet event is:<a href="#section-5-6" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="section-5-7">
-<pre>
-{
-  "time": 123.4,
-  "name": "quic:packet_sent",
-  "path_id": 1,
-  "data": {
-    "header": {
-      "packet_type": "1RTT",
-      "packet_number": 0
-    },
-    "frames": [
-      { "frame_type": "stream", "stream_id": 0, "offset": 0 }
-    ]
-  }
-}
-</pre><a href="#section-5-7" class="pilcrow">¶</a>
-</div>
-<p id="section-5-8">The field is outside <code>data</code>, so existing QUIC event data definitions do not
+<p id="section-5-6">The field is outside <code>data</code>, so existing QUIC event data definitions do not
 need to be copied or redefined for each event. The table above specifies the
 event-by-event semantics and applicability of the common field.
 <a href="#mp-events" class="auto internal xref">Section 4</a> defines the new events. <a href="#multipath-specific-frames" class="auto internal xref">Section 7</a>
-defines the frame encodings.<a href="#section-5-8" class="pilcrow">¶</a></p>
-<div id="logging-validation-during-migration">
+defines the frame encodings.<a href="#section-5-6" class="pilcrow">¶</a></p>
+<div id="correlating-1-rtt-packet-events-across-paths">
 <section id="section-5.1">
-        <h3 id="name-logging-validation-during-m">
-<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-logging-validation-during-m" class="section-name selfRef">Logging validation during migration</a>
+        <h3 id="name-correlating-1-rtt-packet-ev">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-correlating-1-rtt-packet-ev" class="section-name selfRef">Correlating 1-RTT packet events across paths</a>
         </h3>
-<p id="section-5.1-1">Path validation applies to the network tuple, as described in
+<p id="section-5.1-1">Every event that identifies a specific 1-RTT packet <span class="bcp14">MUST</span> carry its
+event-level <code>path_id</code>, even on path 0. For the packet number spaces
+in <span><a href="https://rfc-editor.org/rfc/rfc10069#section-1" class="relref">Section 1</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>, match 1-RTT events by
+(<code>path_id</code>, <code>packet_number</code>) within one connection and sending direction.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1-2">The client logs two sends and one loss.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-5.1-3">
+<pre>
+[
+  { "time": 10.0, "name": "quic:packet_sent", "path_id": 0,
+    "data": { "header": {
+      "packet_type": "1RTT", "packet_number": 42 } } },
+  { "time": 11.0, "name": "quic:packet_sent", "path_id": 1,
+    "data": { "header": {
+      "packet_type": "1RTT", "packet_number": 42 } } },
+  { "time": 90.0, "name": "quic:packet_lost", "path_id": 0,
+    "data": { "header": {
+      "packet_type": "1RTT", "packet_number": 42 } } }
+]
+</pre><a href="#section-5.1-3" class="pilcrow">¶</a>
+</div>
+<p id="section-5.1-4">The server logs one receive event.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-5.1-5">
+<pre>
+{ "time": 25.0, "name": "quic:packet_received", "path_id": 1,
+  "data": { "header": {
+    "packet_type": "1RTT", "packet_number": 42 } } }
+</pre><a href="#section-5.1-5" class="pilcrow">¶</a>
+</div>
+<p id="section-5.1-6">The server's receive event matches the client's send event for <code>(1, 42)</code>.
+The client's loss event matches its send event for <code>(0, 42)</code>.<a href="#section-5.1-6" class="pilcrow">¶</a></p>
+<p id="section-5.1-7">The <code>path_id</code> is set to 0 for Initial, Handshake, 0-RTT, and Retry packet events.<a href="#section-5.1-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="logging-validation-during-migration">
+<section id="section-5.2">
+        <h3 id="name-logging-validation-during-m">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-logging-validation-during-m" class="section-name selfRef">Logging validation during migration</a>
+        </h3>
+<p id="section-5.2-1">Path validation applies to the network tuple, as described in
 <span><a href="https://rfc-editor.org/rfc/rfc10069#section-3.1" class="relref">Section 3.1</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span> and <span><a href="https://rfc-editor.org/rfc/rfc9000#section-8.2" class="relref">Section 8.2</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>. When an
 endpoint probes a candidate tuple for migration of an existing path, it
 can log the probe using the <code>probing_*</code> states of
 <code>quic:migration_state_updated</code>. The event-level <code>path_id</code> identifies the
 path, and <code>data.tuple_id</code> can identify the candidate tuple. Use
-<code>quic:tuple_assigned</code> to record the tuple details.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
-<p id="section-5.1-2"><code>probing_successful</code> records that the endpoint received a matching
+<code>quic:tuple_assigned</code> to record the tuple details.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-2"><code>probing_successful</code> records that the endpoint received a matching
 <code>PATH_RESPONSE</code> for the probe and can consider the tuple for migration.
 <code>migration_complete</code> records completion of the switch to that tuple.
 The Path ID stays the same throughout the migration
-(<span><a href="https://rfc-editor.org/rfc/rfc10069#section-3.1.2" class="relref">Section 3.1.2</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>).<a href="#section-5.1-2" class="pilcrow">¶</a></p>
-<p id="section-5.1-3">In this excerpt, a client probes a new tuple <code>t1</code> for path 1 and then
+(<span><a href="https://rfc-editor.org/rfc/rfc10069#section-3.1.2" class="relref">Section 3.1.2</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>).<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.2-3">In this excerpt, a client probes a new tuple <code>t1</code> for path 1 and then
 completes migration to it. The probing result and the migration result
-are separate states of the same event type.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="section-5.1-4">
+are separate states of the same event type.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-5.2-4">
 <pre>
 [
   { "time": 30.0, "name": "quic:tuple_assigned", "path_id": 1,
@@ -1608,22 +1640,22 @@ are separate states of the same event type.<a href="#section-5.1-3" class="pilcr
   { "time": 48.0, "name": "quic:migration_state_updated", "path_id": 1,
     "data": { "new": "migration_complete", "tuple_id": "t1" } }
 ]
-</pre><a href="#section-5.1-4" class="pilcrow">¶</a>
+</pre><a href="#section-5.2-4" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="adding-a-path-on-a-validated-tuple">
-<section id="section-5.2">
+<section id="section-5.3">
         <h3 id="name-adding-a-path-on-a-validate">
-<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-adding-a-path-on-a-validate" class="section-name selfRef">Adding a path on a validated tuple</a>
+<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-adding-a-path-on-a-validate" class="section-name selfRef">Adding a path on a validated tuple</a>
         </h3>
-<p id="section-5.2-1">An endpoint can reuse a previously validated tuple for a new Path ID
+<p id="section-5.3-1">An endpoint can reuse a previously validated tuple for a new Path ID
 (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-3.1" class="relref">Section 3.1</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>). In this client trace, path 0 already uses
 validated tuple <code>t0</code>. The client opens path 1 using the same local and
 remote IP addresses and UDP ports. Both paths can remain active.
 The client logs <code>quic:path_created</code> for path 1 and uses
-<code>quic:tuple_assigned</code> to associate path 1 with the existing tuple <code>t0</code>.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="section-5.2-2">
+<code>quic:tuple_assigned</code> to associate path 1 with the existing tuple <code>t0</code>.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-5.3-2">
 <pre>
 [
   { "time": 12.0, "name": "quic:path_created", "path_id": 1, "data": {} },
@@ -1634,7 +1666,7 @@ The client logs <code>quic:path_created</code> for path 1 and uses
       "tuple_remote": { "address_v4": { "ip": "198.51.100.1", "port": 443 } }
     } }
 ]
-</pre><a href="#section-5.2-2" class="pilcrow">¶</a>
+</pre><a href="#section-5.3-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -1971,11 +2003,27 @@ the QUIC transport protocol defined in <span>[<a href="#RFC10069" class="cite xr
 </div>
 </address>
 <address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Yanmei Liu</span></div>
+<div dir="auto" class="left"><span class="org">Alibaba Inc.</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:miaoji.lym@alibaba-inc.com" class="email">miaoji.lym@alibaba-inc.com</a>
+</div>
+</address>
+<address class="vcard">
         <div dir="auto" class="left"><span class="fn nameRole">Altanai Bisht</span></div>
 <div dir="auto" class="left"><span class="org">Cisco Systems</span></div>
 <div class="email">
 <span>Email:</span>
 <a href="mailto:albisht@cisco.com" class="email">albisht@cisco.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Noriyuki Kurosu</span></div>
+<div dir="auto" class="left"><span class="org">Individual</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:3p0rta26@gmail.com" class="email">3p0rta26@gmail.com</a>
 </div>
 </address>
 </section>

@@ -4,12 +4,16 @@
 
 QUIC                                                          C. Huitema
 Internet-Draft                                      Private Octopus Inc.
-Intended status: Informational                                  A. Bisht
-Expires: 27 May 2027                                       Cisco Systems
+Intended status: Informational                                    Y. Liu
+Expires: 27 May 2027                                        Alibaba Inc.
+                                                                A. Bisht
+                                                           Cisco Systems
+                                                               N. Kurosu
+                                                              Individual
                                                         23 November 2026
 
 
-        QLOG extensions for Multiple Paths for a QUIC Connection
+               QLOG extensions for Multiple Paths in QUIC
                 draft-huitema-quic-qlog-multipath-latest
 
 Abstract
@@ -75,8 +79,9 @@ Table of Contents
      4.3.  path_status_updated
      4.4.  Example
    5.  Add a Path identifier to existing QUIC events
-     5.1.  Logging validation during migration
-     5.2.  Adding a path on a validated tuple
+     5.1.  Correlating 1-RTT packet events across paths
+     5.2.  Logging validation during migration
+     5.3.  Adding a path on a validated tuple
    6.  Multipath transport parameter
      6.1.  Example
    7.  Multipath specific frames
@@ -337,30 +342,46 @@ Table of Contents
    describe a single known path, and MUST omit it when they are
    connection-wide or the path is unknown.
 
-   An example packet event is:
-
-   {
-     "time": 123.4,
-     "name": "quic:packet_sent",
-     "path_id": 1,
-     "data": {
-       "header": {
-         "packet_type": "1RTT",
-         "packet_number": 0
-       },
-       "frames": [
-         { "frame_type": "stream", "stream_id": 0, "offset": 0 }
-       ]
-     }
-   }
-
    The field is outside data, so existing QUIC event data definitions do
    not need to be copied or redefined for each event.  The table above
    specifies the event-by-event semantics and applicability of the
    common field.  Section 4 defines the new events.  Section 7 defines
    the frame encodings.
 
-5.1.  Logging validation during migration
+5.1.  Correlating 1-RTT packet events across paths
+
+   Every event that identifies a specific 1-RTT packet MUST carry its
+   event-level path_id, even on path 0.  For the packet number spaces in
+   Section 1 of [RFC10069], match 1-RTT events by (path_id,
+   packet_number) within one connection and sending direction.
+
+   The client logs two sends and one loss.
+
+   [
+     { "time": 10.0, "name": "quic:packet_sent", "path_id": 0,
+       "data": { "header": {
+         "packet_type": "1RTT", "packet_number": 42 } } },
+     { "time": 11.0, "name": "quic:packet_sent", "path_id": 1,
+       "data": { "header": {
+         "packet_type": "1RTT", "packet_number": 42 } } },
+     { "time": 90.0, "name": "quic:packet_lost", "path_id": 0,
+       "data": { "header": {
+         "packet_type": "1RTT", "packet_number": 42 } } }
+   ]
+
+   The server logs one receive event.
+
+   { "time": 25.0, "name": "quic:packet_received", "path_id": 1,
+     "data": { "header": {
+       "packet_type": "1RTT", "packet_number": 42 } } }
+
+   The server's receive event matches the client's send event for (1,
+   42).  The client's loss event matches its send event for (0, 42).
+
+   The path_id is set to 0 for Initial, Handshake, 0-RTT, and Retry
+   packet events.
+
+5.2.  Logging validation during migration
 
    Path validation applies to the network tuple, as described in
    Section 3.1 of [RFC10069] and Section 8.2 of [RFC9000].  When an
@@ -395,7 +416,7 @@ Table of Contents
        "data": { "new": "migration_complete", "tuple_id": "t1" } }
    ]
 
-5.2.  Adding a path on a validated tuple
+5.3.  Adding a path on a validated tuple
 
    An endpoint can reuse a previously validated tuple for a new Path ID
    (Section 3.1 of [RFC10069]).  In this client trace, path 0 already
@@ -680,6 +701,16 @@ Authors' Addresses
    Email: huitema@huitema.net
 
 
+   Yanmei Liu
+   Alibaba Inc.
+   Email: miaoji.lym@alibaba-inc.com
+
+
    Altanai Bisht
    Cisco Systems
    Email: albisht@cisco.com
+
+
+   Noriyuki Kurosu
+   Individual
+   Email: 3p0rta26@gmail.com
