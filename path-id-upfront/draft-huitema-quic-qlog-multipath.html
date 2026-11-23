@@ -1366,8 +1366,13 @@ logical QUIC path; multiple path IDs can use the same 4-tuple, and one Path ID
 can use a new 4-tuple after migration. Implementations <span class="bcp14">MUST NOT</span> infer a Path
 ID from a tuple identifier.  Tuple details can
 be recorded with <code>quic:tuple_assigned</code> (see <span>[<a href="#QLOG-QUIC" class="cite xref">QLOG-QUIC</a>]</span>).<a href="#section-4-5" class="pilcrow">¶</a></p>
-<p id="section-4-6">Adding a path ID to the event description indicates that this event is related to
-a specific path. This is explained in <a href="#add-path-id" class="auto internal xref">Section 6</a>.<a href="#section-4-6" class="pilcrow">¶</a></p>
+<p id="section-4-6">The top-level <code>path_id</code> field gives tools one place to find the path ID
+across packet, recovery, and path management events. For example, the
+field stays in the same place when a <code>packet_lost</code> event omits the optional
+packet header. The base qlog schema also uses an optional top-level
+<code>tuple</code> field to associate an event with a network tuple
+(<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15#section-7.2" class="relref">Section 7.2</a> of [<a href="#QLOG-MAIN" class="cite xref">QLOG-MAIN</a>]</span>).
+<a href="#add-path-id" class="auto internal xref">Section 6</a> describes when existing QUIC events include <code>path_id</code>.<a href="#section-4-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="mp-events">
