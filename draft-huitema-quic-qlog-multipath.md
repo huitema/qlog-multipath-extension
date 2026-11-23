@@ -166,8 +166,13 @@ can use a new 4-tuple after migration. Implementations MUST NOT infer a Path
 ID from a tuple identifier.  Tuple details can
 be recorded with `quic:tuple_assigned` (see {{QLOG-QUIC}}).
 
-Adding a path ID to the event description indicates that this event is related to
-a specific path. This is explained in {{add-path-id}}.
+The top-level `path_id` field gives tools one place to find the path ID
+across packet, recovery, and path management events. For example, the
+field stays in the same place when a `packet_lost` event omits the optional
+packet header. The base qlog schema also uses an optional top-level
+`tuple` field to associate an event with a network tuple
+({{Section 7.2 of QLOG-MAIN}}).
+{{add-path-id}} describes when existing QUIC events include `path_id`.
 
 
 # Multipath specific events and event extensions {#mp-events}
