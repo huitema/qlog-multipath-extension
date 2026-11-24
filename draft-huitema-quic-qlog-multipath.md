@@ -370,6 +370,10 @@ The `path_id` is set to 0 for Initial, Handshake, 0-RTT, and Retry packet events
 
 ## Cross-path retransmission {#cross-path-retransmission}
 
+In `quic:marked_for_retransmit`, `path_id` identifies the path that carried
+the lost packet, and in `quic:packet_sent`, it identifies the path carrying
+the new packet with the retransmitted data.
+
 Suppose a packet sent on path 1 is declared lost and its stream data is
 marked for retransmission. The `quic:marked_for_retransmit` event has
 `path_id` 1 in both cases. If the data is sent again on path 1, the new
