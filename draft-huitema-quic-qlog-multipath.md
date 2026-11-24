@@ -367,6 +367,64 @@ The client's loss event matches its send event for `(0, 42)`.
 
 The `path_id` is set to 0 for Initial, Handshake, 0-RTT, and Retry packet events.
 
+## Logging validation during migration
+
+Path validation applies to the network tuple, as described in
+{{Section 3.1 of RFC10069}} and {{Section 8.2 of RFC9000}}. When an
+endpoint probes a candidate tuple for migration of an existing path, it
+can log the probe using the `probing_*` states of
+`quic:migration_state_updated`. The event-level `path_id` identifies the
+path, and `data.tuple_id` can identify the candidate tuple. Use
+`quic:tuple_assigned` to record the tuple details.
+
+`probing_successful` records that the endpoint received a matching
+`PATH_RESPONSE` for the probe and can consider the tuple for migration.
+`migration_complete` records completion of the switch to that tuple.
+The Path ID stays the same throughout the migration
+({{Section 3.1.2 of RFC10069}}).
+
+In this excerpt, a client probes a new tuple `t1` for path 1 and then
+completes migration to it. The probing result and the migration result
+are separate states of the same event type.
+
+~~~ json
+[
+  { "time": 30.0, "name": "quic:tuple_assigned", "path_id": 1,
+    "data": {
+      "tuple_id": "t1",
+      "tuple_local": { "address_v4": { "ip": "192.0.2.2", "port": 44300 } },
+      "tuple_remote": { "address_v4": { "ip": "198.51.100.1", "port": 443 } }
+    } },
+  { "time": 30.1, "name": "quic:migration_state_updated", "path_id": 1,
+    "data": { "new": "probing_started", "tuple_id": "t1" } },
+  { "time": 45.0, "name": "quic:migration_state_updated", "path_id": 1,
+    "data": { "new": "probing_successful", "tuple_id": "t1" } },
+  { "time": 48.0, "name": "quic:migration_state_updated", "path_id": 1,
+    "data": { "new": "migration_complete", "tuple_id": "t1" } }
+]
+~~~
+
+## Adding a path on a validated tuple
+
+An endpoint can reuse a previously validated tuple for a new Path ID
+({{Section 3.1 of RFC10069}}). In this client trace, path 0 already uses
+validated tuple `t0`. The client opens path 1 using the same local and
+remote IP addresses and UDP ports. Both paths can remain active.
+The client logs `quic:path_created` for path 1 and uses
+`quic:tuple_assigned` to associate path 1 with the existing tuple `t0`.
+
+~~~ json
+[
+  { "time": 12.0, "name": "quic:path_created", "path_id": 1, "data": {} },
+  { "time": 12.1, "name": "quic:tuple_assigned", "path_id": 1,
+    "data": {
+      "tuple_id": "t0",
+      "tuple_local": { "address_v4": { "ip": "192.0.2.1", "port": 44300 } },
+      "tuple_remote": { "address_v4": { "ip": "198.51.100.1", "port": 443 } }
+    } }
+]
+~~~
+
 # Multipath transport parameter {#mp-parameters}
 
 In `quic:parameters_set`, the `initial_max_path_id` field records the value
