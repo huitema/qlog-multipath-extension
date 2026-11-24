@@ -374,11 +374,7 @@ In `quic:marked_for_retransmit`, `path_id` identifies the path that carried
 the lost packet, and in `quic:packet_sent`, it identifies the path carrying
 the new packet with the retransmitted data.
 
-Suppose a packet sent on path 1 is declared lost and its stream data is
-marked for retransmission. The `quic:marked_for_retransmit` event has
-`path_id` 1 in both cases. If the data is sent again on path 1, the new
-`quic:packet_sent` event has `path_id` 1. If it is sent on path 0, that
-event has `path_id` 0 ({{Section 5.6 of QUIC-MULTIPATH}}).
+For example a packet sent on path 1 is declared lost and its STREAM data is marked for retransmission. The `quic:marked_for_retransmit` event is emitted with `path_id` 1. If the data is sent again on path 1 a `quic:packet_sent` event with `path_id` 1 and overlapping STREAM ranges would be emitted. If part of the lost STREAM data is retransmitted on path 0, that event has `path_id` 0 ({{Section 5.6 of QUIC-MULTIPATH}}) and contain an overlapping STREAM range.
 
 # Multipath transport parameter {#mp-parameters}
 
