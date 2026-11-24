@@ -1,5 +1,5 @@
 ---
-title: "QLOG extensions for Multiple Paths for a QUIC Connection"
+title: "QLOG extensions for Multiple Paths in QUIC"
 abbrev: "qlog-multipath"
 category: info
 
@@ -34,37 +34,82 @@ author:
     fullname: Altanai Bisht
     organization: Cisco Systems
     email: albisht@cisco.com
+ -
+    fullname: Noriyuki Kurosu
+    organization: Individual
+    email: 3p0rta26@gmail.com
 
 
 normative:
 
-   RFC9000:
-   RFC10069:
-   I-D.ietf-quic-qlog-quic-events:
-   I-D.ietf-quic-qlog-main-schema:
+   QUIC-TRANSPORT:
+       RFC9000
+   QUIC-MULTIPATH:
+       RFC10069
+   QLOG-MAIN:
+       I-D.ietf-quic-qlog-main-schema
+   QLOG-QUIC:
+       I-D.ietf-quic-qlog-quic-events
 
 
 informative:
+  ANRW-2020:
+    title: "Debugging QUIC and HTTP/3 with qlog and qvis"
+    date: "2020"
+    seriesinfo: "ANRW '20: Proceedings of the 2020 Applied Networking Research Workshop"
+    author:
+    -
+      ins: R. Marx
+    -
+      ins: M. Piraux
+    -
+      ins: P. Quax
+    -
+      ins: W. Lamotte
 
 ...
 
 --- abstract
 
-This draft define the QLOG elements that have to be added to
-the definition of QLOG events for QUIC connections.
-
+The qlog specifications define structured logs for QUIC connections.
+This draft extends the qlog specification for QUIC events. It adds
+an optional Path ID element to the description of events, defines new events to log the
+creation and management of multiple paths, and specifies the logging format
+of new frames introduced in RFC 10069.
 
 --- middle
 
 # Introduction {#intro}
 
-The QLOG drafts define the syntax of QLOG {{I-D.ietf-quic-qlog-main-schema}}
-and the events and frames for logging QUIC events {{I-D.ietf-quic-qlog-quic-events}}
-found in QUIC connections per {{RFC9000}}. The extensions to {{RFC9000}} for
-managing multiple paths for a QUIC connections are defined in {{RFC10069}},
+The QLOG drafts define the syntax of QLOG {{QLOG-MAIN}}
+and the events and frames for logging QUIC events {{QLOG-QUIC}}
+found in QUIC connections per {{QLOG-QUIC}}. The extensions to {{QUIC-TRANSPORT}} for
+managing multiple paths for a QUIC connections are defined in {{QUIC-MULTIPATH}},
 which introduces new concepts such as path, new events such as creating or
 abandoning paths, and new frames for managing traffic when using multiple
-paths. This draft defines the corresponding QLOG extensions.
+paths.
+
+This draft defines an extension to the QUIC events specification in
+{{QLOG-QUIC}} to enable logging of QUIC connections that manage
+multiple paths according to {{QUIC-MULTIPATH}}.
+
+Debugging tools like qvis have proven very useful when debugging QUIC implementations
+(see {{ANRW-2020}}). This document provides a standard way to add specific information
+in QLOG traces so updated tools can properly represent QUIC connections that use
+multiple paths according to {{QUIC-MULTIPATH}}. For example, a key function of these
+tools is to correlate packet departures and the arrival of the corresponding
+acknowledgement. For plain QUIC connections, this can be done by examining
+packet numbers. With multipath, there is a packet number space per path, and
+correlation for 1RTT packets requires examining both packet numbers
+and the ID of the path on which the
+packet was sent. The required logging information is defined in this document.
+
+This document defines how a path ID can be added to event headers in {{path-id-def}},
+adds events describing the management of paths in {{mp-events}},
+explains the effects of adding a path ID to events defined in
+{{QLOG-QUIC}} in {{add-path-id}},
+specifies the logging of multipath specific frames in {{multipath-frames}},
+and that of the multipath transport parameter in {{mp-parameters}}.
 
 # Conventions and Definitions
 
@@ -73,11 +118,11 @@ paths. This draft defines the corresponding QLOG extensions.
 # Event Schema Definition {#event-schema}
 
 This document extends the `quic` namespace of
-{{I-D.ietf-quic-qlog-quic-events}} to cover the multipath extension
-defined in {{RFC10069}}. The event schema URN for this extension is
+{{QLOG-QUIC}} to cover the multipath extension
+defined in {{QUIC-MULTIPATH}}. The event schema URN for this extension is
 `urn:ietf:params:qlog:events:quic#multipath`. The fragment `multipath`
 identifies the extension within the `quic` namespace, as specified in
-{{Section 8.1 of I-D.ietf-quic-qlog-main-schema}}.
+{{Section 8.1 of QLOG-MAIN}}.
 
 
 ## Draft Event Schema Identification
@@ -93,6 +138,43 @@ append a hyphen and the corresponding draft number to that URN. For
 exampledraft 00 of this document is identified using the URI
 `urn:ietf:params:qlog:events:quic#multipath-00`.
 
+# Adding a path identifier to event headers {#path-id-def}
+
+Managing multiple paths per connection requires identifying these paths.
+Per {{QUIC-MULTIPATH}}, this is done using a path ID. This path ID
+will be added to events as specified in {{mp-events}} and {{add-path-id}}.
+Each of these events MUST include the following field in its top-level
+`Event` map alongside `time`, `name`, and `data`
+({{Section 7 of QLOG-MAIN}}).
+
+~~~ cddl
+MultipathEventFields = (path_id: uint32)
+~~~
+
+`path_id` identifies the affected path within the connection. It is an
+unsigned 32-bit integer in the range 0 to 4294967295 inclusive
+({{Section 2.1 of QUIC-MULTIPATH}}).
+
+The value of `path_id` is the Path ID defined in {{QUIC-MULTIPATH}}. It is scoped to
+the QUIC connection, is shared by both directions, starts at 0 for the
+initial path, increases monotonically, and is not reused. The range is
+0..2^32-1, inclusive. The field is unsigned: negative values are invalid.
+
+`path_id` is distinct from qlog's `tuple` / `tuple_id`. A path ID identifies a
+logical QUIC path; multiple path IDs can use the same 4-tuple, and one Path ID
+can use a new 4-tuple after migration. Implementations MUST NOT infer a Path
+ID from a tuple identifier.  Tuple details can
+be recorded with `quic:tuple_assigned` (see {{QLOG-QUIC}}).
+
+The top-level `path_id` field gives tools one place to find the path ID
+across packet, recovery, and path management events. For example, the
+field stays in the same place when a `packet_lost` event omits the optional
+packet header. The base qlog schema also uses an optional top-level
+`tuple` field to associate an event with a network tuple
+({{Section 7.2 of QLOG-MAIN}}).
+{{add-path-id}} describes when existing QUIC events include `path_id`.
+
+
 # Multipath specific events and event extensions {#mp-events}
 
 The three events in this section have Base importance. They record
@@ -101,38 +183,14 @@ events record the frames that carry path management signals. A single
 change can involve several frames, and a local decision can precede the
 first frame that signals it.
 
-Each of these events MUST include the following field in its top-level
-`Event` map alongside `time`, `name`, and `data`
-({{Section 7 of I-D.ietf-quic-qlog-main-schema}}).
-
-~~~ cddl
-MultipathEventFields = (path_id: uint32)
-~~~
-
-`path_id` identifies the affected path within the connection. It is an
-unsigned 32-bit integer in the range 0 to 4294967295 inclusive
-({{Section 2.1 of RFC10069}}).
-
-The value of `path_id` is the Path ID defined in {{RFC10069}}. It is scoped to
-the QUIC connection, is shared by both directions, starts at 0 for the
-initial path, increases monotonically, and is not reused. The range is
-0..2^32-1, inclusive. The field is unsigned: negative values are invalid.
-
-For example, if a packet on path 0 changes the status of path 1, the
-status event has `path_id` 1. The optional qlog `tuple` field identifies
-the network tuple associated with an event. Two Path IDs can share a
-tuple, and a path can change tuples during migration. Tuple details can
-be recorded with `quic:tuple_assigned` ({{I-D.ietf-quic-qlog-quic-events}}).
-
-`path_id` is distinct from qlog's `tuple` / `tuple_id`. A Path ID identifies a
-logical QUIC path; multiple Path IDs can use the same 4-tuple, and one Path ID
-can use a new 4-tuple after migration. Implementations MUST NOT infer a Path
-ID from a tuple identifier.
+All the events described in this section affect a single path. The
+corresponding `path_id` MUST be included in the respective event headers,
+as specified in {{path-id-def}}.
 
 The event data types extend the qlog main schema as follows. The
 optional `error_code` and `sequence_number` fields use the qlog
 `uint64` type. Their values are limited to 0 through 2^62 - 1 by
-{{Sections 4.2 and 4.3 of RFC10069}}.
+{{Sections 4.2 and 4.3 of QUIC-MULTIPATH}}.
 
 ~~~ cddl
 $ProtocolEventData /= QUICPathCreated / QUICPathAbandoned /
@@ -144,7 +202,7 @@ $ProtocolEventData /= QUICPathCreated / QUICPathAbandoned /
 `quic:path_created` is emitted once when the endpoint starts using a Path ID
 for a new path. For an additional path, the client logs the event when it
 initiates the path and the server logs it when it accepts the attempt and
-sets up the path locally ({{Section 3.1 of RFC10069}}). Validation can
+sets up the path locally ({{Section 3.1 of QUIC-MULTIPATH}}). Validation can
 still be pending. For the initial path, the endpoint logs the event with
 `path_id` 0 when the handshake completes with multipath negotiated.
 Issuing connection IDs for future paths alone does not trigger this event.
@@ -160,10 +218,10 @@ QUICPathCreated = {
 ## path_abandoned
 
 `quic:path_abandoned` is emitted once when the endpoint abandons the
-indicated Path ID under {{Section 3.4 of RFC10069}}. The `initiator` is
+indicated Path ID under {{Section 3.4 of QUIC-MULTIPATH}}. The `initiator` is
 `local` when the endpoint decides to close the path and `remote` when it
 acts on the peer's PATH_ABANDON. These values use the `Initiator` type
-from {{I-D.ietf-quic-qlog-quic-events}}. If known, `error_code` records
+from {{QLOG-QUIC}}. If known, `error_code` records
 the numeric PATH_ABANDON error code for that decision.
 
 An unused Path ID can be abandoned without a preceding `path_created`.
@@ -184,7 +242,7 @@ QUICPathAbandoned = {
 usage preference it advertises (`initiator` is `local`), or records a
 change in the peer's advertised preference (`initiator` is `remote`).
 Each endpoint expresses its own preference for how its peer should use
-the path ({{Section 3.3 of RFC10069}}). A sender can choose how to
+the path ({{Section 3.3 of QUIC-MULTIPATH}}). A sender can choose how to
 schedule packets independently of the advertised preference.
 
 `new` gives the updated preference. If included, `old` gives the previous
@@ -193,7 +251,7 @@ preference is known. The first advertisement can precede path creation.
 `sequence_number`, if present, is the Path Status Sequence Number of the
 advertisement. An ignored out-of-order or duplicate advertisement, or a
 newer advertisement that repeats the current preference, produces no
-status change event ({{Section 4.3 of RFC10069}}).
+status change event ({{Section 4.3 of QUIC-MULTIPATH}}).
 
 ~~~ cddl
 QUICPathStatusUpdated = {
@@ -221,21 +279,21 @@ path 0. Later the client abandons path 1 at the application's request.
     "path_id": 1, "data": { "initiator": "remote", "new": "backup",
                             "sequence_number": 0 } },
   { "time": 97.0, "name": "quic:path_abandoned",
-    "path_id": 1, "data": { "initiator": "local", "error_code": 62 } }
+    "path_id": 1, "data": { "initiator": "local",
+                            "error_code": 62 } }
 ]
 ~~~
 
-
-# Add a Path identifier to existing QUIC events
+# Add a Path ID to existing QUIC events {#add-path-id}
 
 When a QUIC event describes an operation or state for one known path,
 implementations MUST include `path_id`, including when its value is 0.
-(The `path_id` field is defined in {{mp-events}}.)
+(The `path_id` field is defined in {{path-id-def}}.)
 Implementations
 MUST omit the field when the event is connection-wide or when the associated
 Path ID is not known. Omission does not mean path 0. An implementation MAY
 place `path_id` in `common_fields` only when the same value applies to every
-event in that trace, following the common-field rules in {{I-D.ietf-quic-qlog-main-schema}}.
+event in that trace, following the common-field rules in {{QLOG-MAIN}}.
 
 The event-level field identifies the path on which the event's packet or
 operation applies. A Path ID carried inside a frame remains a frame field and
@@ -250,7 +308,7 @@ when the stated path context is known:
 | --- | --- |
 | `packet_sent`, `packet_received` | Path carrying the packet. |
 | `packet_lost` | Path carrying the lost packet. |
-| `marked_for_retransmit` | Original sending path of the data marked for retransmission ({{path-recovery}}). |
+| `marked_for_retransmit` | Sending path of the packet whose data is marked for retransmission ({{cross-path-retransmission}}). |
 | `packet_dropped`, `packet_buffered` | Path associated with the packet, if it can be identified at that point. |
 | `packets_acked` | Path of the acknowledged packets, not the path carrying the ACK or PATH_ACK frame. Implementations MUST split events when acknowledged packets belong to different paths. |
 | `recovery_metrics_updated`, `recovery_parameters_set` | Path whose recovery or congestion-control values are reported. |
@@ -268,48 +326,80 @@ the event-level `path_id` does not replace it. For other QUIC events,
 implementations MUST include `path_id` when they describe a single known
 path, and MUST omit it when they are connection-wide or the path is unknown.
 
-An example packet event is:
-
-~~~ json
-{
-  "time": 123.4,
-  "name": "quic:packet_sent",
-  "path_id": 1,
-  "data": {
-    "header": {
-      "packet_type": "1RTT",
-      "packet_number": 0
-    },
-    "frames": [
-      { "frame_type": "stream", "stream_id": 0, "offset": 0 }
-    ]
-  }
-}
-~~~
-
 The field is outside `data`, so existing QUIC event data definitions do not
 need to be copied or redefined for each event. The table above specifies the
 event-by-event semantics and applicability of the common field.
-{{mp-events}} defines the new events. {{multipath-specific-frames}}
+{{mp-events}} defines the new events. {{multipath-frames}}
 defines the frame encodings.
+
+## Correlating 1-RTT packet events across paths
+
+Every event that identifies a specific 1-RTT packet MUST carry its
+event-level `path_id`, even on path 0. For the packet number spaces
+in {{Section 1 of QUIC-MULTIPATH}}, match 1-RTT events by
+(`path_id`, `packet_number`) within one connection and sending direction.
+
+The client logs two sends and one loss.
+
+~~~ json
+[
+  { "time": 10.0, "name": "quic:packet_sent", "path_id": 0,
+    "data": { "header": {
+      "packet_type": "1RTT", "packet_number": 42 } } },
+  { "time": 11.0, "name": "quic:packet_sent", "path_id": 1,
+    "data": { "header": {
+      "packet_type": "1RTT", "packet_number": 42 } } },
+  { "time": 90.0, "name": "quic:packet_lost", "path_id": 0,
+    "data": { "header": {
+      "packet_type": "1RTT", "packet_number": 42 } } }
+]
+~~~
+
+The server logs one receive event.
+
+~~~ json
+{ "time": 25.0, "name": "quic:packet_received", "path_id": 1,
+  "data": { "header": {
+    "packet_type": "1RTT", "packet_number": 42 } } }
+~~~
+
+The server's receive event matches the client's send event for `(1, 42)`.
+The client's loss event matches its send event for `(0, 42)`.
+
+The `path_id` is set to 0 for Initial, Handshake, 0-RTT, and Retry packet events.
+
+## Cross-path retransmission {#cross-path-retransmission}
+
+When data from a lost packet is marked for retransmission, the `path_id` of
+`quic:marked_for_retransmit` identifies the path on which that packet was
+sent. If the data is sent again on a different path
+({{Section 5.6 of QUIC-MULTIPATH}}), the `path_id` of `quic:packet_sent`
+identifies the path carrying the new packet.
+
+In this example, the sender declares packet 42 lost when it discards the
+state of path 1 ({{Section 3.4.3 of QUIC-MULTIPATH}}). The sender logs
+the following events in order:
+
+| Event | `path_id` | What the sender records |
+| --- | --- | --- |
+| `quic:packet_sent` | 1 | Packet 42 carries bytes 800 through 1599 of stream 0. |
+| `quic:path_abandoned` | 1 | The sender abandons path 1. |
+| `quic:packet_lost` | 1 | Packet 42 is declared lost. |
+| `quic:marked_for_retransmit` | 1 | The sender marks those stream bytes for retransmission. |
+| `quic:packet_sent` | 0 | Packet 17 carries the same bytes of stream 0. |
 
 # Multipath transport parameter {#mp-parameters}
 
-The `initial_max_path_id` transport parameter (0x3e) is logged in
-`quic:parameters_set`. The `initiator` field of that event identifies
-the endpoint that advertised the value. The multipath extension is
-enabled only if both endpoints advertise the parameter
-({{Section 2 of RFC10069}}).
+In `quic:parameters_set`, the `initial_max_path_id` field records the value
+of the transport parameter defined in {{Section 2.1 of QUIC-MULTIPATH}}. Include
+this field only if the endpoint identified by `initiator` advertised the
+parameter.
 
 ~~~ cddl
 $$quic-parametersset-extension //= (
     ? initial_max_path_id: uint32
 )
 ~~~
-
-A value of 0 enables the extension without allowing extra paths
-immediately. It is distinct from an absent field, which means that the
-endpoint did not advertise the parameter.
 
 ## Example
 
@@ -325,29 +415,31 @@ maximum Path ID of 3 and the server advertises 1.
 ]
 ~~~
 
-# Multipath specific frames
+# Multipath specific frames {#multipath-frames}
 
 The following CDDL extends the `$QuicFrame` type socket defined in
-{{Section 8.13 of I-D.ietf-quic-qlog-quic-events}}. These frame objects
+{{Section 8.13 of QLOG-QUIC}}. These frame objects
 can appear wherever a QUIC event records frames, including the `frames`
 array of `quic:packet_sent` and `quic:packet_received`. The optional
-`raw` field uses `RawInfo` from {{I-D.ietf-quic-qlog-main-schema}}.
+`raw` field uses `RawInfo` from {{QLOG-MAIN}}.
 
 Within a frame, `path_id` is the Path Identifier carried on the wire.
 For example, a PATH_ACK sent on path 0 can acknowledge packets on path 1.
 In that case the PATH_ACK object contains `"path_id": 1`. Path IDs and
 path ID limits are unsigned 32-bit values. QUIC variable-length integer
-fields are logged as decoded values within the limits of {{RFC10069}}.
+fields are logged as decoded values within the limits of {{QUIC-MULTIPATH}}.
 
 ~~~ cddl
 $QuicFrame /= PathAckFrame / PathAbandonFrame / PathStatusFrame /
-              PathNewConnectionIDFrame / PathRetireConnectionIDFrame /
-              MaxPathIDFrame / PathsBlockedFrame / PathCIDsBlockedFrame
+              PathNewConnectionIDFrame /
+              PathRetireConnectionIDFrame /
+              MaxPathIDFrame / PathsBlockedFrame /
+              PathCIDsBlockedFrame
 ~~~
 
 ## PATH_ACK
 
-Both wire types in {{Section 4.1 of RFC10069}} use the frame type
+Both wire types in {{Section 4.1 of QUIC-MULTIPATH}} use the frame type
 `path_ack`. The `path_id` selects the packet number space being
 acknowledged. As in the base `AckFrame`, `ack_delay` is expressed in
 milliseconds after applying the ACK delay exponent. The `acked_ranges`
@@ -359,7 +451,8 @@ cumulative counts for the acknowledged path, including counts of zero.
 
 ~~~ cddl
 PathAckFrame = { PathAckFields } /
-               { PathAckFields, ect0: uint64, ect1: uint64, ce: uint64 }
+               { PathAckFields, ect0: uint64, ect1: uint64,
+                 ce: uint64 }
 
 PathAckFields = (
     frame_type: "path_ack"
@@ -375,7 +468,7 @@ PathAckFields = (
 For PATH_ABANDON (0x3e75), `path_id` identifies the path being closed.
 The `error` field uses qlog transport error names, including `no_error`
 for code 0. The four additional names below correspond to the codes in
-{{Section 4.2.1 of RFC10069}}. For a code with no known name, log
+{{Section 4.2.1 of QUIC-MULTIPATH}}. For a code with no known name, log
 `"error": "unknown"` and include its numeric value in `error_code`.
 
 ~~~ cddl
@@ -398,7 +491,7 @@ $TransportError /= "application_abandon_path" /      ; 0x3e
 The `frame_type` identifies the preference advertised for `path_id`.
 Use `path_status_available` for 0x3e77 and `path_status_backup` for 0x3e76.
 Both use the same per-path status sequence number space
-({{Section 4.3 of RFC10069}}). The frame object records the received
+({{Section 4.3 of QUIC-MULTIPATH}}). The frame object records the received
 sequence number even when the receiver ignores an outdated advertisement.
 
 ~~~ cddl
@@ -415,7 +508,7 @@ PathStatusFrame = {
 These frames use the fields of the base `NewConnectionIDFrame` and
 `RetireConnectionIDFrame`, with an additional `path_id`. Both the
 connection ID sequence number and the retirement threshold apply to the
-indicated path ({{Sections 4.4 and 4.5 of RFC10069}}). For
+indicated path ({{Sections 4.4 and 4.5 of QUIC-MULTIPATH}}). For
 PATH_NEW_CONNECTION_ID (0x3e78), `connection_id_length`, when present,
 is the length in bytes of the connection ID on the wire. For
 PATH_RETIRE_CONNECTION_ID (0x3e79), the pair (`path_id`,
@@ -449,7 +542,7 @@ at the sender in `limit`. Both fields represent the Maximum Path
 Identifier on the wire. PATH_CIDS_BLOCKED (0x3e7c) identifies the path
 that lacks an unused connection ID and reports the next connection ID
 sequence number expected from the peer
-({{Sections 4.6 and 4.7 of RFC10069}}).
+({{Sections 4.6 and 4.7 of QUIC-MULTIPATH}}).
 
 ~~~ cddl
 MaxPathIDFrame = {
@@ -496,93 +589,6 @@ of connection IDs for path 2.
 }
 ~~~
 
-# Per-path congestion control and recovery {#path-recovery}
-
-## Congestion control and RTT
-
-For congestion control ({{Section 5.3 of RFC10069}}), each path's
-metrics and any connection-wide values are logged in separate
-`quic:recovery_metrics_updated` events.
-In a per-path event, `packets_in_flight` counts packets across that path's
-packet number spaces. The same scoping rule applies to
-`quic:recovery_parameters_set` and `quic:congestion_state_updated`.
-
-For RTT metrics ({{Section 5.4 of RFC10069}}), `path_id` identifies the
-path whose estimator was updated. All packets acknowledged in a
-`quic:packets_acked` event were sent on the path identified by `path_id`.
-
-## Probe timeout, packet loss, and retransmission
-
-For a probe timeout (PTO, {{Section 5.7 of RFC10069}}),
-`quic:timer_updated` identifies the path whose timer changed. For a
-combined loss detection timer (`timer_type` of `"loss_timeout"`), the event
-includes `path_id` only when the update concerns one known path. When
-logged, `pto_count` appears in `quic:recovery_metrics_updated`. A
-`quic:packet_sent` event with trigger `"pto_probe"` identifies the path
-carrying the probe.
-
-For a packet first declared lost when abandoned path state is discarded
-({{Section 3.4.3 of RFC10069}}), the endpoint SHOULD include
-`path_state_discarded` in `quic:packet_lost` and omit `trigger`. The field
-`path_state_discarded` is absent for other loss declarations.
-
-~~~ cddl
-$$quic-packetlost-extension //= (
-    ; only present if the packet is first declared lost when
-    ; abandoned path state is discarded
-    ? path_state_discarded: true
-)
-~~~
-
-In a `quic:marked_for_retransmit` event ({{Section 5.6 of RFC10069}}),
-`path_id` identifies the path on which the data marked for retransmission
-was originally sent.
-
-## Example of cross-path recovery
-
-The PATH_ACK arrives on path 0 and acknowledges the probe on path 1.
-Packet 42 on path 0 carries the same stream bytes as the lost packet 42
-on path 1.
-
-~~~ json
-[
-  { "time": 0, "name": "quic:packet_sent", "path_id": 1,
-    "data": {
-      "header": { "packet_type": "1RTT", "packet_number": 42 },
-      "frames": [{ "frame_type": "stream", "stream_id": 0,
-                   "offset": 800, "raw": { "length": 800 } }] } },
-  { "time": 160, "name": "quic:timer_updated", "path_id": 1,
-    "data": { "timer_type": "pto", "event_type": "expired",
-              "packet_number_space": "application_data" } },
-  { "time": 160, "name": "quic:packet_sent", "path_id": 1,
-    "data": {
-      "header": { "packet_type": "1RTT", "packet_number": 45 },
-      "trigger": "pto_probe",
-      "frames": [{ "frame_type": "ping" }] } },
-  { "time": 186, "name": "quic:packet_received", "path_id": 0,
-    "data": {
-      "header": { "packet_type": "1RTT", "packet_number": 9 },
-      "frames": [{ "frame_type": "path_ack", "path_id": 1,
-                   "acked_ranges": [[45]] }] } },
-  { "time": 186, "name": "quic:packet_lost", "path_id": 1,
-    "data": {
-      "header": { "packet_type": "1RTT", "packet_number": 42 },
-      "trigger": "reordering_threshold" } },
-  { "time": 186, "name": "quic:recovery_metrics_updated",
-    "path_id": 1,
-    "data": { "congestion_window": 6000, "pto_count": 0 } },
-  { "time": 186, "name": "quic:marked_for_retransmit", "path_id": 1,
-    "data": { "frames": [{ "frame_type": "stream", "stream_id": 0,
-                 "offset": 800, "raw": { "length": 800 } }] } },
-  { "time": 187, "name": "quic:packet_sent", "path_id": 0,
-    "data": {
-      "header": { "packet_type": "1RTT", "packet_number": 42 },
-      "trigger": "retransmit_reordered",
-      "frames": [{ "frame_type": "stream", "stream_id": 0,
-                   "offset": 800, "raw": { "length": 800 } }] } }
-]
-~~~
-
 # Security Considerations {#security}
 
 TODO Security
@@ -591,7 +597,7 @@ TODO Security
 # IANA Considerations {#iana}
 
 This document registers a new entry in the "qlog event schema URIs"
-registry defined in {{Section 15 of I-D.ietf-quic-qlog-main-schema}}.
+registry defined in {{Section 15 of QLOG-MAIN}}.
 
 Event schema URI:  `urn:ietf:params:qlog:events:quic#multipath`
 
@@ -600,7 +606,7 @@ Namespace:  `quic`
 Event Types:  `path_created`, `path_abandoned`, `path_status_updated`
 
 Description:  Event definitions related to the extensions to
-the QUIC transport protocol defined in {{RFC10069}}.
+the QUIC transport protocol defined in {{QUIC-MULTIPATH}}.
 
 Reference:  {{mp-events}} of this document.
 
