@@ -4,13 +4,17 @@
 <meta charset="utf-8">
 <meta content="Common,Latin" name="scripts">
 <meta content="initial-scale=1.0" name="viewport">
-<title>QLOG extensions for Multiple Paths for a QUIC Connection</title>
+<title>QLOG extensions for Multiple Paths in QUIC</title>
 <meta content="Christian Huitema" name="author">
 <meta content="Yanmei Liu" name="author">
 <meta content="Altanai Bisht" name="author">
+<meta content="Noriyuki Kurosu" name="author">
 <meta content="
-       This draft define the QLOG elements that have to be added to
-the definition of QLOG events for QUIC connections. 
+       The qlog specifications define structured logs for QUIC connections.
+This draft extends the qlog specification for QUIC events. It adds
+an optional Path ID element to the description of events, defines new events to log the
+creation and management of multiple paths, and specifies the logging format
+of new frames introduced in RFC 10069. 
     " name="description">
 <meta content="xml2rfc 3.35.0" name="generator">
 <meta content="QUIC" name="keyword">
@@ -1050,7 +1054,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Huitema, et al.</td>
-<td class="center">Expires 27 May 2027</td>
+<td class="center">Expires 28 May 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1063,12 +1067,12 @@ svg {
 <dd class="internet-draft">draft-huitema-quic-qlog-multipath-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-11-23" class="published">23 November 2026</time>
+<time datetime="2026-11-24" class="published">24 November 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-05-27">27 May 2027</time></dd>
+<dd class="expires"><time datetime="2027-05-28">28 May 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1083,14 +1087,21 @@ svg {
       <div class="author-name">A. Bisht</div>
 <div class="org">Cisco Systems</div>
 </div>
+<div class="author">
+      <div class="author-name">N. Kurosu</div>
+<div class="org">Individual</div>
+</div>
 </dd>
 </dl>
 </div>
-<h1 id="title">QLOG extensions for Multiple Paths for a QUIC Connection</h1>
+<h1 id="title">QLOG extensions for Multiple Paths in QUIC</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">This draft define the QLOG elements that have to be added to
-the definition of QLOG events for QUIC connections.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">The qlog specifications define structured logs for QUIC connections.
+This draft extends the qlog specification for QUIC events. It adds
+an optional Path ID element to the description of events, defines new events to log the
+creation and management of multiple paths, and specifies the logging format
+of new frames introduced in RFC 10069.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1126,7 +1137,7 @@ the definition of QLOG events for QUIC connections.<a href="#section-abstract-1"
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 27 May 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 28 May 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1170,67 +1181,64 @@ the definition of QLOG events for QUIC connections.<a href="#section-abstract-1"
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
-            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-multipath-specific-events-a" class="internal xref">Multipath specific events and event extensions</a></p>
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-adding-a-path-identifier-to" class="internal xref">Adding a path identifier to event headers</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-multipath-specific-events-a" class="internal xref">Multipath specific events and event extensions</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
-                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-path_created" class="internal xref">path_created</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-path_created" class="internal xref">path_created</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
-                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-path_abandoned" class="internal xref">path_abandoned</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-path_abandoned" class="internal xref">path_abandoned</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
-                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-path_status_updated" class="internal xref">path_status_updated</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
+                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="auto internal xref">5.3</a>.  <a href="#name-path_status_updated" class="internal xref">path_status_updated</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4">
-                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="auto internal xref">4.4</a>.  <a href="#name-example" class="internal xref">Example</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.4">
+                <p id="section-toc.1-1.5.2.4.1"><a href="#section-5.4" class="auto internal xref">5.4</a>.  <a href="#name-example" class="internal xref">Example</a></p>
 </li>
             </ul>
 </li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
-            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-add-a-path-identifier-to-ex" class="internal xref">Add a Path identifier to existing QUIC events</a></p>
-</li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-multipath-transport-paramet" class="internal xref">Multipath transport parameter</a></p>
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-add-a-path-id-to-existing-q" class="internal xref">Add a Path ID to existing QUIC events</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
-                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-example-2" class="internal xref">Example</a></p>
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-correlating-1-rtt-packet-ev" class="internal xref">Correlating 1-RTT packet events across paths</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-cross-path-retransmission" class="internal xref">Cross-path retransmission</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-multipath-specific-frames" class="internal xref">Multipath specific frames</a></p>
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-multipath-transport-paramet" class="internal xref">Multipath transport parameter</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
-                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-path_ack" class="internal xref">PATH_ACK</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
-                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-path_abandon" class="internal xref">PATH_ABANDON</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
-                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-path_status_available-and-p" class="internal xref">PATH_STATUS_AVAILABLE and PATH_STATUS_BACKUP</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4">
-                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-path_new_connection_id-and-" class="internal xref">PATH_NEW_CONNECTION_ID and PATH_RETIRE_CONNECTION_ID</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.5">
-                <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="auto internal xref">7.5</a>.  <a href="#name-max_path_id-paths_blocked-a" class="internal xref">MAX_PATH_ID, PATHS_BLOCKED, and PATH_CIDS_BLOCKED</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.6">
-                <p id="section-toc.1-1.7.2.6.1"><a href="#section-7.6" class="auto internal xref">7.6</a>.  <a href="#name-example-3" class="internal xref">Example</a></p>
+                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-example-2" class="internal xref">Example</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-per-path-congestion-control" class="internal xref">Per-path congestion control and recovery</a></p>
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-multipath-specific-frames" class="internal xref">Multipath specific frames</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
-                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-congestion-control-and-rtt" class="internal xref">Congestion control and RTT</a></p>
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-path_ack" class="internal xref">PATH_ACK</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
-                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-probe-timeout-packet-loss-a" class="internal xref">Probe timeout, packet loss, and retransmission</a></p>
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-path_abandon" class="internal xref">PATH_ABANDON</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.3">
-                <p id="section-toc.1-1.8.2.3.1"><a href="#section-8.3" class="auto internal xref">8.3</a>.  <a href="#name-example-of-cross-path-recov" class="internal xref">Example of cross-path recovery</a></p>
+                <p id="section-toc.1-1.8.2.3.1"><a href="#section-8.3" class="auto internal xref">8.3</a>.  <a href="#name-path_status_available-and-p" class="internal xref">PATH_STATUS_AVAILABLE and PATH_STATUS_BACKUP</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.4">
+                <p id="section-toc.1-1.8.2.4.1"><a href="#section-8.4" class="auto internal xref">8.4</a>.  <a href="#name-path_new_connection_id-and-" class="internal xref">PATH_NEW_CONNECTION_ID and PATH_RETIRE_CONNECTION_ID</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.5">
+                <p id="section-toc.1-1.8.2.5.1"><a href="#section-8.5" class="auto internal xref">8.5</a>.  <a href="#name-max_path_id-paths_blocked-a" class="internal xref">MAX_PATH_ID, PATHS_BLOCKED, and PATH_CIDS_BLOCKED</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.6">
+                <p id="section-toc.1-1.8.2.6.1"><a href="#section-8.6" class="auto internal xref">8.6</a>.  <a href="#name-example-3" class="internal xref">Example</a></p>
 </li>
             </ul>
 </li>
@@ -1241,7 +1249,15 @@ the definition of QLOG events for QUIC connections.<a href="#section-abstract-1"
             <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
-            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1">
+                <p id="section-toc.1-1.11.2.1.1"><a href="#section-11.1" class="auto internal xref">11.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2">
+                <p id="section-toc.1-1.11.2.2.1"><a href="#section-11.2" class="auto internal xref">11.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
             <p id="section-toc.1-1.12.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
@@ -1258,13 +1274,32 @@ the definition of QLOG events for QUIC connections.<a href="#section-abstract-1"
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">The QLOG drafts define the syntax of QLOG <span>[<a href="#I-D.ietf-quic-qlog-main-schema" class="cite xref">I-D.ietf-quic-qlog-main-schema</a>]</span>
-and the events and frames for logging QUIC events <span>[<a href="#I-D.ietf-quic-qlog-quic-events" class="cite xref">I-D.ietf-quic-qlog-quic-events</a>]</span>
-found in QUIC connections per <span>[<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>. The extensions to <span>[<a href="#RFC9000" class="cite xref">RFC9000</a>]</span> for
-managing multiple paths for a QUIC connections are defined in <span>[<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>,
+<p id="section-1-1">The QLOG drafts define the syntax of QLOG <span>[<a href="#QLOG-MAIN" class="cite xref">QLOG-MAIN</a>]</span>
+and the events and frames for logging QUIC events <span>[<a href="#QLOG-QUIC" class="cite xref">QLOG-QUIC</a>]</span>
+found in QUIC connections per <span>[<a href="#QLOG-QUIC" class="cite xref">QLOG-QUIC</a>]</span>. The extensions to <span>[<a href="#QUIC-TRANSPORT" class="cite xref">QUIC-TRANSPORT</a>]</span> for
+managing multiple paths for a QUIC connections are defined in <span>[<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>,
 which introduces new concepts such as path, new events such as creating or
 abandoning paths, and new frames for managing traffic when using multiple
-paths. This draft defines the corresponding QLOG extensions.<a href="#section-1-1" class="pilcrow">¶</a></p>
+paths.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">This draft defines an extension to the QUIC events specification in
+<span>[<a href="#QLOG-QUIC" class="cite xref">QLOG-QUIC</a>]</span> to enable logging of QUIC connections that manage
+multiple paths according to <span>[<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">Debugging tools like qvis have proven very useful when debugging QUIC implementations
+(see <span>[<a href="#ANRW-2020" class="cite xref">ANRW-2020</a>]</span>). This document provides a standard way to add specific information
+in QLOG traces so updated tools can properly represent QUIC connections that use
+multiple paths according to <span>[<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>. For example, a key function of these
+tools is to correlate packet departures and the arrival of the corresponding
+acknowledgement. For plain QUIC connections, this can be done by examining
+packet numbers. With multipath, there is a packet number space per path, and
+correlation for 1RTT packets requires examining both packet numbers
+and the ID of the path on which the
+packet was sent. The required logging information is defined in this document.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">This document defines how a path ID can be added to event headers in <a href="#path-id-def" class="auto internal xref">Section 4</a>,
+adds events describing the management of paths in <a href="#mp-events" class="auto internal xref">Section 5</a>,
+explains the effects of adding a path ID to events defined in
+<span>[<a href="#QLOG-QUIC" class="cite xref">QLOG-QUIC</a>]</span> in <a href="#add-path-id" class="auto internal xref">Section 6</a>,
+specifies the logging of multipath specific frames in <a href="#multipath-frames" class="auto internal xref">Section 8</a>,
+and that of the multipath transport parameter in <a href="#mp-parameters" class="auto internal xref">Section 7</a>.<a href="#section-1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conventions-and-definitions">
@@ -1284,11 +1319,11 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-event-schema-definition" class="section-name selfRef">Event Schema Definition</a>
       </h2>
 <p id="section-3-1">This document extends the <code>quic</code> namespace of
-<span>[<a href="#I-D.ietf-quic-qlog-quic-events" class="cite xref">I-D.ietf-quic-qlog-quic-events</a>]</span> to cover the multipath extension
-defined in <span>[<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>. The event schema URN for this extension is
+<span>[<a href="#QLOG-QUIC" class="cite xref">QLOG-QUIC</a>]</span> to cover the multipath extension
+defined in <span>[<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>. The event schema URN for this extension is
 <code>urn:ietf:params:qlog:events:quic#multipath</code>. The fragment <code>multipath</code>
 identifies the extension within the <code>quic</code> namespace, as specified in
-<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15#section-8.1" class="relref">Section 8.1</a> of [<a href="#I-D.ietf-quic-qlog-main-schema" class="cite xref">I-D.ietf-quic-qlog-main-schema</a>]</span>.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15#section-8.1" class="relref">Section 8.1</a> of [<a href="#QLOG-MAIN" class="cite xref">QLOG-MAIN</a>]</span>.<a href="#section-3-1" class="pilcrow">¶</a></p>
 <div id="draft-event-schema-identification">
 <section id="section-3.1">
         <h3 id="name-draft-event-schema-identifi">
@@ -1306,117 +1341,133 @@ exampledraft 00 of this document is identified using the URI
 </div>
 </section>
 </div>
-<div id="mp-events">
+<div id="path-id-def">
 <section id="section-4">
-      <h2 id="name-multipath-specific-events-a">
-<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-multipath-specific-events-a" class="section-name selfRef">Multipath specific events and event extensions</a>
+      <h2 id="name-adding-a-path-identifier-to">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-adding-a-path-identifier-to" class="section-name selfRef">Adding a path identifier to event headers</a>
       </h2>
-<p id="section-4-1">The three events in this section have Base importance. They record
+<p id="section-4-1">Managing multiple paths per connection requires identifying these paths.
+Per <span>[<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>, this is done using a path ID. This path ID
+will be added to events as specified in <a href="#mp-events" class="auto internal xref">Section 5</a> and <a href="#add-path-id" class="auto internal xref">Section 6</a>.
+Each of these events <span class="bcp14">MUST</span> include the following field in its top-level
+<code>Event</code> map alongside <code>time</code>, <code>name</code>, and <code>data</code>
+(<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15#section-7" class="relref">Section 7</a> of [<a href="#QLOG-MAIN" class="cite xref">QLOG-MAIN</a>]</span>).<a href="#section-4-1" class="pilcrow">¶</a></p>
+<div class="lang-cddl sourcecode" id="section-4-2">
+<pre>
+MultipathEventFields = (path_id: uint32)
+</pre><a href="#section-4-2" class="pilcrow">¶</a>
+</div>
+<p id="section-4-3"><code>path_id</code> identifies the affected path within the connection. It is an
+unsigned 32-bit integer in the range 0 to 4294967295 inclusive
+(<span><a href="https://rfc-editor.org/rfc/rfc10069#section-2.1" class="relref">Section 2.1</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>).<a href="#section-4-3" class="pilcrow">¶</a></p>
+<p id="section-4-4">The value of <code>path_id</code> is the Path ID defined in <span>[<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>. It is scoped to
+the QUIC connection, is shared by both directions, starts at 0 for the
+initial path, increases monotonically, and is not reused. The range is
+0..2^32-1, inclusive. The field is unsigned: negative values are invalid.<a href="#section-4-4" class="pilcrow">¶</a></p>
+<p id="section-4-5"><code>path_id</code> is distinct from qlog's <code>tuple</code> / <code>tuple_id</code>. A path ID identifies a
+logical QUIC path; multiple path IDs can use the same 4-tuple, and one Path ID
+can use a new 4-tuple after migration. Implementations <span class="bcp14">MUST NOT</span> infer a Path
+ID from a tuple identifier.  Tuple details can
+be recorded with <code>quic:tuple_assigned</code> (see <span>[<a href="#QLOG-QUIC" class="cite xref">QLOG-QUIC</a>]</span>).<a href="#section-4-5" class="pilcrow">¶</a></p>
+<p id="section-4-6">The top-level <code>path_id</code> field gives tools one place to find the path ID
+across packet, recovery, and path management events. For example, the
+field stays in the same place when a <code>packet_lost</code> event omits the optional
+packet header. The base qlog schema also uses an optional top-level
+<code>tuple</code> field to associate an event with a network tuple
+(<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15#section-7.2" class="relref">Section 7.2</a> of [<a href="#QLOG-MAIN" class="cite xref">QLOG-MAIN</a>]</span>).
+<a href="#add-path-id" class="auto internal xref">Section 6</a> describes when existing QUIC events include <code>path_id</code>.<a href="#section-4-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="mp-events">
+<section id="section-5">
+      <h2 id="name-multipath-specific-events-a">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-multipath-specific-events-a" class="section-name selfRef">Multipath specific events and event extensions</a>
+      </h2>
+<p id="section-5-1">The three events in this section have Base importance. They record
 changes to the paths of a connection as seen by the endpoint. Packet
 events record the frames that carry path management signals. A single
 change can involve several frames, and a local decision can precede the
-first frame that signals it.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<p id="section-4-2">Each of these events <span class="bcp14">MUST</span> include the following field in its top-level
-<code>Event</code> map alongside <code>time</code>, <code>name</code>, and <code>data</code>
-(<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15#section-7" class="relref">Section 7</a> of [<a href="#I-D.ietf-quic-qlog-main-schema" class="cite xref">I-D.ietf-quic-qlog-main-schema</a>]</span>).<a href="#section-4-2" class="pilcrow">¶</a></p>
-<div class="lang-cddl sourcecode" id="section-4-3">
-<pre>
-MultipathEventFields = (path_id: uint32)
-</pre><a href="#section-4-3" class="pilcrow">¶</a>
-</div>
-<p id="section-4-4"><code>path_id</code> identifies the affected path within the connection. It is an
-unsigned 32-bit integer in the range 0 to 4294967295 inclusive
-(<span><a href="https://rfc-editor.org/rfc/rfc10069#section-2.1" class="relref">Section 2.1</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>).<a href="#section-4-4" class="pilcrow">¶</a></p>
-<p id="section-4-5">The value of <code>path_id</code> is the Path ID defined in <span>[<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>. It is scoped to
-the QUIC connection, is shared by both directions, starts at 0 for the
-initial path, increases monotonically, and is not reused. The range is
-0..2^32-1, inclusive. The field is unsigned: negative values are invalid.<a href="#section-4-5" class="pilcrow">¶</a></p>
-<p id="section-4-6">For example, if a packet on path 0 changes the status of path 1, the
-status event has <code>path_id</code> 1. The optional qlog <code>tuple</code> field identifies
-the network tuple associated with an event. Two Path IDs can share a
-tuple, and a path can change tuples during migration. Tuple details can
-be recorded with <code>quic:tuple_assigned</code> (<span>[<a href="#I-D.ietf-quic-qlog-quic-events" class="cite xref">I-D.ietf-quic-qlog-quic-events</a>]</span>).<a href="#section-4-6" class="pilcrow">¶</a></p>
-<p id="section-4-7"><code>path_id</code> is distinct from qlog's <code>tuple</code> / <code>tuple_id</code>. A Path ID identifies a
-logical QUIC path; multiple Path IDs can use the same 4-tuple, and one Path ID
-can use a new 4-tuple after migration. Implementations <span class="bcp14">MUST NOT</span> infer a Path
-ID from a tuple identifier.<a href="#section-4-7" class="pilcrow">¶</a></p>
-<p id="section-4-8">The event data types extend the qlog main schema as follows. The
+first frame that signals it.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-2">All the events described in this section affect a single path. The
+corresponding <code>path_id</code> <span class="bcp14">MUST</span> be included in the respective event headers,
+as specified in <a href="#path-id-def" class="auto internal xref">Section 4</a>.<a href="#section-5-2" class="pilcrow">¶</a></p>
+<p id="section-5-3">The event data types extend the qlog main schema as follows. The
 optional <code>error_code</code> and <code>sequence_number</code> fields use the qlog
 <code>uint64</code> type. Their values are limited to 0 through 2^62 - 1 by
-Sections <a href="https://rfc-editor.org/rfc/rfc10069#section-4.2" class="relref">4.2</a> and <a href="https://rfc-editor.org/rfc/rfc10069#section-4.3" class="relref">4.3</a> of <span>[<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>.<a href="#section-4-8" class="pilcrow">¶</a></p>
-<div class="lang-cddl sourcecode" id="section-4-9">
+Sections <a href="https://rfc-editor.org/rfc/rfc10069#section-4.2" class="relref">4.2</a> and <a href="https://rfc-editor.org/rfc/rfc10069#section-4.3" class="relref">4.3</a> of <span>[<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>.<a href="#section-5-3" class="pilcrow">¶</a></p>
+<div class="lang-cddl sourcecode" id="section-5-4">
 <pre>
 $ProtocolEventData /= QUICPathCreated / QUICPathAbandoned /
                       QUICPathStatusUpdated
-</pre><a href="#section-4-9" class="pilcrow">¶</a>
+</pre><a href="#section-5-4" class="pilcrow">¶</a>
 </div>
 <div id="pathcreated">
-<section id="section-4.1">
+<section id="section-5.1">
         <h3 id="name-path_created">
-<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-path_created" class="section-name selfRef">path_created</a>
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-path_created" class="section-name selfRef">path_created</a>
         </h3>
-<p id="section-4.1-1"><code>quic:path_created</code> is emitted once when the endpoint starts using a Path ID
+<p id="section-5.1-1"><code>quic:path_created</code> is emitted once when the endpoint starts using a Path ID
 for a new path. For an additional path, the client logs the event when it
 initiates the path and the server logs it when it accepts the attempt and
-sets up the path locally (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-3.1" class="relref">Section 3.1</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>). Validation can
+sets up the path locally (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-3.1" class="relref">Section 3.1</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>). Validation can
 still be pending. For the initial path, the endpoint logs the event with
 <code>path_id</code> 0 when the handshake completes with multipath negotiated.
 Issuing connection IDs for future paths alone does not trigger this event.
 Migration to a new tuple retains the existing Path ID and can be logged
-with <code>quic:migration_state_updated</code>.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
-<div class="lang-cddl sourcecode" id="section-4.1-2">
+with <code>quic:migration_state_updated</code>.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<div class="lang-cddl sourcecode" id="section-5.1-2">
 <pre>
 QUICPathCreated = {
     * $$quic-pathcreated-extension
 }
-</pre><a href="#section-4.1-2" class="pilcrow">¶</a>
+</pre><a href="#section-5.1-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="pathabandoned">
-<section id="section-4.2">
+<section id="section-5.2">
         <h3 id="name-path_abandoned">
-<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-path_abandoned" class="section-name selfRef">path_abandoned</a>
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-path_abandoned" class="section-name selfRef">path_abandoned</a>
         </h3>
-<p id="section-4.2-1"><code>quic:path_abandoned</code> is emitted once when the endpoint abandons the
-indicated Path ID under <span><a href="https://rfc-editor.org/rfc/rfc10069#section-3.4" class="relref">Section 3.4</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>. The <code>initiator</code> is
+<p id="section-5.2-1"><code>quic:path_abandoned</code> is emitted once when the endpoint abandons the
+indicated Path ID under <span><a href="https://rfc-editor.org/rfc/rfc10069#section-3.4" class="relref">Section 3.4</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>. The <code>initiator</code> is
 <code>local</code> when the endpoint decides to close the path and <code>remote</code> when it
 acts on the peer's PATH_ABANDON. These values use the <code>Initiator</code> type
-from <span>[<a href="#I-D.ietf-quic-qlog-quic-events" class="cite xref">I-D.ietf-quic-qlog-quic-events</a>]</span>. If known, <code>error_code</code> records
-the numeric PATH_ABANDON error code for that decision.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
-<p id="section-4.2-2">An unused Path ID can be abandoned without a preceding <code>path_created</code>.
+from <span>[<a href="#QLOG-QUIC" class="cite xref">QLOG-QUIC</a>]</span>. If known, <code>error_code</code> records
+the numeric PATH_ABANDON error code for that decision.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-2">An unused Path ID can be abandoned without a preceding <code>path_created</code>.
 A repeated or reciprocal PATH_ABANDON and the eventual release of retained
-path state do not produce additional abandonment events.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
-<div class="lang-cddl sourcecode" id="section-4.2-3">
+path state do not produce additional abandonment events.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+<div class="lang-cddl sourcecode" id="section-5.2-3">
 <pre>
 QUICPathAbandoned = {
     initiator: Initiator
     ? error_code: uint64 .le 4611686018427387903
     * $$quic-pathabandoned-extension
 }
-</pre><a href="#section-4.2-3" class="pilcrow">¶</a>
+</pre><a href="#section-5.2-3" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="pathstatusupdated">
-<section id="section-4.3">
+<section id="section-5.3">
         <h3 id="name-path_status_updated">
-<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-path_status_updated" class="section-name selfRef">path_status_updated</a>
+<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-path_status_updated" class="section-name selfRef">path_status_updated</a>
         </h3>
-<p id="section-4.3-1"><code>quic:path_status_updated</code> is emitted when the endpoint changes the path
+<p id="section-5.3-1"><code>quic:path_status_updated</code> is emitted when the endpoint changes the path
 usage preference it advertises (<code>initiator</code> is <code>local</code>), or records a
 change in the peer's advertised preference (<code>initiator</code> is <code>remote</code>).
 Each endpoint expresses its own preference for how its peer should use
-the path (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-3.3" class="relref">Section 3.3</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>). A sender can choose how to
-schedule packets independently of the advertised preference.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
-<p id="section-4.3-2"><code>new</code> gives the updated preference. If included, <code>old</code> gives the previous
+the path (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-3.3" class="relref">Section 3.3</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>). A sender can choose how to
+schedule packets independently of the advertised preference.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+<p id="section-5.3-2"><code>new</code> gives the updated preference. If included, <code>old</code> gives the previous
 preference for the same Path ID and initiator. Omit <code>old</code> when no previous
 preference is known. The first advertisement can precede path creation.
 <code>sequence_number</code>, if present, is the Path Status Sequence Number of the
 advertisement. An ignored out-of-order or duplicate advertisement, or a
 newer advertisement that repeats the current preference, produces no
-status change event (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-4.3" class="relref">Section 4.3</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>).<a href="#section-4.3-2" class="pilcrow">¶</a></p>
-<div class="lang-cddl sourcecode" id="section-4.3-3">
+status change event (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-4.3" class="relref">Section 4.3</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>).<a href="#section-5.3-2" class="pilcrow">¶</a></p>
+<div class="lang-cddl sourcecode" id="section-5.3-3">
 <pre>
 QUICPathStatusUpdated = {
     initiator: Initiator
@@ -1427,19 +1478,19 @@ QUICPathStatusUpdated = {
 }
 
 QUICPathStatus = "available" / "backup"
-</pre><a href="#section-4.3-3" class="pilcrow">¶</a>
+</pre><a href="#section-5.3-3" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="example">
-<section id="section-4.4">
+<section id="section-5.4">
         <h3 id="name-example">
-<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-example" class="section-name selfRef">Example</a>
+<a href="#section-5.4" class="section-number selfRef">5.4. </a><a href="#name-example" class="section-name selfRef">Example</a>
         </h3>
-<p id="section-4.4-1">In this excerpt from a client's event list, the client opens path 1.
+<p id="section-5.4-1">In this excerpt from a client's event list, the client opens path 1.
 It then receives the peer's first preference for path 1 in a packet on
-path 0. Later the client abandons path 1 at the application's request.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="section-4.4-2">
+path 0. Later the client abandons path 1 at the application's request.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-5.4-2">
 <pre>
 [
   { "time": 12.0, "name": "quic:path_created",
@@ -1448,34 +1499,35 @@ path 0. Later the client abandons path 1 at the application's request.<a href="#
     "path_id": 1, "data": { "initiator": "remote", "new": "backup",
                             "sequence_number": 0 } },
   { "time": 97.0, "name": "quic:path_abandoned",
-    "path_id": 1, "data": { "initiator": "local", "error_code": 62 } }
+    "path_id": 1, "data": { "initiator": "local",
+                            "error_code": 62 } }
 ]
-</pre><a href="#section-4.4-2" class="pilcrow">¶</a>
+</pre><a href="#section-5.4-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 </section>
 </div>
-<div id="add-a-path-identifier-to-existing-quic-events">
-<section id="section-5">
-      <h2 id="name-add-a-path-identifier-to-ex">
-<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-add-a-path-identifier-to-ex" class="section-name selfRef">Add a Path identifier to existing QUIC events</a>
+<div id="add-path-id">
+<section id="section-6">
+      <h2 id="name-add-a-path-id-to-existing-q">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-add-a-path-id-to-existing-q" class="section-name selfRef">Add a Path ID to existing QUIC events</a>
       </h2>
-<p id="section-5-1">When a QUIC event describes an operation or state for one known path,
+<p id="section-6-1">When a QUIC event describes an operation or state for one known path,
 implementations <span class="bcp14">MUST</span> include <code>path_id</code>, including when its value is 0.
-(The <code>path_id</code> field is defined in <a href="#mp-events" class="auto internal xref">Section 4</a>.)
+(The <code>path_id</code> field is defined in <a href="#path-id-def" class="auto internal xref">Section 4</a>.)
 Implementations
 <span class="bcp14">MUST</span> omit the field when the event is connection-wide or when the associated
 Path ID is not known. Omission does not mean path 0. An implementation <span class="bcp14">MAY</span>
 place <code>path_id</code> in <code>common_fields</code> only when the same value applies to every
-event in that trace, following the common-field rules in <span>[<a href="#I-D.ietf-quic-qlog-main-schema" class="cite xref">I-D.ietf-quic-qlog-main-schema</a>]</span>.<a href="#section-5-1" class="pilcrow">¶</a></p>
-<p id="section-5-2">The event-level field identifies the path on which the event's packet or
+event in that trace, following the common-field rules in <span>[<a href="#QLOG-MAIN" class="cite xref">QLOG-MAIN</a>]</span>.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">The event-level field identifies the path on which the event's packet or
 operation applies. A Path ID carried inside a frame remains a frame field and
 can identify a different path. For example, a packet sent on path 0 can carry
 a PATH_ACK frame acknowledging packets from path 1; the event has
-<code>path_id: 0</code>, while the PATH_ACK frame has <code>path_id: 1</code>.<a href="#section-5-2" class="pilcrow">¶</a></p>
-<p id="section-5-3">The field applies to the following existing events in the <code>quic</code> namespace
-when the stated path context is known:<a href="#section-5-3" class="pilcrow">¶</a></p>
+<code>path_id: 0</code>, while the PATH_ACK frame has <code>path_id: 1</code>.<a href="#section-6-2" class="pilcrow">¶</a></p>
+<p id="section-6-3">The field applies to the following existing events in the <code>quic</code> namespace
+when the stated path context is known:<a href="#section-6-3" class="pilcrow">¶</a></p>
 <table class="center" id="table-1">
         <caption><a href="#table-1" class="selfRef">Table 1</a></caption>
 <thead>
@@ -1501,7 +1553,7 @@ when the stated path context is known:<a href="#section-5-3" class="pilcrow">¶<
             <td class="text-left" rowspan="1" colspan="1">
               <code>marked_for_retransmit</code>
 </td>
-            <td class="text-left" rowspan="1" colspan="1">Original sending path of the data marked for retransmission (<a href="#path-recovery" class="auto internal xref">Section 8</a>).</td>
+            <td class="text-left" rowspan="1" colspan="1">Sending path of the packet whose data is marked for retransmission (<a href="#cross-path-retransmission" class="auto internal xref">Section 6.2</a>).</td>
           </tr>
           <tr>
             <td class="text-left" rowspan="1" colspan="1">
@@ -1559,66 +1611,143 @@ when the stated path context is known:<a href="#section-5-3" class="pilcrow">¶<
           </tr>
         </tbody>
       </table>
-<p id="section-5-5">Path-management events defined by this document <span class="bcp14">MUST</span> include <code>path_id</code> when
+<p id="section-6-5">Path-management events defined by this document <span class="bcp14">MUST</span> include <code>path_id</code> when
 they refer to one path. For a frame whose RFC 10069 definition contains a
 Path ID, the frame's <code>data</code> representation <span class="bcp14">MUST</span> also retain that frame field;
 the event-level <code>path_id</code> does not replace it. For other QUIC events,
 implementations <span class="bcp14">MUST</span> include <code>path_id</code> when they describe a single known
-path, and <span class="bcp14">MUST</span> omit it when they are connection-wide or the path is unknown.<a href="#section-5-5" class="pilcrow">¶</a></p>
-<p id="section-5-6">An example packet event is:<a href="#section-5-6" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="section-5-7">
-<pre>
-{
-  "time": 123.4,
-  "name": "quic:packet_sent",
-  "path_id": 1,
-  "data": {
-    "header": {
-      "packet_type": "1RTT",
-      "packet_number": 0
-    },
-    "frames": [
-      { "frame_type": "stream", "stream_id": 0, "offset": 0 }
-    ]
-  }
-}
-</pre><a href="#section-5-7" class="pilcrow">¶</a>
-</div>
-<p id="section-5-8">The field is outside <code>data</code>, so existing QUIC event data definitions do not
+path, and <span class="bcp14">MUST</span> omit it when they are connection-wide or the path is unknown.<a href="#section-6-5" class="pilcrow">¶</a></p>
+<p id="section-6-6">The field is outside <code>data</code>, so existing QUIC event data definitions do not
 need to be copied or redefined for each event. The table above specifies the
 event-by-event semantics and applicability of the common field.
-<a href="#mp-events" class="auto internal xref">Section 4</a> defines the new events. <a href="#multipath-specific-frames" class="auto internal xref">Section 7</a>
-defines the frame encodings.<a href="#section-5-8" class="pilcrow">¶</a></p>
+<a href="#mp-events" class="auto internal xref">Section 5</a> defines the new events. <a href="#multipath-frames" class="auto internal xref">Section 8</a>
+defines the frame encodings.<a href="#section-6-6" class="pilcrow">¶</a></p>
+<div id="correlating-1-rtt-packet-events-across-paths">
+<section id="section-6.1">
+        <h3 id="name-correlating-1-rtt-packet-ev">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-correlating-1-rtt-packet-ev" class="section-name selfRef">Correlating 1-RTT packet events across paths</a>
+        </h3>
+<p id="section-6.1-1">Every event that identifies a specific 1-RTT packet <span class="bcp14">MUST</span> carry its
+event-level <code>path_id</code>, even on path 0. For the packet number spaces
+in <span><a href="https://rfc-editor.org/rfc/rfc10069#section-1" class="relref">Section 1</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>, match 1-RTT events by
+(<code>path_id</code>, <code>packet_number</code>) within one connection and sending direction.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.1-2">The client logs two sends and one loss.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-6.1-3">
+<pre>
+[
+  { "time": 10.0, "name": "quic:packet_sent", "path_id": 0,
+    "data": { "header": {
+      "packet_type": "1RTT", "packet_number": 42 } } },
+  { "time": 11.0, "name": "quic:packet_sent", "path_id": 1,
+    "data": { "header": {
+      "packet_type": "1RTT", "packet_number": 42 } } },
+  { "time": 90.0, "name": "quic:packet_lost", "path_id": 0,
+    "data": { "header": {
+      "packet_type": "1RTT", "packet_number": 42 } } }
+]
+</pre><a href="#section-6.1-3" class="pilcrow">¶</a>
+</div>
+<p id="section-6.1-4">The server logs one receive event.<a href="#section-6.1-4" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-6.1-5">
+<pre>
+{ "time": 25.0, "name": "quic:packet_received", "path_id": 1,
+  "data": { "header": {
+    "packet_type": "1RTT", "packet_number": 42 } } }
+</pre><a href="#section-6.1-5" class="pilcrow">¶</a>
+</div>
+<p id="section-6.1-6">The server's receive event matches the client's send event for <code>(1, 42)</code>.
+The client's loss event matches its send event for <code>(0, 42)</code>.<a href="#section-6.1-6" class="pilcrow">¶</a></p>
+<p id="section-6.1-7">The <code>path_id</code> is set to 0 for Initial, Handshake, 0-RTT, and Retry packet events.<a href="#section-6.1-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="cross-path-retransmission">
+<section id="section-6.2">
+        <h3 id="name-cross-path-retransmission">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-cross-path-retransmission" class="section-name selfRef">Cross-path retransmission</a>
+        </h3>
+<p id="section-6.2-1">When data from a lost packet is marked for retransmission, the <code>path_id</code> of
+<code>quic:marked_for_retransmit</code> identifies the path on which that packet was
+sent. If the data is sent again on a different path
+(<span><a href="https://rfc-editor.org/rfc/rfc10069#section-5.6" class="relref">Section 5.6</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>), the <code>path_id</code> of <code>quic:packet_sent</code>
+identifies the path carrying the new packet.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.2-2">In this example, the sender declares packet 42 lost when it discards the
+state of path 1 (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-3.4.3" class="relref">Section 3.4.3</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>). The sender logs
+the following events in order:<a href="#section-6.2-2" class="pilcrow">¶</a></p>
+<table class="center" id="table-2">
+          <caption><a href="#table-2" class="selfRef">Table 2</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Event</th>
+              <th class="text-left" rowspan="1" colspan="1">path_id</th>
+              <th class="text-left" rowspan="1" colspan="1">What the sender records</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>quic:packet_sent</code>
+</td>
+              <td class="text-left" rowspan="1" colspan="1">1</td>
+              <td class="text-left" rowspan="1" colspan="1">Packet 42 carries bytes 800 through 1599 of stream 0.</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>quic:path_abandoned</code>
+</td>
+              <td class="text-left" rowspan="1" colspan="1">1</td>
+              <td class="text-left" rowspan="1" colspan="1">The sender abandons path 1.</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>quic:packet_lost</code>
+</td>
+              <td class="text-left" rowspan="1" colspan="1">1</td>
+              <td class="text-left" rowspan="1" colspan="1">Packet 42 is declared lost.</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>quic:marked_for_retransmit</code>
+</td>
+              <td class="text-left" rowspan="1" colspan="1">1</td>
+              <td class="text-left" rowspan="1" colspan="1">The sender marks those stream bytes for retransmission.</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>quic:packet_sent</code>
+</td>
+              <td class="text-left" rowspan="1" colspan="1">0</td>
+              <td class="text-left" rowspan="1" colspan="1">Packet 17 carries the same bytes of stream 0.</td>
+            </tr>
+          </tbody>
+        </table>
+</section>
+</div>
 </section>
 </div>
 <div id="mp-parameters">
-<section id="section-6">
+<section id="section-7">
       <h2 id="name-multipath-transport-paramet">
-<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-multipath-transport-paramet" class="section-name selfRef">Multipath transport parameter</a>
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-multipath-transport-paramet" class="section-name selfRef">Multipath transport parameter</a>
       </h2>
-<p id="section-6-1">The <code>initial_max_path_id</code> transport parameter (0x3e) is logged in
-<code>quic:parameters_set</code>. The <code>initiator</code> field of that event identifies
-the endpoint that advertised the value. The multipath extension is
-enabled only if both endpoints advertise the parameter
-(<span><a href="https://rfc-editor.org/rfc/rfc10069#section-2" class="relref">Section 2</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>).<a href="#section-6-1" class="pilcrow">¶</a></p>
-<div class="lang-cddl sourcecode" id="section-6-2">
+<p id="section-7-1">In <code>quic:parameters_set</code>, the <code>initial_max_path_id</code> field records the value
+of the transport parameter defined in <span><a href="https://rfc-editor.org/rfc/rfc10069#section-2.1" class="relref">Section 2.1</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>. Include
+this field only if the endpoint identified by <code>initiator</code> advertised the
+parameter.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<div class="lang-cddl sourcecode" id="section-7-2">
 <pre>
 $$quic-parametersset-extension //= (
     ? initial_max_path_id: uint32
 )
-</pre><a href="#section-6-2" class="pilcrow">¶</a>
+</pre><a href="#section-7-2" class="pilcrow">¶</a>
 </div>
-<p id="section-6-3">A value of 0 enables the extension without allowing extra paths
-immediately. It is distinct from an absent field, which means that the
-endpoint did not advertise the parameter.<a href="#section-6-3" class="pilcrow">¶</a></p>
 <div id="example-1">
-<section id="section-6.1">
+<section id="section-7.1">
         <h3 id="name-example-2">
-<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-example-2" class="section-name selfRef">Example</a>
+<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-example-2" class="section-name selfRef">Example</a>
         </h3>
-<p id="section-6.1-1">In this excerpt from a client's event list, the client advertises a
-maximum Path ID of 3 and the server advertises 1.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="section-6.1-2">
+<p id="section-7.1-1">In this excerpt from a client's event list, the client advertises a
+maximum Path ID of 3 and the server advertises 1.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-7.1-2">
 <pre>
 [
   { "time": 0.0, "name": "quic:parameters_set",
@@ -1626,51 +1755,54 @@ maximum Path ID of 3 and the server advertises 1.<a href="#section-6.1-1" class=
   { "time": 31.2, "name": "quic:parameters_set",
     "data": { "initiator": "remote", "initial_max_path_id": 1 } }
 ]
-</pre><a href="#section-6.1-2" class="pilcrow">¶</a>
+</pre><a href="#section-7.1-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 </section>
 </div>
-<div id="multipath-specific-frames">
-<section id="section-7">
+<div id="multipath-frames">
+<section id="section-8">
       <h2 id="name-multipath-specific-frames">
-<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-multipath-specific-frames" class="section-name selfRef">Multipath specific frames</a>
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-multipath-specific-frames" class="section-name selfRef">Multipath specific frames</a>
       </h2>
-<p id="section-7-1">The following CDDL extends the <code>$QuicFrame</code> type socket defined in
-<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-quic-events-14#section-8.13" class="relref">Section 8.13</a> of [<a href="#I-D.ietf-quic-qlog-quic-events" class="cite xref">I-D.ietf-quic-qlog-quic-events</a>]</span>. These frame objects
+<p id="section-8-1">The following CDDL extends the <code>$QuicFrame</code> type socket defined in
+<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-quic-events-14#section-8.13" class="relref">Section 8.13</a> of [<a href="#QLOG-QUIC" class="cite xref">QLOG-QUIC</a>]</span>. These frame objects
 can appear wherever a QUIC event records frames, including the <code>frames</code>
 array of <code>quic:packet_sent</code> and <code>quic:packet_received</code>. The optional
-<code>raw</code> field uses <code>RawInfo</code> from <span>[<a href="#I-D.ietf-quic-qlog-main-schema" class="cite xref">I-D.ietf-quic-qlog-main-schema</a>]</span>.<a href="#section-7-1" class="pilcrow">¶</a></p>
-<p id="section-7-2">Within a frame, <code>path_id</code> is the Path Identifier carried on the wire.
+<code>raw</code> field uses <code>RawInfo</code> from <span>[<a href="#QLOG-MAIN" class="cite xref">QLOG-MAIN</a>]</span>.<a href="#section-8-1" class="pilcrow">¶</a></p>
+<p id="section-8-2">Within a frame, <code>path_id</code> is the Path Identifier carried on the wire.
 For example, a PATH_ACK sent on path 0 can acknowledge packets on path 1.
 In that case the PATH_ACK object contains <code>"path_id": 1</code>. Path IDs and
 path ID limits are unsigned 32-bit values. QUIC variable-length integer
-fields are logged as decoded values within the limits of <span>[<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>.<a href="#section-7-2" class="pilcrow">¶</a></p>
-<div class="lang-cddl sourcecode" id="section-7-3">
+fields are logged as decoded values within the limits of <span>[<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>.<a href="#section-8-2" class="pilcrow">¶</a></p>
+<div class="lang-cddl sourcecode" id="section-8-3">
 <pre>
 $QuicFrame /= PathAckFrame / PathAbandonFrame / PathStatusFrame /
-              PathNewConnectionIDFrame / PathRetireConnectionIDFrame /
-              MaxPathIDFrame / PathsBlockedFrame / PathCIDsBlockedFrame
-</pre><a href="#section-7-3" class="pilcrow">¶</a>
+              PathNewConnectionIDFrame /
+              PathRetireConnectionIDFrame /
+              MaxPathIDFrame / PathsBlockedFrame /
+              PathCIDsBlockedFrame
+</pre><a href="#section-8-3" class="pilcrow">¶</a>
 </div>
 <div id="pathack">
-<section id="section-7.1">
+<section id="section-8.1">
         <h3 id="name-path_ack">
-<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-path_ack" class="section-name selfRef">PATH_ACK</a>
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-path_ack" class="section-name selfRef">PATH_ACK</a>
         </h3>
-<p id="section-7.1-1">Both wire types in <span><a href="https://rfc-editor.org/rfc/rfc10069#section-4.1" class="relref">Section 4.1</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span> use the frame type
+<p id="section-8.1-1">Both wire types in <span><a href="https://rfc-editor.org/rfc/rfc10069#section-4.1" class="relref">Section 4.1</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span> use the frame type
 <code>path_ack</code>. The <code>path_id</code> selects the packet number space being
 acknowledged. As in the base <code>AckFrame</code>, <code>ack_delay</code> is expressed in
 milliseconds after applying the ACK delay exponent. The <code>acked_ranges</code>
 field contains decoded, inclusive packet number ranges. For example,
-<code>[[40, 42], [48]]</code> acknowledges packets 40 through 42 and packet 48.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
-<p id="section-7.1-2">For wire type 0x3e, omit the ECN counts. For 0x3f, include all three
-cumulative counts for the acknowledged path, including counts of zero.<a href="#section-7.1-2" class="pilcrow">¶</a></p>
-<div class="lang-cddl sourcecode" id="section-7.1-3">
+<code>[[40, 42], [48]]</code> acknowledges packets 40 through 42 and packet 48.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
+<p id="section-8.1-2">For wire type 0x3e, omit the ECN counts. For 0x3f, include all three
+cumulative counts for the acknowledged path, including counts of zero.<a href="#section-8.1-2" class="pilcrow">¶</a></p>
+<div class="lang-cddl sourcecode" id="section-8.1-3">
 <pre>
 PathAckFrame = { PathAckFields } /
-               { PathAckFields, ect0: uint64, ect1: uint64, ce: uint64 }
+               { PathAckFields, ect0: uint64, ect1: uint64,
+                 ce: uint64 }
 
 PathAckFields = (
     frame_type: "path_ack"
@@ -1679,21 +1811,21 @@ PathAckFields = (
     ? acked_ranges: [+ AckRange]
     ? raw: RawInfo
 )
-</pre><a href="#section-7.1-3" class="pilcrow">¶</a>
+</pre><a href="#section-8.1-3" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="pathabandon">
-<section id="section-7.2">
+<section id="section-8.2">
         <h3 id="name-path_abandon">
-<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-path_abandon" class="section-name selfRef">PATH_ABANDON</a>
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-path_abandon" class="section-name selfRef">PATH_ABANDON</a>
         </h3>
-<p id="section-7.2-1">For PATH_ABANDON (0x3e75), <code>path_id</code> identifies the path being closed.
+<p id="section-8.2-1">For PATH_ABANDON (0x3e75), <code>path_id</code> identifies the path being closed.
 The <code>error</code> field uses qlog transport error names, including <code>no_error</code>
 for code 0. The four additional names below correspond to the codes in
-<span><a href="https://rfc-editor.org/rfc/rfc10069#section-4.2.1" class="relref">Section 4.2.1</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>. For a code with no known name, log
-<code>"error": "unknown"</code> and include its numeric value in <code>error_code</code>.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
-<div class="lang-cddl sourcecode" id="section-7.2-2">
+<span><a href="https://rfc-editor.org/rfc/rfc10069#section-4.2.1" class="relref">Section 4.2.1</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>. For a code with no known name, log
+<code>"error": "unknown"</code> and include its numeric value in <code>error_code</code>.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+<div class="lang-cddl sourcecode" id="section-8.2-2">
 <pre>
 PathAbandonFrame = {
     frame_type: "path_abandon"
@@ -1707,21 +1839,21 @@ $TransportError /= "application_abandon_path" /      ; 0x3e
                    "path_resource_limit_reached" /   ; 0x3e75
                    "path_unstable_or_poor" /         ; 0x3e76
                    "no_cid_available_for_path"       ; 0x3e77
-</pre><a href="#section-7.2-2" class="pilcrow">¶</a>
+</pre><a href="#section-8.2-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="pathstatusavailable-and-pathstatusbackup">
-<section id="section-7.3">
+<section id="section-8.3">
         <h3 id="name-path_status_available-and-p">
-<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-path_status_available-and-p" class="section-name selfRef">PATH_STATUS_AVAILABLE and PATH_STATUS_BACKUP</a>
+<a href="#section-8.3" class="section-number selfRef">8.3. </a><a href="#name-path_status_available-and-p" class="section-name selfRef">PATH_STATUS_AVAILABLE and PATH_STATUS_BACKUP</a>
         </h3>
-<p id="section-7.3-1">The <code>frame_type</code> identifies the preference advertised for <code>path_id</code>.
+<p id="section-8.3-1">The <code>frame_type</code> identifies the preference advertised for <code>path_id</code>.
 Use <code>path_status_available</code> for 0x3e77 and <code>path_status_backup</code> for 0x3e76.
 Both use the same per-path status sequence number space
-(<span><a href="https://rfc-editor.org/rfc/rfc10069#section-4.3" class="relref">Section 4.3</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>). The frame object records the received
-sequence number even when the receiver ignores an outdated advertisement.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
-<div class="lang-cddl sourcecode" id="section-7.3-2">
+(<span><a href="https://rfc-editor.org/rfc/rfc10069#section-4.3" class="relref">Section 4.3</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>). The frame object records the received
+sequence number even when the receiver ignores an outdated advertisement.<a href="#section-8.3-1" class="pilcrow">¶</a></p>
+<div class="lang-cddl sourcecode" id="section-8.3-2">
 <pre>
 PathStatusFrame = {
     frame_type: "path_status_available" / "path_status_backup"
@@ -1729,24 +1861,24 @@ PathStatusFrame = {
     sequence_number: uint64
     ? raw: RawInfo
 }
-</pre><a href="#section-7.3-2" class="pilcrow">¶</a>
+</pre><a href="#section-8.3-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="pathnewconnectionid-and-pathretireconnectionid">
-<section id="section-7.4">
+<section id="section-8.4">
         <h3 id="name-path_new_connection_id-and-">
-<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-path_new_connection_id-and-" class="section-name selfRef">PATH_NEW_CONNECTION_ID and PATH_RETIRE_CONNECTION_ID</a>
+<a href="#section-8.4" class="section-number selfRef">8.4. </a><a href="#name-path_new_connection_id-and-" class="section-name selfRef">PATH_NEW_CONNECTION_ID and PATH_RETIRE_CONNECTION_ID</a>
         </h3>
-<p id="section-7.4-1">These frames use the fields of the base <code>NewConnectionIDFrame</code> and
+<p id="section-8.4-1">These frames use the fields of the base <code>NewConnectionIDFrame</code> and
 <code>RetireConnectionIDFrame</code>, with an additional <code>path_id</code>. Both the
 connection ID sequence number and the retirement threshold apply to the
-indicated path (Sections <a href="https://rfc-editor.org/rfc/rfc10069#section-4.4" class="relref">4.4</a> and <a href="https://rfc-editor.org/rfc/rfc10069#section-4.5" class="relref">4.5</a> of <span>[<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>). For
+indicated path (Sections <a href="https://rfc-editor.org/rfc/rfc10069#section-4.4" class="relref">4.4</a> and <a href="https://rfc-editor.org/rfc/rfc10069#section-4.5" class="relref">4.5</a> of <span>[<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>). For
 PATH_NEW_CONNECTION_ID (0x3e78), <code>connection_id_length</code>, when present,
 is the length in bytes of the connection ID on the wire. For
 PATH_RETIRE_CONNECTION_ID (0x3e79), the pair (<code>path_id</code>,
-<code>sequence_number</code>) identifies the connection ID to retire.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
-<div class="lang-cddl sourcecode" id="section-7.4-2">
+<code>sequence_number</code>) identifies the connection ID to retire.<a href="#section-8.4-1" class="pilcrow">¶</a></p>
+<div class="lang-cddl sourcecode" id="section-8.4-2">
 <pre>
 PathNewConnectionIDFrame = {
     frame_type: "path_new_connection_id"
@@ -1765,23 +1897,23 @@ PathRetireConnectionIDFrame = {
     sequence_number: uint64
     ? raw: RawInfo
 }
-</pre><a href="#section-7.4-2" class="pilcrow">¶</a>
+</pre><a href="#section-8.4-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="maxpathid-pathsblocked-and-pathcidsblocked">
-<section id="section-7.5">
+<section id="section-8.5">
         <h3 id="name-max_path_id-paths_blocked-a">
-<a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-max_path_id-paths_blocked-a" class="section-name selfRef">MAX_PATH_ID, PATHS_BLOCKED, and PATH_CIDS_BLOCKED</a>
+<a href="#section-8.5" class="section-number selfRef">8.5. </a><a href="#name-max_path_id-paths_blocked-a" class="section-name selfRef">MAX_PATH_ID, PATHS_BLOCKED, and PATH_CIDS_BLOCKED</a>
         </h3>
-<p id="section-7.5-1">MAX_PATH_ID (0x3e7a) advertises the largest acceptable Path ID in
+<p id="section-8.5-1">MAX_PATH_ID (0x3e7a) advertises the largest acceptable Path ID in
 <code>maximum</code>. PATHS_BLOCKED (0x3e7b) reports the Path ID limit in effect
 at the sender in <code>limit</code>. Both fields represent the Maximum Path
 Identifier on the wire. PATH_CIDS_BLOCKED (0x3e7c) identifies the path
 that lacks an unused connection ID and reports the next connection ID
 sequence number expected from the peer
-(Sections <a href="https://rfc-editor.org/rfc/rfc10069#section-4.6" class="relref">4.6</a> and <a href="https://rfc-editor.org/rfc/rfc10069#section-4.7" class="relref">4.7</a> of <span>[<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>).<a href="#section-7.5-1" class="pilcrow">¶</a></p>
-<div class="lang-cddl sourcecode" id="section-7.5-2">
+(Sections <a href="https://rfc-editor.org/rfc/rfc10069#section-4.6" class="relref">4.6</a> and <a href="https://rfc-editor.org/rfc/rfc10069#section-4.7" class="relref">4.7</a> of <span>[<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>).<a href="#section-8.5-1" class="pilcrow">¶</a></p>
+<div class="lang-cddl sourcecode" id="section-8.5-2">
 <pre>
 MaxPathIDFrame = {
     frame_type: "max_path_id"
@@ -1801,19 +1933,19 @@ PathCIDsBlockedFrame = {
     next_sequence_number: uint64
     ? raw: RawInfo
 }
-</pre><a href="#section-7.5-2" class="pilcrow">¶</a>
+</pre><a href="#section-8.5-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="example-2">
-<section id="section-7.6">
+<section id="section-8.6">
         <h3 id="name-example-3">
-<a href="#section-7.6" class="section-number selfRef">7.6. </a><a href="#name-example-3" class="section-name selfRef">Example</a>
+<a href="#section-8.6" class="section-number selfRef">8.6. </a><a href="#name-example-3" class="section-name selfRef">Example</a>
         </h3>
-<p id="section-7.6-1">In this packet sent on path 0, the PATH_ACK acknowledges packets on
+<p id="section-8.6-1">In this packet sent on path 0, the PATH_ACK acknowledges packets on
 path 1 and the PATH_CIDS_BLOCKED reports that the sender has run out
-of connection IDs for path 2.<a href="#section-7.6-1" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="section-7.6-2">
+of connection IDs for path 2.<a href="#section-8.6-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-8.6-2">
 <pre>
 {
   "time": 16.5,
@@ -1830,110 +1962,7 @@ of connection IDs for path 2.<a href="#section-7.6-1" class="pilcrow">¶</a></p>
     ]
   }
 }
-</pre><a href="#section-7.6-2" class="pilcrow">¶</a>
-</div>
-</section>
-</div>
-</section>
-</div>
-<div id="path-recovery">
-<section id="section-8">
-      <h2 id="name-per-path-congestion-control">
-<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-per-path-congestion-control" class="section-name selfRef">Per-path congestion control and recovery</a>
-      </h2>
-<div id="congestion-control-and-rtt">
-<section id="section-8.1">
-        <h3 id="name-congestion-control-and-rtt">
-<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-congestion-control-and-rtt" class="section-name selfRef">Congestion control and RTT</a>
-        </h3>
-<p id="section-8.1-1">For congestion control (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-5.3" class="relref">Section 5.3</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>), each path's
-metrics and any connection-wide values are logged in separate
-<code>quic:recovery_metrics_updated</code> events.
-In a per-path event, <code>packets_in_flight</code> counts packets across that path's
-packet number spaces. The same scoping rule applies to
-<code>quic:recovery_parameters_set</code> and <code>quic:congestion_state_updated</code>.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
-<p id="section-8.1-2">For RTT metrics (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-5.4" class="relref">Section 5.4</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>), <code>path_id</code> identifies the
-path whose estimator was updated. All packets acknowledged in a
-<code>quic:packets_acked</code> event were sent on the path identified by <code>path_id</code>.<a href="#section-8.1-2" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="probe-timeout-packet-loss-and-retransmission">
-<section id="section-8.2">
-        <h3 id="name-probe-timeout-packet-loss-a">
-<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-probe-timeout-packet-loss-a" class="section-name selfRef">Probe timeout, packet loss, and retransmission</a>
-        </h3>
-<p id="section-8.2-1">For a probe timeout (PTO, <span><a href="https://rfc-editor.org/rfc/rfc10069#section-5.7" class="relref">Section 5.7</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>),
-<code>quic:timer_updated</code> identifies the path whose timer changed. For a
-combined loss detection timer (<code>timer_type</code> of <code>"loss_timeout"</code>), the event
-includes <code>path_id</code> only when the update concerns one known path. When
-logged, <code>pto_count</code> appears in <code>quic:recovery_metrics_updated</code>. A
-<code>quic:packet_sent</code> event with trigger <code>"pto_probe"</code> identifies the path
-carrying the probe.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
-<p id="section-8.2-2">For a packet first declared lost when abandoned path state is discarded
-(<span><a href="https://rfc-editor.org/rfc/rfc10069#section-3.4.3" class="relref">Section 3.4.3</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>), the endpoint <span class="bcp14">SHOULD</span> include
-<code>path_state_discarded</code> in <code>quic:packet_lost</code> and omit <code>trigger</code>. The field
-<code>path_state_discarded</code> is absent for other loss declarations.<a href="#section-8.2-2" class="pilcrow">¶</a></p>
-<div class="lang-cddl sourcecode" id="section-8.2-3">
-<pre>
-$$quic-packetlost-extension //= (
-    ; only present if the packet is first declared lost when
-    ; abandoned path state is discarded
-    ? path_state_discarded: true
-)
-</pre><a href="#section-8.2-3" class="pilcrow">¶</a>
-</div>
-<p id="section-8.2-4">In a <code>quic:marked_for_retransmit</code> event (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-5.6" class="relref">Section 5.6</a> of [<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>),
-<code>path_id</code> identifies the path on which the data marked for retransmission
-was originally sent.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="example-of-cross-path-recovery">
-<section id="section-8.3">
-        <h3 id="name-example-of-cross-path-recov">
-<a href="#section-8.3" class="section-number selfRef">8.3. </a><a href="#name-example-of-cross-path-recov" class="section-name selfRef">Example of cross-path recovery</a>
-        </h3>
-<p id="section-8.3-1">The PATH_ACK arrives on path 0 and acknowledges the probe on path 1.
-Packet 42 on path 0 carries the same stream bytes as the lost packet 42
-on path 1.<a href="#section-8.3-1" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="section-8.3-2">
-<pre>
-[
-  { "time": 0, "name": "quic:packet_sent", "path_id": 1,
-    "data": {
-      "header": { "packet_type": "1RTT", "packet_number": 42 },
-      "frames": [{ "frame_type": "stream", "stream_id": 0,
-                   "offset": 800, "raw": { "length": 800 } }] } },
-  { "time": 160, "name": "quic:timer_updated", "path_id": 1,
-    "data": { "timer_type": "pto", "event_type": "expired",
-              "packet_number_space": "application_data" } },
-  { "time": 160, "name": "quic:packet_sent", "path_id": 1,
-    "data": {
-      "header": { "packet_type": "1RTT", "packet_number": 45 },
-      "trigger": "pto_probe",
-      "frames": [{ "frame_type": "ping" }] } },
-  { "time": 186, "name": "quic:packet_received", "path_id": 0,
-    "data": {
-      "header": { "packet_type": "1RTT", "packet_number": 9 },
-      "frames": [{ "frame_type": "path_ack", "path_id": 1,
-                   "acked_ranges": [[45]] }] } },
-  { "time": 186, "name": "quic:packet_lost", "path_id": 1,
-    "data": {
-      "header": { "packet_type": "1RTT", "packet_number": 42 },
-      "trigger": "reordering_threshold" } },
-  { "time": 186, "name": "quic:recovery_metrics_updated",
-    "path_id": 1,
-    "data": { "congestion_window": 6000, "pto_count": 0 } },
-  { "time": 186, "name": "quic:marked_for_retransmit", "path_id": 1,
-    "data": { "frames": [{ "frame_type": "stream", "stream_id": 0,
-                 "offset": 800, "raw": { "length": 800 } }] } },
-  { "time": 187, "name": "quic:packet_sent", "path_id": 0,
-    "data": {
-      "header": { "packet_type": "1RTT", "packet_number": 42 },
-      "trigger": "retransmit_reordered",
-      "frames": [{ "frame_type": "stream", "stream_id": 0,
-                   "offset": 800, "raw": { "length": 800 } }] } }
-]
-</pre><a href="#section-8.3-2" class="pilcrow">¶</a>
+</pre><a href="#section-8.6-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -1953,13 +1982,13 @@ on path 1.<a href="#section-8.3-1" class="pilcrow">¶</a></p>
 <a href="#section-10" class="section-number selfRef">10. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
 <p id="section-10-1">This document registers a new entry in the "qlog event schema URIs"
-registry defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15#section-15" class="relref">Section 15</a> of [<a href="#I-D.ietf-quic-qlog-main-schema" class="cite xref">I-D.ietf-quic-qlog-main-schema</a>]</span>.<a href="#section-10-1" class="pilcrow">¶</a></p>
+registry defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15#section-15" class="relref">Section 15</a> of [<a href="#QLOG-MAIN" class="cite xref">QLOG-MAIN</a>]</span>.<a href="#section-10-1" class="pilcrow">¶</a></p>
 <p id="section-10-2">Event schema URI:  <code>urn:ietf:params:qlog:events:quic#multipath</code><a href="#section-10-2" class="pilcrow">¶</a></p>
 <p id="section-10-3">Namespace:  <code>quic</code><a href="#section-10-3" class="pilcrow">¶</a></p>
 <p id="section-10-4">Event Types:  <code>path_created</code>, <code>path_abandoned</code>, <code>path_status_updated</code><a href="#section-10-4" class="pilcrow">¶</a></p>
 <p id="section-10-5">Description:  Event definitions related to the extensions to
-the QUIC transport protocol defined in <span>[<a href="#RFC10069" class="cite xref">RFC10069</a>]</span>.<a href="#section-10-5" class="pilcrow">¶</a></p>
-<p id="section-10-6">Reference:  <a href="#mp-events" class="auto internal xref">Section 4</a> of this document.<a href="#section-10-6" class="pilcrow">¶</a></p>
+the QUIC transport protocol defined in <span>[<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>.<a href="#section-10-5" class="pilcrow">¶</a></p>
+<p id="section-10-6">Reference:  <a href="#mp-events" class="auto internal xref">Section 5</a> of this document.<a href="#section-10-6" class="pilcrow">¶</a></p>
 <p id="section-10-7">This document modifies the following QUIC events: <code>packet_sent</code>, <code>packet_received</code>, <code>packet_dropped</code>,
 <code>packet_buffered</code>, <code>packets_acked</code>, <code>packet_lost</code>, <code>marked_for_retransmit</code>,
 <code>recovery_metrics_updated</code>,
@@ -1968,40 +1997,60 @@ the QUIC transport protocol defined in <span>[<a href="#RFC10069" class="cite xr
 <code>tuple_assigned</code>, <code>migration_state_updated</code>, <code>frames_parsed</code>, and
 <code>frames_created</code>.<a href="#section-10-7" class="pilcrow">¶</a></p>
 <p id="section-10-8">This document adds the <code>initial_max_path_id</code> field to the
-<code>parameters_set</code> event (<a href="#mp-parameters" class="auto internal xref">Section 6</a>).<a href="#section-10-8" class="pilcrow">¶</a></p>
+<code>parameters_set</code> event (<a href="#mp-parameters" class="auto internal xref">Section 7</a>).<a href="#section-10-8" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="sec-normative-references">
+<div id="sec-combined-references">
 <section id="section-11">
-      <h2 id="name-normative-references">
-<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+      <h2 id="name-references">
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
+<div id="sec-normative-references">
+<section id="section-11.1">
+        <h3 id="name-normative-references">
+<a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
 <dl class="references">
-<dt id="I-D.ietf-quic-qlog-main-schema">[I-D.ietf-quic-qlog-main-schema]</dt>
-      <dd>
+<dt id="QLOG-MAIN">[QLOG-MAIN]</dt>
+        <dd>
 <span class="refAuthor">Marx, R.</span>, <span class="refAuthor">Niccolini, L.</span>, <span class="refAuthor">Seemann, M.</span>, and <span class="refAuthor">L. Pardue</span>, <span class="refTitle">"qlog: Structured Logging for Network Protocols"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-qlog-main-schema-15</span>, <time datetime="2026-11-02" class="refDate">2 November 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15">https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="I-D.ietf-quic-qlog-quic-events">[I-D.ietf-quic-qlog-quic-events]</dt>
-      <dd>
+<dt id="QLOG-QUIC">[QLOG-QUIC]</dt>
+        <dd>
 <span class="refAuthor">Marx, R.</span>, <span class="refAuthor">Niccolini, L.</span>, <span class="refAuthor">Seemann, M.</span>, and <span class="refAuthor">L. Pardue</span>, <span class="refTitle">"QUIC event definitions for qlog"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-qlog-quic-events-14</span>, <time datetime="2026-11-02" class="refDate">2 November 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-quic-events-14">https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-quic-events-14</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="QUIC-MULTIPATH">[QUIC-MULTIPATH]</dt>
+        <dd>
+<span class="refAuthor">Liu, Y., Ed.</span>, <span class="refAuthor">Ma, Y.</span>, <span class="refAuthor">De Coninck, Q., Ed.</span>, <span class="refAuthor">Bonaventure, O.</span>, <span class="refAuthor">Huitema, C.</span>, and <span class="refAuthor">M. Kühlewind, Ed.</span>, <span class="refTitle">"Managing Multiple Paths for a QUIC Connection"</span>, <span class="seriesInfo">RFC 10069</span>, <span class="seriesInfo">DOI 10.17487/RFC10069</span>, <time datetime="2026-11" class="refDate">November 2026</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc10069">https://www.rfc-editor.org/rfc/rfc10069</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="QUIC-TRANSPORT">[QUIC-TRANSPORT]</dt>
+        <dd>
+<span class="refAuthor">Iyengar, J., Ed.</span> and <span class="refAuthor">M. Thomson, Ed.</span>, <span class="refTitle">"QUIC: A UDP-Based Multiplexed and Secure Transport"</span>, <span class="seriesInfo">RFC 9000</span>, <span class="seriesInfo">DOI 10.17487/RFC9000</span>, <time datetime="2021-05" class="refDate">May 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9000">https://www.rfc-editor.org/rfc/rfc9000</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
       <dd>
 <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="RFC9000">[RFC9000]</dt>
+</dl>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-11.2">
+        <h3 id="name-informative-references">
+<a href="#section-11.2" class="section-number selfRef">11.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="ANRW-2020">[ANRW-2020]</dt>
       <dd>
-<span class="refAuthor">Iyengar, J., Ed.</span> and <span class="refAuthor">M. Thomson, Ed.</span>, <span class="refTitle">"QUIC: A UDP-Based Multiplexed and Secure Transport"</span>, <span class="seriesInfo">RFC 9000</span>, <span class="seriesInfo">DOI 10.17487/RFC9000</span>, <time datetime="2021-05" class="refDate">May 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9000">https://www.rfc-editor.org/rfc/rfc9000</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC10069">[RFC10069]</dt>
-    <dd>
-<span class="refAuthor">Liu, Y., Ed.</span>, <span class="refAuthor">Ma, Y.</span>, <span class="refAuthor">De Coninck, Q., Ed.</span>, <span class="refAuthor">Bonaventure, O.</span>, <span class="refAuthor">Huitema, C.</span>, and <span class="refAuthor">M. Kühlewind, Ed.</span>, <span class="refTitle">"Managing Multiple Paths for a QUIC Connection"</span>, <span class="seriesInfo">RFC 10069</span>, <span class="seriesInfo">DOI 10.17487/RFC10069</span>, <time datetime="2026-11" class="refDate">November 2026</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc10069">https://www.rfc-editor.org/rfc/rfc10069</a>&gt;</span>. </dd>
+<span class="refAuthor">Marx, R.</span>, <span class="refAuthor">Piraux, M.</span>, <span class="refAuthor">Quax, P.</span>, and <span class="refAuthor">W. Lamotte</span>, <span class="refTitle">"Debugging QUIC and HTTP/3 with qlog and qvis"</span>, <span class="seriesInfo">ANRW '20: Proceedings of the 2020 Applied Networking Research Workshop </span>, <time datetime="2020" class="refDate">2020</time>. </dd>
 <dd class="break"></dd>
 </dl>
+</section>
+</div>
 </section>
 </div>
 <div id="acknowledgments">
@@ -2039,6 +2088,14 @@ the QUIC transport protocol defined in <span>[<a href="#RFC10069" class="cite xr
 <div class="email">
 <span>Email:</span>
 <a href="mailto:albisht@cisco.com" class="email">albisht@cisco.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Noriyuki Kurosu</span></div>
+<div dir="auto" class="left"><span class="org">Individual</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:3p0rta26@gmail.com" class="email">3p0rta26@gmail.com</a>
 </div>
 </address>
 </section>
