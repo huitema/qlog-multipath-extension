@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-11-22T00:09:04.839486+00:00",
+  "timestamp": "2026-11-24T00:09:10.280790+00:00",
   "repo": "huitema/qlog-multipath-extension",
   "labels": [
     {
@@ -69,7 +69,7 @@
       "labels": [],
       "body": "We need to add \"path_id\" to the event headers. The key is to find out how to do that using the syntax specified in https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema.",
       "createdAt": "2026-11-19T00:00:19Z",
-      "updatedAt": "2026-11-19T16:37:08Z",
+      "updatedAt": "2026-11-23T19:52:36Z",
       "closedAt": "2026-11-19T16:37:07Z",
       "comments": [
         {
@@ -78,6 +78,13 @@
           "body": "Addressed by merged PR #3. The draft now defines event-level path_id, its applicability to existing QUIC events, and an example. Further schema-validation work is tracked in #20. Closing as completed.",
           "createdAt": "2026-11-19T16:37:07Z",
           "updatedAt": "2026-11-19T16:37:07Z"
+        },
+        {
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "body": "Closing as done.",
+          "createdAt": "2026-11-23T19:52:36Z",
+          "updatedAt": "2026-11-23T19:52:36Z"
         }
       ]
     },
@@ -129,7 +136,7 @@
       "labels": [],
       "body": "We need to be serious about this. Analyse privacy issues, for example.",
       "createdAt": "2026-11-19T00:35:10Z",
-      "updatedAt": "2026-11-19T20:09:13Z",
+      "updatedAt": "2026-11-23T23:39:11Z",
       "closedAt": null,
       "comments": [
         {
@@ -226,15 +233,15 @@
       "id": "I_kwDOVzZa388AAAABgxYKoA",
       "title": "Define how qlog records multipath negotiation and initial path limits.",
       "url": "https://github.com/huitema/qlog-multipath-extension/issues/18",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "altanai",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Log multipath negotiation through quic:parameters_set  like a typed mapping for `initial_max_path_id` in `quic:parameters_set`. this is so that a trace should make it possible to understand whether multipath was negotiated and which initial limit each endpoint advertised.\n\nSuggested additions:\n\n- Extend `$$quic-parametersset-extension` with `initial_max_path_id`, using the RFC 10069 range of 0 through 4294967295.\n- Preserve the base event\u2019s `initiator` semantics so local and remote advertisements can be distinguished.\n- Explain that a parameter present on the wire with value `0` still advertises support. Distinguish absence on the wire from a value omitted because the logger did not capture it.\n- Include examples for both endpoints advertising support, an advertisement with value `0`, and one endpoint not advertising the parameter.\n\nReferences: [RFC 10069 \u00a72](https://www.rfc-editor.org/rfc/rfc10069.html#section-2), [\u00a72.1](https://www.rfc-editor.org/rfc/rfc10069.html#section-2.1), and [qlog QUIC events \u00a75.3](https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-quic-events-14#section-5.3).",
       "createdAt": "2026-11-19T16:29:47Z",
-      "updatedAt": "2026-11-19T17:12:04Z",
-      "closedAt": null,
+      "updatedAt": "2026-11-23T19:59:18Z",
+      "closedAt": "2026-11-23T19:59:18Z",
       "comments": [
         {
           "author": "altanai",
@@ -257,7 +264,7 @@
       "labels": [],
       "body": "The draft explicitly allows `quic:path_created` to be emitted while validation is still pending. A reader therefore needs a defined way to determine when validation succeeds, fails, or is unnecessary because the tuple was previously validated. Advertised `available` or `backup` status expresses a usage preference and does not establish validation success.\n\nSuggested additions:\n\n- Specify how to log validation start, success, and failure for a given Path ID and tuple, including the endpoint\u2019s perspective.\n- Explain how existing `quic:migration_state_updated` probing states, `quic:timer_updated` with `path_validation`, and PATH_CHALLENGE/PATH_RESPONSE packet events should be used. Define an additional field or event only if the existing events cannot express the outcome.\n- Distinguish establishing an additional path from migrating an existing Path ID to a new tuple. In particular, avoid requiring `migration_complete` for additional-path establishment, since its base semantics include discarding the old path.\n- Cover reuse of an already validated tuple, and include success and failure examples showing the relationship to `path_created` and `path_abandoned`.\n\nReferences: [RFC 10069 \u00a73.1](https://www.rfc-editor.org/rfc/rfc10069.html#section-3.1), [qlog QUIC events \u00a75.21](https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-quic-events-14#section-5.21), and [\u00a75.22](https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-quic-events-14#section-5.22).\n\nRelated: #5.",
       "createdAt": "2026-11-19T16:30:21Z",
-      "updatedAt": "2026-11-20T22:14:29Z",
+      "updatedAt": "2026-11-23T19:55:01Z",
       "closedAt": null,
       "comments": [
         {
@@ -266,6 +273,13 @@
           "body": "I'm kind of inclined to think that path validation (in RFC9000 terms, kind of easier to think of as 4-tuple validation I guess) is not a multipath concern and the only thing this draft needs to take care of is that a path is mapped to a 4-tuple at all times.",
           "createdAt": "2026-11-20T22:14:29Z",
           "updatedAt": "2026-11-20T22:14:29Z"
+        },
+        {
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "body": "I think that the consensus is to use the QUIC event \"migration state updated\" for now, and push for a name change in the qlog:quic spec\n",
+          "createdAt": "2026-11-23T19:55:01Z",
+          "updatedAt": "2026-11-23T19:55:01Z"
         }
       ]
     },
@@ -324,6 +338,79 @@
           "body": " Expanding on my issue. from the 2 examples \n\n1. Path 1 is created, the peer marks it backup, and the local endpoint abandons it. what is there now about 2 sends and 1 loss is good lifecycle example \n```\n[\n  { \"time\": 10.0, \"name\": \"quic:packet_sent\", \"path_id\": 0,\n    \"data\": { \"header\": {\n      \"packet_type\": \"1RTT\", \"packet_number\": 42 } } },\n  { \"time\": 11.0, \"name\": \"quic:packet_sent\", \"path_id\": 1,\n    \"data\": { \"header\": {\n      \"packet_type\": \"1RTT\", \"packet_number\": 42 } } },\n  { \"time\": 90.0, \"name\": \"quic:packet_lost\", \"path_id\": 0,\n    \"data\": { \"header\": {\n      \"packet_type\": \"1RTT\", \"packet_number\": 42 } } }\n]\n```\nI proposed another example for the lifecycle and two packet receives. Both packets arrive on path 0 and carry the same backup advertisement for path 1. The first produces a status update for path 1. The second is logged as another packet receive, with no additional status update.\n\n\nExample number 2 : Packet number 42 appears on paths 0 and 1, the loss is matched to path 0, while the peer\u2019s receive matches path 1.This shows why tools need both path_id and packet number to match 1-RTT events within a connection and sending direction so this is fine",
           "createdAt": "2026-11-20T22:56:39Z",
           "updatedAt": "2026-11-20T22:56:39Z"
+        }
+      ]
+    },
+    {
+      "number": 31,
+      "id": "I_kwDOVzZa388AAAABhkPByA",
+      "title": "Should the path_id be added to the event header or to the event data?",
+      "url": "https://github.com/huitema/qlog-multipath-extension/issues/31",
+      "state": "CLOSED",
+      "author": "huitema",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "In a chat discussion, @flub pointed out that \"in our implementation we had added the path_id mostly to the existing data fields, rather than having it in the event header. I wonder what seems to have motivated everyone else to put it in the event header? Especially since it does not apply to all events. Are there any other header fields that have a precedent for this?\"\n\nThe current design is based ont he implementation in picoquic, which puts the path_id close to the packet number in the event header. However, that was done before updates to the qlog draft moved the packet number field out of the event header, to the packet header in the data field.\n\nWe may need to update the text and do a similar move. It makes sense, because the destination connection ID in the packet header is ties to the path_id, and the packet number belong to a packet number space identified by the packet type and the path_id. However, not all events carry a packet header, so for some events we will need to add the path_id to the event data field.",
+      "createdAt": "2026-11-22T20:44:38Z",
+      "updatedAt": "2026-11-23T19:50:52Z",
+      "closedAt": "2026-11-23T19:50:51Z",
+      "comments": [
+        {
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I\u2019m good with using `data.header.path_id` when the event includes a packet header, and `data.path_id` when the event refers to a known path but has no packet header. If there\u2019s no single known path, omit the field. Thoughts ?",
+          "createdAt": "2026-11-22T23:05:34Z",
+          "updatedAt": "2026-11-22T23:05:34Z"
+        },
+        {
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "body": "@altanai if we agree to move the path_id out of the header, that's indeed what we will do. But let's wait for a few more comments before we do that.",
+          "createdAt": "2026-11-22T23:46:11Z",
+          "updatedAt": "2026-11-22T23:46:11Z"
+        },
+        {
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "body": "sounds good @huitema \n Original thinking was to put path_id at the top-level of event\u00a0 so its better accessible\u00a0 and also it was meant ot be optional. \nIf we agree on the split, could we include two packet_lost examples with a known path, one with data.header and one without? Since the packet header is optional, that would show readers exactly where to find path_id in both cases.",
+          "createdAt": "2026-11-22T23:57:14Z",
+          "updatedAt": "2026-11-22T23:57:14Z"
+        },
+        {
+          "author": "Yanmei-Liu",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I have a different view on where the path ID should go. There are three possible locations for the path ID associated with an event:\n\n- **A \u2014 `event.path_id`**: at the top level, alongside `time`, `name`, and `data`.\n- **B \u2014 `event.data.header.path_id`**: inside the packet header, alongside fields such as `packet_number`.\n- **C \u2014 `event.data.path_id`**: directly in `data`, alongside `header` when present.\n\nThe proposal earlier in this thread combines B and C: use B when the event includes a packet header and C when the header is absent but the path is known.\n\nI lean slightly toward **A**. A single, predictable location gives loggers one place to write the path ID and analysis tools one place to read it. `quic:packet_lost` illustrates the drawback of B: the logger may know which path carried the lost packet even when it omits the optional header. With the B/C split, that logging choice changes where a tool has to look for the same information.\n\nBoth A and C provide a stable location. What tips the balance toward A for me is how we use multipath traces: For example, a rise in smoothed RTT or a run of consecutive packet losses on one path can indicate a problem with that path. With a top-level `path_id`, a tool can first group all events for that path into a timeline, then decode the event-specific `data` it needs to investigate.\n",
+          "createdAt": "2026-11-23T09:23:35Z",
+          "updatedAt": "2026-11-23T09:23:35Z"
+        },
+        {
+          "author": "flub",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Agree that having a single location makes things easier. Additionally having it in `PacketHeader` might be slightly misleading since this is not really a field in the header, it is rather derived from it. So I don't think I'm a big fan of B.\n\nI find it slightly odd to have a field that does not belong to all events in the toplevel event, like A suggests. For that reason I lean slightly towards C I think. I don't think to filter you need to parse each event-specific data field, filtering can still be done without knowing the specific schema.",
+          "createdAt": "2026-11-23T14:52:00Z",
+          "updatedAt": "2026-11-23T14:52:00Z"
+        },
+        {
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "body": "Keeping the option names defined by @Yanmei-Liu, it seems that we have the following list of pro and con:\n\n* Option A:\n  - Pro: path_id at a single place. It is easy to filter events belonging to a path and analyze that path.\n  - Con: not all events have a path ID.\n* Option B:\n  - Pro: for transmission events, having the path_id close to CID and PN seems natural.\n  - Con: the packet header is an optional field.\n  - Con: the packet header would mix info in the packet (CID, PN) and info derived from the CID (Path_ID)\n* Option C:\n  - Pro: the packet header is unchanged\n  - Con: filtering per path requires parsing the event data.\n  - Con: requires updating event.data syntax for all events.\n\nBased on that, my personal opinion is evolving towards keeping option A for now. Maybe add text somewhere in the draft to discuss the design choice.",
+          "createdAt": "2026-11-23T15:44:40Z",
+          "updatedAt": "2026-11-23T15:44:40Z"
+        },
+        {
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "body": "righto so I\u2019d stick with option A, the top-level path_id I originally proposed in [PR #3](https://github.com/huitema/qlog-multipath-extension/pull/3). Like we asked it gives tools one place to find the path for packet, recovery, and path management events. For packet_lost, that location stays the same whether or not the logger includes data.header.\n\nThere\u2019s precedent in [quicwg/qlog#134](https://github.com/quicwg/qlog/issues/134) where Robin proposed an event-level path identifier so tools like qvis could distinguish paths within a single connection trace. The generic field that came out of that work later became tuple, which is still an optional top-level field. I\u2019d use the same placement for the RFC 10069 Path ID and add a short rationale to the draft like @huitema  suggested",
+          "createdAt": "2026-11-23T19:28:37Z",
+          "updatedAt": "2026-11-23T19:28:37Z"
+        },
+        {
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "body": "Closing this issue and keeping option A for now. The PR #30 has been updated to incorporate a short rationale for the design. We can always revisit the issue if we get feedback once the draft is published.",
+          "createdAt": "2026-11-23T19:49:17Z",
+          "updatedAt": "2026-11-23T19:49:17Z"
         }
       ]
     }
@@ -537,21 +624,21 @@
       "id": "PR_kwDOVzZa388AAAABQQ8Cdw",
       "title": "Add minimal text to check github pages update.",
       "url": "https://github.com/huitema/qlog-multipath-extension/pull/8",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "huitema",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "This is really a no-op PR. I am trying to see whether the git pages publishing works.",
       "createdAt": "2026-11-19T00:26:06Z",
-      "updatedAt": "2026-11-19T00:32:39Z",
+      "updatedAt": "2026-11-22T00:21:23Z",
       "baseRepository": "huitema/qlog-multipath-extension",
       "baseRefName": "main",
       "baseRefOid": "6e90c64c0d1a79d013b4bcbee0441b270824b4c4",
       "headRepository": "huitema/qlog-multipath-extension",
       "headRefName": "check-draft-header",
       "headRefOid": "1224309311af1cd7d14a8bad38b1c9db89091df6",
-      "closedAt": null,
+      "closedAt": "2026-11-22T00:21:22Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
@@ -562,6 +649,13 @@
           "body": "No need for this PR. The page publishing issue is fixed!",
           "createdAt": "2026-11-19T00:32:39Z",
           "updatedAt": "2026-11-19T00:32:39Z"
+        },
+        {
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "body": "Not needed.",
+          "createdAt": "2026-11-22T00:21:22Z",
+          "updatedAt": "2026-11-22T00:21:22Z"
         }
       ],
       "reviews": []
@@ -728,13 +822,13 @@
       "labels": [],
       "body": "Closes #12. Complements the event-level `path_id` proposal in #3.\n\nSpecify which path owns a congestion-control metric, RTT estimate, PTO, loss declaration, and retransmission decision. The sender trace shows a PTO probe on path 1, its acknowledgment arriving on path 0, and the lost stream bytes being sent again on path 0. Both data packets have number 42, so the example also shows why the sending path is needed to identify a packet.\n\nThe only proposed new data field is the optional `path_state_discarded: true` on `quic:packet_lost`. It identifies packets first declared lost when the endpoint discards an abandoned path\u2019s state. [RFC 10069 \u00a73.4.3](https://www.rfc-editor.org/rfc/rfc10069.html#section-3.4.3)\n\nBuilt the text and HTML draft with xml2rfc. Checked the nine example events, validated their payloads and frame objects against the combined qlog CDDL, and tested the new field's presence, omission, and invalid values.\n",
       "createdAt": "2026-11-19T06:38:15Z",
-      "updatedAt": "2026-11-21T01:50:43Z",
+      "updatedAt": "2026-11-23T09:30:06Z",
       "baseRepository": "huitema/qlog-multipath-extension",
       "baseRefName": "main",
       "baseRefOid": "5f260052513f5c8a7f22fc78d5669100b2e6cdac",
       "headRepository": "huitema/qlog-multipath-extension",
       "headRefName": "feat/path-metrics",
-      "headRefOid": "cf6c4fda3b1e457eadf1e470fc84c47b4716d540",
+      "headRefOid": "f753abec4caf9b75de5b7b9b220406f80ce2dc25",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -983,6 +1077,66 @@
               "body": "Yes. we only need to say that when the extension is used, the packets described as needing retransmissions where packet sent on the designated path_id.",
               "createdAt": "2026-11-21T01:46:47Z",
               "updatedAt": "2026-11-21T01:48:28Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZsXvFA",
+          "commit": {
+            "abbreviatedOid": "f753abe"
+          },
+          "author": "Yanmei-Liu",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-23T09:30:06Z",
+          "updatedAt": "2026-11-23T09:30:06Z",
+          "comments": [
+            {
+              "originalPosition": 26,
+              "body": "Agreed, I simplified the sentence to say that all packets acknowledged by the event were sent on the path identified by `path_id`.",
+              "createdAt": "2026-11-23T09:30:06Z",
+              "updatedAt": "2026-11-23T09:30:06Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZsXxqQ",
+          "commit": {
+            "abbreviatedOid": "f753abe"
+          },
+          "author": "Yanmei-Liu",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-23T09:30:09Z",
+          "updatedAt": "2026-11-23T09:30:09Z",
+          "comments": [
+            {
+              "originalPosition": 53,
+              "body": "I removed the wording about logging a separate event for each path and clarified that `path_id` identifies the original sending path of the data marked for retransmission.",
+              "createdAt": "2026-11-23T09:30:09Z",
+              "updatedAt": "2026-11-23T09:30:09Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZsX0eg",
+          "commit": {
+            "abbreviatedOid": "f753abe"
+          },
+          "author": "Yanmei-Liu",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-23T09:30:13Z",
+          "updatedAt": "2026-11-23T09:30:13Z",
+          "comments": [
+            {
+              "originalPosition": 56,
+              "body": "Agreed, I removed both sentences about sending the data in new packets and matching STREAM byte ranges.",
+              "createdAt": "2026-11-23T09:30:13Z",
+              "updatedAt": "2026-11-23T09:30:13Z"
             }
           ]
         }
@@ -1336,13 +1490,13 @@
       "labels": [],
       "body": "Add `quic:path_validation_updated` to report local path validation transitions, including optional trigger, failure reason, and PATH_ABANDON error code. Register the event type alongside the existing multipath path lifecycle events.",
       "createdAt": "2026-11-19T18:49:38Z",
-      "updatedAt": "2026-11-20T22:17:56Z",
+      "updatedAt": "2026-11-23T01:11:40Z",
       "baseRepository": "huitema/qlog-multipath-extension",
       "baseRefName": "main",
-      "baseRefOid": "d4024d32c4c97531cbcbceefa40d97d70dcbd22f",
+      "baseRefOid": "f8ef13c452fab9f85c85c1a34e1b941975384c27",
       "headRepository": "huitema/qlog-multipath-extension",
       "headRefName": "codex/path-validation-events",
-      "headRefOid": "83bb9769ce82eef26cf8aa07d580c913ef97ff3a",
+      "headRefOid": "8854c616dc1223cbc286157567b0654214a351fc",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -1466,6 +1620,126 @@
           "createdAt": "2026-11-20T22:17:56Z",
           "updatedAt": "2026-11-20T22:17:56Z",
           "comments": []
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZopapQ",
+          "commit": {
+            "abbreviatedOid": "83bb976"
+          },
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-23T00:15:13Z",
+          "updatedAt": "2026-11-23T00:15:13Z",
+          "comments": [
+            {
+              "originalPosition": 15,
+              "body": "Yes can so. Reworking the examples. ",
+              "createdAt": "2026-11-23T00:15:13Z",
+              "updatedAt": "2026-11-23T00:15:13Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZosfxg",
+          "commit": {
+            "abbreviatedOid": "83bb976"
+          },
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-23T00:27:37Z",
+          "updatedAt": "2026-11-23T00:27:37Z",
+          "comments": [
+            {
+              "originalPosition": 15,
+              "body": "yes when it described a known path.  \nok dropping the new event and reusing existing `quic:migration_state_updated` event.\nIf we still need an explicit validation outcome for the added path case, can we discuss extending the base QUIC qlog schema ?\n\n\n",
+              "createdAt": "2026-11-23T00:27:37Z",
+              "updatedAt": "2026-11-23T00:27:38Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZos0Wg",
+          "commit": {
+            "abbreviatedOid": "83bb976"
+          },
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-23T00:28:53Z",
+          "updatedAt": "2026-11-23T00:28:53Z",
+          "comments": [
+            {
+              "originalPosition": 25,
+              "body": "noted",
+              "createdAt": "2026-11-23T00:28:53Z",
+              "updatedAt": "2026-11-23T00:28:54Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZounnQ",
+          "commit": {
+            "abbreviatedOid": "83bb976"
+          },
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-23T00:35:59Z",
+          "updatedAt": "2026-11-23T00:35:59Z",
+          "comments": [
+            {
+              "originalPosition": 15,
+              "body": "check the \"Logging validation during migration\" section \nI added a use case for NAT rebinding",
+              "createdAt": "2026-11-23T00:35:59Z",
+              "updatedAt": "2026-11-23T00:35:59Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZo39tA",
+          "commit": {
+            "abbreviatedOid": "39987aa"
+          },
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-23T01:10:56Z",
+          "updatedAt": "2026-11-23T01:10:56Z",
+          "comments": [
+            {
+              "originalPosition": 17,
+              "body": "we could've done that yes but following the review feedback, I revised the PR to use the existing `migration_state_updated` event for probing during migration. I\u2019ll open an issue in quicwg/qlog and start a discussion thread about how to log explicit tuple validation outcomes ",
+              "createdAt": "2026-11-23T01:10:56Z",
+              "updatedAt": "2026-11-23T01:10:56Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZo4Kzg",
+          "commit": {
+            "abbreviatedOid": "39987aa"
+          },
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-23T01:11:40Z",
+          "updatedAt": "2026-11-23T01:11:40Z",
+          "comments": [
+            {
+              "originalPosition": 15,
+              "body": "aah I see it already exists https://github.com/quicwg/qlog/issues/659#issue-6521668431 \r\nthank you @huitema ",
+              "createdAt": "2026-11-23T01:11:40Z",
+              "updatedAt": "2026-11-23T01:11:40Z"
+            }
+          ]
         }
       ]
     },
@@ -1556,24 +1830,26 @@
       "id": "PR_kwDOVzZa388AAAABQk9G8w",
       "title": "Clarify how qlog records multipath negotiation",
       "url": "https://github.com/huitema/qlog-multipath-extension/pull/26",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "Yanmei-Liu",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Closes #18.\n\nIn `quic:parameters_set`, the optional `initial_max_path_id` field records the value advertised by the endpoint identified by `initiator`. The draft now points directly to [Section 2.1 of RFC 10069](https://www.rfc-editor.org/rfc/rfc10069.html#section-2.1) for the transport parameter definition.\n",
       "createdAt": "2026-11-20T03:58:11Z",
-      "updatedAt": "2026-11-20T05:37:21Z",
+      "updatedAt": "2026-11-23T19:59:16Z",
       "baseRepository": "huitema/qlog-multipath-extension",
       "baseRefName": "main",
-      "baseRefOid": "5f260052513f5c8a7f22fc78d5669100b2e6cdac",
+      "baseRefOid": "a6544e18cbde86f0c3f5903a52993d1e0fec6ebf",
       "headRepository": "huitema/qlog-multipath-extension",
       "headRefName": "docs/multipath-negotiation-logging",
-      "headRefOid": "562f452c26cdeb7b63ee622f8544734ba2935553",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "fb698c65a5461888e212dd5227b54c7610b234fe",
+      "closedAt": "2026-11-23T19:59:16Z",
+      "mergedAt": "2026-11-23T19:59:16Z",
+      "mergedBy": "huitema",
+      "mergeCommit": {
+        "oid": "1c9b34bb99fece5ae6be5b618f811808ec8ac817"
+      },
       "comments": [],
       "reviews": [
         {
@@ -1754,20 +2030,430 @@
       "id": "PR_kwDOVzZa388AAAABQ8WPWw",
       "title": "Rework abstract, introduction, path-id section.",
       "url": "https://github.com/huitema/qlog-multipath-extension/pull/30",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "huitema",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "This is mostly an editorial PR:\n\n* rework the abstract\n* rework the introduction, adding a reference to tools for motivation, and adding a paragraph on the organization of the document.\n* move the text defining path_id to its own section\n\n",
       "createdAt": "2026-11-21T20:16:02Z",
-      "updatedAt": "2026-11-21T20:16:38Z",
+      "updatedAt": "2026-11-23T19:45:38Z",
       "baseRepository": "huitema/qlog-multipath-extension",
       "baseRefName": "main",
       "baseRefOid": "f8ef13c452fab9f85c85c1a34e1b941975384c27",
       "headRepository": "huitema/qlog-multipath-extension",
       "headRefName": "path-id-upfront",
-      "headRefOid": "3ec7066644c038b95d9c9b6feb49fe480fc92bdc",
+      "headRefOid": "c7e0038ec8469b421159d9babfdf5e33f2025864",
+      "closedAt": "2026-11-23T19:45:37Z",
+      "mergedAt": "2026-11-23T19:45:37Z",
+      "mergedBy": "huitema",
+      "mergeCommit": {
+        "oid": "a6544e18cbde86f0c3f5903a52993d1e0fec6ebf"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOVzZa388AAAABZjIjhg",
+          "commit": {
+            "abbreviatedOid": "3ec7066"
+          },
+          "author": "flub",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-22T01:51:59Z",
+          "updatedAt": "2026-11-22T02:05:23Z",
+          "comments": [
+            {
+              "originalPosition": 33,
+              "body": "`This draft extends the QLOG specification for QUIC events.` This sentence kind of feels half-finished. Would it make sense to add \"to support events for the QUIC Multipath extension.\"?",
+              "createdAt": "2026-11-22T01:51:59Z",
+              "updatedAt": "2026-11-22T02:05:23Z"
+            },
+            {
+              "originalPosition": 35,
+              "body": "```suggestion\ncreation and management of multiple paths, and specifies the logging format\n```",
+              "createdAt": "2026-11-22T01:52:27Z",
+              "updatedAt": "2026-11-22T02:05:23Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZmH3yw",
+          "commit": {
+            "abbreviatedOid": "3ec7066"
+          },
+          "author": "ekstrah",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "Only line 112 needs a fix before merging. The other comments are minor. ",
+          "createdAt": "2026-11-22T14:14:55Z",
+          "updatedAt": "2026-11-22T17:30:46Z",
+          "comments": [
+            {
+              "originalPosition": 70,
+              "body": "Just quick formatting\n\n```suggestion\n\n# Conventions and Definitions\n```",
+              "createdAt": "2026-11-22T14:14:55Z",
+              "updatedAt": "2026-11-22T17:30:46Z"
+            },
+            {
+              "originalPosition": 88,
+              "body": "Compared with `main`, \"these events\" (line 144) now refers to \"all relevant events\" (line 143). The `MUST` does not specify which events are relevant, so readers could consider `parameters_set` relevant because it logs `initial_max_path_id`. The add-path-id section says to omit `path_id` on connection-wide events (line 286). I think it is a good idea to point to the sections that define the rule. \n\nFor example:\n```suggestion\nwill be added to events as specified in {{mp-events}} and {{add-path-id}}.\n```\n",
+              "createdAt": "2026-11-22T16:04:26Z",
+              "updatedAt": "2026-11-22T17:30:46Z"
+            },
+            {
+              "originalPosition": 86,
+              "body": "Just typo;\n\n```suggestion\nManaging multiple paths per connection requires identifying these paths.\n```",
+              "createdAt": "2026-11-22T16:08:27Z",
+              "updatedAt": "2026-11-22T17:30:46Z"
+            },
+            {
+              "originalPosition": 55,
+              "body": "```suggestion\ntools is to correlate packet departures and the arrival of the corresponding\n````",
+              "createdAt": "2026-11-22T16:25:08Z",
+              "updatedAt": "2026-11-22T17:30:46Z"
+            },
+            {
+              "originalPosition": 120,
+              "body": "```suggestion\nAll the events described in this section affect a single path. The\n```",
+              "createdAt": "2026-11-22T16:26:30Z",
+              "updatedAt": "2026-11-22T17:30:46Z"
+            },
+            {
+              "originalPosition": 121,
+              "body": "In qlog, `header` already names the packet header inside the `data` of packet events. It is `PacketHeader`, defined in the quic-events draft. A reader could think that \"event header\" means `PacketHeader` and add `path_id` through its extension socket. Tools that look for `path_id` at the top level would not find it. Could we say \"event\" or \"top level\" instead? \n\n_There are the same wordings on Lines 73, 106, 139, and 167._\n\n```suggestion\ncorresponding `path_id` MUST be included in the top-level `Event` map of each event,\n```",
+              "createdAt": "2026-11-22T17:06:42Z",
+              "updatedAt": "2026-11-22T17:30:46Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZnuk3g",
+          "commit": {
+            "abbreviatedOid": "3ec7066"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-22T20:26:09Z",
+          "updatedAt": "2026-11-22T20:26:09Z",
+          "comments": [
+            {
+              "originalPosition": 33,
+              "body": "No. It is a point about standardization status. The actual extensions are specified in the next sentence.",
+              "createdAt": "2026-11-22T20:26:09Z",
+              "updatedAt": "2026-11-22T20:26:09Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZnw_Hg",
+          "commit": {
+            "abbreviatedOid": "3ec7066"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-22T20:31:08Z",
+          "updatedAt": "2026-11-22T20:31:09Z",
+          "comments": [
+            {
+              "originalPosition": 121,
+              "body": "Let's defer that. @flub pointed out that adding the path_id to the event header might be a mistake, and that we should carry it in the data filed instead, and for packet transmission events in the packet header. That's a discussion that we need to have, and it may involve a series of changes. See issue #31.",
+              "createdAt": "2026-11-22T20:31:08Z",
+              "updatedAt": "2026-11-22T23:34:54Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZocdIw",
+          "commit": {
+            "abbreviatedOid": "393e5be"
+          },
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "state": "CHANGES_REQUESTED",
+          "body": "",
+          "createdAt": "2026-11-22T23:28:05Z",
+          "updatedAt": "2026-11-22T23:47:13Z",
+          "comments": [
+            {
+              "originalPosition": 13,
+              "body": "think you mean ANRW ",
+              "createdAt": "2026-11-22T23:28:05Z",
+              "updatedAt": "2026-11-22T23:47:13Z"
+            },
+            {
+              "originalPosition": 33,
+              "body": "nit : \"It adds\", not \"It add\"",
+              "createdAt": "2026-11-22T23:31:50Z",
+              "updatedAt": "2026-11-22T23:47:13Z"
+            },
+            {
+              "originalPosition": 51,
+              "body": "suggestion : lets replace \"have proven very useful\u201d with the specifics like for example \n\"qlog visualization tools such as qvis [DebuggingQuic] can match a packet\u2019s send event in one endpoint\u2019s trace to its receive event in the peer\u2019s trace.\"\n",
+              "createdAt": "2026-11-22T23:46:23Z",
+              "updatedAt": "2026-11-22T23:47:13Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZoi8zQ",
+          "commit": {
+            "abbreviatedOid": "393e5be"
+          },
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-22T23:52:39Z",
+          "updatedAt": "2026-11-22T23:52:39Z",
+          "comments": [
+            {
+              "originalPosition": 51,
+              "body": "just for information. I found no mention of qvis in any of the 13 published RFCs listed by the QUIC Working Group. Its added only as a reference \nin draft-ietf-quic-qlog-main-schema-15 \n\n[16.2. ](https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15#section-16.2)[Informative References](https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15#name-informative-references)\n[ANRW-2020]\nMarx, R., Piraux, M., Quax, P., and W. Lamotte, \"Debugging QUIC and HTTP/3 with qlog and qvis\", September 2020, <https://qlog.edm.uhasselt.be/anrw/>.",
+              "createdAt": "2026-11-22T23:52:39Z",
+              "updatedAt": "2026-11-22T23:52:39Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZsguDw",
+          "commit": {
+            "abbreviatedOid": "393e5be"
+          },
+          "author": "Yanmei-Liu",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-23T09:42:06Z",
+          "updatedAt": "2026-11-23T09:42:06Z",
+          "comments": [
+            {
+              "originalPosition": 33,
+              "body": "```suggestion\nThe qlog specifications define structured logs for QUIC connections.\nThis draft extends the qlog specification for QUIC events. It adds a\n```",
+              "createdAt": "2026-11-23T09:42:06Z",
+              "updatedAt": "2026-11-23T09:42:06Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZsgwMQ",
+          "commit": {
+            "abbreviatedOid": "393e5be"
+          },
+          "author": "Yanmei-Liu",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-23T09:42:08Z",
+          "updatedAt": "2026-11-23T09:42:09Z",
+          "comments": [
+            {
+              "originalPosition": 59,
+              "body": "Could we scope this example to 1-RTT packets in one connection and sending direction? Packet numbers can repeat across number spaces, and PATH_ACK identifies the path on which the acknowledged packet was sent.",
+              "createdAt": "2026-11-23T09:42:08Z",
+              "updatedAt": "2026-11-23T09:42:08Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZsgycQ",
+          "commit": {
+            "abbreviatedOid": "393e5be"
+          },
+          "author": "Yanmei-Liu",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-23T09:42:11Z",
+          "updatedAt": "2026-11-23T09:42:11Z",
+          "comments": [
+            {
+              "originalPosition": 121,
+              "body": "Section 4 says \u201ctop-level `Event` map,\u201d while Section 5 says \u201cevent headers.\u201d Once #31 settles where `path_id` belongs, could we use the same terminology in both sections?",
+              "createdAt": "2026-11-23T09:42:11Z",
+              "updatedAt": "2026-11-23T09:42:11Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZx_vKw",
+          "commit": {
+            "abbreviatedOid": "3ec7066"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-23T16:15:42Z",
+          "updatedAt": "2026-11-23T16:15:42Z",
+          "comments": [
+            {
+              "originalPosition": 121,
+              "body": "Yes, we need to a be a bit more formal here. The definition in the [main draft](https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15) is for an \"Event Class\", defined as:\r\n\r\n```\r\nEvent = {\r\n    time: float64\r\n    name: text\r\n    data: $ProtocolEventData\r\n    ? tuple: TupleID\r\n    ? time_format: TimeFormat\r\n    ? group_id: GroupID\r\n    ? system_info: SystemInformation\r\n\r\n    ; events can contain any amount of custom fields\r\n    * text => any\r\n}\r\n```\r\n\r\nThere is no such thing as an event header. There is an event class, with a definition to which we could add:\r\n```\r\n    ? path_id: PathID\r\n```\r\nThis extension would apply to concrete events defined in the QUIC extension.",
+              "createdAt": "2026-11-23T16:15:42Z",
+              "updatedAt": "2026-11-23T18:54:29Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZ0YMwA",
+          "commit": {
+            "abbreviatedOid": "393e5be"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-23T18:56:34Z",
+          "updatedAt": "2026-11-23T18:56:34Z",
+          "comments": [
+            {
+              "originalPosition": 13,
+              "body": "Yes, fixing that.",
+              "createdAt": "2026-11-23T18:56:34Z",
+              "updatedAt": "2026-11-23T18:56:35Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZ0ZW0g",
+          "commit": {
+            "abbreviatedOid": "393e5be"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-23T18:57:56Z",
+          "updatedAt": "2026-11-23T18:57:56Z",
+          "comments": [
+            {
+              "originalPosition": 33,
+              "body": "Fixing.",
+              "createdAt": "2026-11-23T18:57:56Z",
+              "updatedAt": "2026-11-23T18:57:56Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZ0cVKA",
+          "commit": {
+            "abbreviatedOid": "393e5be"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-23T19:01:24Z",
+          "updatedAt": "2026-11-23T19:01:25Z",
+          "comments": [
+            {
+              "originalPosition": 59,
+              "body": "We can certainly specify that this is for 1RTT packets. The direction is implicit, existing tools already handle it.",
+              "createdAt": "2026-11-23T19:01:25Z",
+              "updatedAt": "2026-11-23T19:01:25Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZ0iAvg",
+          "commit": {
+            "abbreviatedOid": "393e5be"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-23T19:08:08Z",
+          "updatedAt": "2026-11-23T19:08:09Z",
+          "comments": [
+            {
+              "originalPosition": 51,
+              "body": "Yes. we are adding the same reference. I will update the reference handle for consistency with the quic qlog draft.",
+              "createdAt": "2026-11-23T19:08:08Z",
+              "updatedAt": "2026-11-23T19:08:09Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZ0irog",
+          "commit": {
+            "abbreviatedOid": "393e5be"
+          },
+          "author": "huitema",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-23T19:08:56Z",
+          "updatedAt": "2026-11-23T19:08:56Z",
+          "comments": [
+            {
+              "originalPosition": 59,
+              "body": "Change the text to specify 1RTT packets.",
+              "createdAt": "2026-11-23T19:08:56Z",
+              "updatedAt": "2026-11-23T19:08:57Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZ05sjQ",
+          "commit": {
+            "abbreviatedOid": "ea4c7bb"
+          },
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-23T19:33:42Z",
+          "updatedAt": "2026-11-23T19:33:43Z",
+          "comments": [
+            {
+              "originalPosition": 154,
+              "body": "If we keep option A in #31, this would record the rationale in the draft.\n\n```suggestion\nThe top-level `path_id` field gives tools one place to find the path ID\nacross packet, recovery, and path management events. For example, the\nfield stays in the same place when a `packet_lost` event omits the optional\npacket header. The base qlog schema also uses an optional top-level\n`tuple` field to associate an event with a network tuple\n({{Section 7.2 of QLOG-MAIN}}).\n{{add-path-id}} describes when existing QUIC events include `path_id`.\n```",
+              "createdAt": "2026-11-23T19:33:42Z",
+              "updatedAt": "2026-11-23T19:33:43Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOVzZa388AAAABZ1Dtmw",
+          "commit": {
+            "abbreviatedOid": "c7e0038"
+          },
+          "author": "altanai",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-23T19:45:15Z",
+          "updatedAt": "2026-11-23T19:45:15Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 32,
+      "id": "PR_kwDOVzZa388AAAABRaET9g",
+      "title": "Copy security section from QLOG-QUIC.",
+      "url": "https://github.com/huitema/qlog-multipath-extension/pull/32",
+      "state": "OPEN",
+      "author": "huitema",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "I looked at the security sections of QLOG-MAIN and QLOG-QUIC. The text proposed here is a direct copy of the text in QLOG-QUIC, which points to QLOG-MAIN. The text in QLOG-MAIN is well developed, and I think is sufficient for now. If we later find threats specific to multipath logging, we can always update the section.\r\n\r\nFixes #9",
+      "createdAt": "2026-11-23T23:36:05Z",
+      "updatedAt": "2026-11-23T23:39:09Z",
+      "baseRepository": "huitema/qlog-multipath-extension",
+      "baseRefName": "main",
+      "baseRefOid": "1c9b34bb99fece5ae6be5b618f811808ec8ac817",
+      "headRepository": "huitema/qlog-multipath-extension",
+      "headRefName": "security-section",
+      "headRefOid": "1b56edc0d2d2e64c492f98edd8b3e45436bd80fd",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
