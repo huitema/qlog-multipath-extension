@@ -1668,7 +1668,10 @@ The client's loss event matches its send event for <code>(0, 42)</code>.<a href=
 <p id="section-6.2-1">In <code>quic:marked_for_retransmit</code>, <code>path_id</code> identifies the path that carried
 the lost packet, and in <code>quic:packet_sent</code>, it identifies the path carrying
 the new packet with the retransmitted data.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
-<p id="section-6.2-2">For example a packet sent on path 1 is declared lost and its STREAM data is marked for retransmission. The <code>quic:marked_for_retransmit</code> event is emitted with <code>path_id</code> 1. If the data is sent again on path 1 a <code>quic:packet_sent</code> event with <code>path_id</code> 1 and overlapping STREAM ranges would be emitted. If part of the lost STREAM data is retransmitted on path 0, that event has <code>path_id</code> 0 (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-5.6" class="relref">Section 5.6</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>) and contain an overlapping STREAM range.<a href="#section-6.2-2" class="pilcrow">¶</a></p>
+<p id="section-6.2-2">For example, if a packet sent on path 1 is declared lost and its STREAM data is
+retransmitted on path 0, the <code>quic:packet_lost</code> and <code>quic:marked_for_retransmit</code>
+events both use <code>path_id</code> 1, while the <code>quic:packet_sent</code> event for the
+retransmission uses <code>path_id</code> 0.<a href="#section-6.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
