@@ -240,10 +240,8 @@ QUICPathAbandoned = {
 
 `quic:path_status_updated` is emitted when the endpoint changes the path
 usage preference it advertises (`initiator` is `local`), or records a
-change in the peer's advertised preference (`initiator` is `remote`).
-Each endpoint expresses its own preference for how its peer should use
-the path ({{Section 3.3 of QUIC-MULTIPATH}}). A sender can choose how to
-schedule packets independently of the advertised preference.
+change in the peer's advertised preference (`initiator` is `remote`);
+see {{Section 3.3 of QUIC-MULTIPATH}}.
 
 `new` gives the updated preference. If included, `old` gives the previous
 preference for the same Path ID and initiator. Omit `old` when no previous
@@ -468,10 +466,8 @@ $TransportError /= "application_abandon_path" /      ; 0x3e
 ## PATH_STATUS_AVAILABLE and PATH_STATUS_BACKUP
 
 The `frame_type` identifies the preference advertised for `path_id`.
-Use `path_status_available` for 0x3e77 and `path_status_backup` for 0x3e76.
-Both use the same per-path status sequence number space
-({{Section 4.3 of QUIC-MULTIPATH}}). The frame object records the received
-sequence number even when the receiver ignores an outdated advertisement.
+Use `path_status_available` for 0x3e77 and `path_status_backup` for 0x3e76
+({{Section 4.3 of QUIC-MULTIPATH}}).
 
 ~~~ cddl
 PathStatusFrame = {
