@@ -425,40 +425,11 @@ Table of Contents
 
 6.2.  Cross-path retransmission
 
-   When data from a lost packet is marked for retransmission, the
-   path_id of quic:marked_for_retransmit identifies the path on which
-   that packet was sent.  If the data is sent again on a different path
-   (Section 5.6 of [QUIC-MULTIPATH]), the path_id of quic:packet_sent
-   identifies the path carrying the new packet.
-
-   In this example, the sender declares packet 42 lost when it discards
-   the state of path 1 (Section 3.4.3 of [QUIC-MULTIPATH]).  The sender
-   logs the following events in order:
-
-      +============================+=========+=====================+
-      | Event                      | path_id | What the sender     |
-      |                            |         | records             |
-      +============================+=========+=====================+
-      | quic:packet_sent           | 1       | Packet 42 carries   |
-      |                            |         | bytes 800 through   |
-      |                            |         | 1599 of stream 0.   |
-      +----------------------------+---------+---------------------+
-      | quic:path_abandoned        | 1       | The sender abandons |
-      |                            |         | path 1.             |
-      +----------------------------+---------+---------------------+
-      | quic:packet_lost           | 1       | Packet 42 is        |
-      |                            |         | declared lost.      |
-      +----------------------------+---------+---------------------+
-      | quic:marked_for_retransmit | 1       | The sender marks    |
-      |                            |         | those stream bytes  |
-      |                            |         | for retransmission. |
-      +----------------------------+---------+---------------------+
-      | quic:packet_sent           | 0       | Packet 17 carries   |
-      |                            |         | the same bytes of   |
-      |                            |         | stream 0.           |
-      +----------------------------+---------+---------------------+
-
-                                 Table 2
+   Suppose a packet sent on path 1 is declared lost and its stream data
+   is marked for retransmission.  The quic:marked_for_retransmit event
+   has path_id 1 in both cases.  If the data is sent again on path 1,
+   the new quic:packet_sent event has path_id 1.  If it is sent on path
+   0, that event has path_id 0 (Section 5.6 of [QUIC-MULTIPATH]).
 
 7.  Multipath transport parameter
 
