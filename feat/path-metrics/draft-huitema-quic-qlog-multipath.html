@@ -1665,11 +1665,14 @@ The client's loss event matches its send event for <code>(0, 42)</code>.<a href=
         <h3 id="name-cross-path-retransmission">
 <a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-cross-path-retransmission" class="section-name selfRef">Cross-path retransmission</a>
         </h3>
-<p id="section-6.2-1">Suppose a packet sent on path 1 is declared lost and its stream data is
+<p id="section-6.2-1">In <code>quic:marked_for_retransmit</code>, <code>path_id</code> identifies the path that carried
+the lost packet, and in <code>quic:packet_sent</code>, it identifies the path carrying
+the new packet with the retransmitted data.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.2-2">Suppose a packet sent on path 1 is declared lost and its stream data is
 marked for retransmission. The <code>quic:marked_for_retransmit</code> event has
 <code>path_id</code> 1 in both cases. If the data is sent again on path 1, the new
 <code>quic:packet_sent</code> event has <code>path_id</code> 1. If it is sent on path 0, that
-event has <code>path_id</code> 0 (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-5.6" class="relref">Section 5.6</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>).<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+event has <code>path_id</code> 0 (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-5.6" class="relref">Section 5.6</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>).<a href="#section-6.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
