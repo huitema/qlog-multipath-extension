@@ -5,12 +5,12 @@
 QUIC                                                          C. Huitema
 Internet-Draft                                      Private Octopus Inc.
 Intended status: Informational                                    Y. Liu
-Expires: 27 May 2027                                        Alibaba Inc.
+Expires: 28 May 2027                                        Alibaba Inc.
                                                                 A. Bisht
                                                            Cisco Systems
                                                                N. Kurosu
                                                               Individual
-                                                        23 November 2026
+                                                        24 November 2026
 
 
                QLOG extensions for Multiple Paths in QUIC
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 27 May 2027.
+   This Internet-Draft will expire on 28 May 2027.
 
 Copyright Notice
 
@@ -605,7 +605,8 @@ Table of Contents
 
 9.  Security Considerations
 
-   TODO Security
+   The security and privacy considerations discussed in Section 14 of
+   [QLOG-MAIN] apply to this document as well.
 
 10.  IANA Considerations
 
