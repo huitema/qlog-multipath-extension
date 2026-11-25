@@ -148,11 +148,13 @@ Each of these events MUST include the following field in its top-level
 ({{Section 7 of QLOG-MAIN}}).
 
 ~~~ cddl
-MultipathEventFields = (path_id: uint32)
+PATH_ID = uint32
+MultipathEventFields = (path_id: PATH_ID)
 ~~~
 
-`path_id` identifies the path ID as defined  in {{QUIC-MULTIPATH}}. It
-is scoped to the connection and represented by a `uint32` in the log.
+`path_id` identifies a path within the connection. The `PATH_ID` type
+uses qlog's unsigned 32-bit integer ({{Section 1.2 of QLOG-MAIN}})
+for the range specified in {{Section 2.1 of QUIC-MULTIPATH}}.
 
 `path_id` is distinct from qlog's `tuple` / `tuple_id`. A path ID identifies a
 logical QUIC path; multiple path IDs can use the same 4-tuple, and one Path ID
@@ -381,7 +383,7 @@ parameter.
 
 ~~~ cddl
 $$quic-parametersset-extension //= (
-    ? initial_max_path_id: uint32
+    ? initial_max_path_id: PATH_ID
 )
 ~~~
 
@@ -440,7 +442,7 @@ PathAckFrame = { PathAckFields } /
 
 PathAckFields = (
     frame_type: "path_ack"
-    path_id: uint32
+    path_id: PATH_ID
     ? ack_delay: float32
     ? acked_ranges: [+ AckRange]
     ? raw: RawInfo
@@ -458,7 +460,7 @@ for code 0. The four additional names below correspond to the codes in
 ~~~ cddl
 PathAbandonFrame = {
     frame_type: "path_abandon"
-    path_id: uint32
+    path_id: PATH_ID
     error: $TransportError / CryptoError
     ? error_code: uint64
     ? raw: RawInfo
@@ -479,7 +481,7 @@ Use `path_status_available` for 0x3e77 and `path_status_backup` for 0x3e76
 ~~~ cddl
 PathStatusFrame = {
     frame_type: "path_status_available" / "path_status_backup"
-    path_id: uint32
+    path_id: PATH_ID
     sequence_number: uint64
     ? raw: RawInfo
 }
@@ -499,7 +501,7 @@ PATH_RETIRE_CONNECTION_ID (0x3e79), the pair (`path_id`,
 ~~~ cddl
 PathNewConnectionIDFrame = {
     frame_type: "path_new_connection_id"
-    path_id: uint32
+    path_id: PATH_ID
     sequence_number: uint64
     retire_prior_to: uint64
     ? connection_id_length: uint8
@@ -510,7 +512,7 @@ PathNewConnectionIDFrame = {
 
 PathRetireConnectionIDFrame = {
     frame_type: "path_retire_connection_id"
-    path_id: uint32
+    path_id: PATH_ID
     sequence_number: uint64
     ? raw: RawInfo
 }
@@ -529,19 +531,19 @@ sequence number expected from the peer
 ~~~ cddl
 MaxPathIDFrame = {
     frame_type: "max_path_id"
-    maximum: uint32
+    maximum: PATH_ID
     ? raw: RawInfo
 }
 
 PathsBlockedFrame = {
     frame_type: "paths_blocked"
-    limit: uint32
+    limit: PATH_ID
     ? raw: RawInfo
 }
 
 PathCIDsBlockedFrame = {
     frame_type: "path_cids_blocked"
-    path_id: uint32
+    path_id: PATH_ID
     next_sequence_number: uint64
     ? raw: RawInfo
 }
