@@ -1668,11 +1668,10 @@ The client's loss event matches its send event for <code>(0, 42)</code>.<a href=
 <p id="section-6.2-1">In <code>quic:marked_for_retransmit</code>, <code>path_id</code> identifies the path that carried
 the lost packet, and in <code>quic:packet_sent</code>, it identifies the path carrying
 the new packet with the retransmitted data.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
-<p id="section-6.2-2">For example, packet 42 carries STREAM frames for stream 0 on path 1. When
-the sender declares packet 42 lost and marks its data for retransmission,
-the <code>quic:packet_lost</code> and <code>quic:marked_for_retransmit</code> events both use
-<code>path_id</code> 1. Packet 17 repeats the same STREAM frames on path 0, so its
-<code>quic:packet_sent</code> event uses <code>path_id</code> 0.<a href="#section-6.2-2" class="pilcrow">¶</a></p>
+<p id="section-6.2-2">For example, if a packet sent on path 1 is declared lost and its STREAM data is
+retransmitted on path 0, the <code>quic:packet_lost</code> and <code>quic:marked_for_retransmit</code>
+events both use <code>path_id</code> 1, while the <code>quic:packet_sent</code> event for the
+retransmission uses <code>path_id</code> 0.<a href="#section-6.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
