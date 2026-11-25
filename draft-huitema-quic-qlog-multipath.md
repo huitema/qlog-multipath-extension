@@ -308,6 +308,7 @@ when the stated path context is known:
 | --- | --- |
 | `packet_sent`, `packet_received` | Path carrying the packet. |
 | `packet_lost` | Path carrying the lost packet. |
+| `marked_for_retransmit` | Original sending path of the packet whose data is marked for retransmission (see {{cross-path-retransmission}}). |
 | `packet_dropped`, `packet_buffered` | Path associated with the packet, if it can be identified at that point. |
 | `packets_acked` | Path of the acknowledged packets, not the path carrying the ACK or PATH_ACK frame. Implementations MUST split events when acknowledged packets belong to different paths. |
 | `recovery_metrics_updated`, `recovery_parameters_set` | Path whose recovery or congestion-control values are reported. |
@@ -366,6 +367,17 @@ The server's receive event matches the client's send event for `(1, 42)`.
 The client's loss event matches its send event for `(0, 42)`.
 
 The `path_id` is set to 0 for Initial, Handshake, 0-RTT, and Retry packet events.
+
+## Cross-path retransmission {#cross-path-retransmission}
+
+In `quic:marked_for_retransmit`, `path_id` identifies the path that carried
+the lost packet, and in `quic:packet_sent`, it identifies the path carrying
+the new packet with the retransmitted data.
+
+For example, if a packet sent on path 1 is declared lost and its STREAM data is
+retransmitted on path 0, the `quic:packet_lost` and `quic:marked_for_retransmit`
+events both use `path_id` 1, while the `quic:packet_sent` event for the
+retransmission uses `path_id` 0.
 
 # Multipath transport parameter {#mp-parameters}
 
@@ -590,7 +602,8 @@ the QUIC transport protocol defined in {{QUIC-MULTIPATH}}.
 Reference:  {{mp-events}} of this document.
 
 This document modifies the following QUIC events: `packet_sent`, `packet_received`, `packet_dropped`,
-`packet_buffered`, `packets_acked`, `packet_lost`, `recovery_metrics_updated`,
+`packet_buffered`, `packets_acked`, `packet_lost`, `marked_for_retransmit`,
+`recovery_metrics_updated`,
 `recovery_parameters_set`, `congestion_state_updated`, `ecn_state_updated`,
 `timer_updated`, `mtu_updated`, `spin_bit_updated`, `connection_id_updated`,
 `tuple_assigned`, `migration_state_updated`, `frames_parsed`, and
