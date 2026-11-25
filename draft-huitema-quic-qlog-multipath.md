@@ -409,9 +409,9 @@ array of `quic:packet_sent` and `quic:packet_received`. The optional
 
 Within a frame, `path_id` is the Path Identifier carried on the wire.
 For example, a PATH_ACK sent on path 0 can acknowledge packets on path 1.
-In that case the PATH_ACK object contains `"path_id": 1`. Path IDs and
-path ID limits are unsigned 32-bit values. QUIC variable-length integer
-fields are logged as decoded values within the limits of {{QUIC-MULTIPATH}}.
+In that case the PATH_ACK object contains `"path_id": 1`.
+QUIC variable-length integer fields are logged as decoded values within
+the limits of {{QUIC-MULTIPATH}}.
 
 ~~~ cddl
 $QuicFrame /= PathAckFrame / PathAbandonFrame / PathStatusFrame /
