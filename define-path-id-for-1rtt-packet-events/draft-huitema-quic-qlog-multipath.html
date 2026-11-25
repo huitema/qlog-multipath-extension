@@ -1624,9 +1624,10 @@ defines the frame encodings.<a href="#section-6-7" class="pilcrow">¶</a></p>
         <h3 id="name-correlating-1-rtt-packet-ev">
 <a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-correlating-1-rtt-packet-ev" class="section-name selfRef">Correlating 1-RTT packet events across paths</a>
         </h3>
-<p id="section-6.1-1">Once the endpoint has sent and received <code>initial_max_path_id</code>, every event that
-identifies a specific 1-RTT packet <span class="bcp14">MUST</span> carry its event-level <code>path_id</code>,
-even on path 0. To match 1-RTT events within one connection and sending
+<p id="section-6.1-1">Once the logging endpoint knows that multipath support has been negotiated
+as described in <span><a href="https://rfc-editor.org/rfc/rfc10069#section-2" class="relref">Section 2</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>, every event that identifies
+a specific 1-RTT packet <span class="bcp14">MUST</span> carry its event-level <code>path_id</code>, including
+on path 0. To match 1-RTT events within one connection and sending
 direction, use (<code>path_id</code>, <code>packet_number</code>) (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-1" class="relref">Section 1</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>).<a href="#section-6.1-1" class="pilcrow">¶</a></p>
 <p id="section-6.1-2">The client logs two sends and one loss.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
 <div class="lang-json sourcecode" id="section-6.1-3">
