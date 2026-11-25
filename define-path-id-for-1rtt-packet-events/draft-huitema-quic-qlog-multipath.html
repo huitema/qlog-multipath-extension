@@ -1346,31 +1346,26 @@ exampledraft 00 of this document is identified using the URI
       <h2 id="name-adding-a-path-identifier-to">
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-adding-a-path-identifier-to" class="section-name selfRef">Adding a path identifier to event headers</a>
       </h2>
-<p id="section-4-1">Managing multiple paths per connection requires identifying these paths.
-Per <span>[<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>, this is done using a path ID. This path ID
-will be added to events as specified in <a href="#mp-events" class="auto internal xref">Section 5</a> and <a href="#add-path-id" class="auto internal xref">Section 6</a>.
-Each of these events <span class="bcp14">MUST</span> include the following field in its top-level
-<code>Event</code> map alongside <code>time</code>, <code>name</code>, and <code>data</code>
-(<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15#section-7" class="relref">Section 7</a> of [<a href="#QLOG-MAIN" class="cite xref">QLOG-MAIN</a>]</span>).<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-1">The top-level <code>path_id</code> identifies the path on which a packet was sent or
+received. It appears alongside <code>time</code>, <code>name</code>, and <code>data</code> in the qlog
+<code>Event</code> map (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15#section-7" class="relref">Section 7</a> of [<a href="#QLOG-MAIN" class="cite xref">QLOG-MAIN</a>]</span>). <a href="#add-path-id" class="auto internal xref">Section 6</a> specifies when
+to include it.<a href="#section-4-1" class="pilcrow">¶</a></p>
 <div class="lang-cddl sourcecode" id="section-4-2">
 <pre>
-MultipathEventFields = (path_id: uint32)
+MultipathEventFields = (? path_id: uint32)
 </pre><a href="#section-4-2" class="pilcrow">¶</a>
 </div>
-<p id="section-4-3"><code>path_id</code> identifies the path ID as defined  in <span>[<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>. It
+<p id="section-4-3"><code>path_id</code> is the Path ID defined in <span>[<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>. It
 is scoped to the connection and represented by a <code>uint32</code> in the log.<a href="#section-4-3" class="pilcrow">¶</a></p>
 <p id="section-4-4"><code>path_id</code> is distinct from qlog's <code>tuple</code> / <code>tuple_id</code>. A path ID identifies a
 logical QUIC path; multiple path IDs can use the same 4-tuple, and one Path ID
 can use a new 4-tuple after migration. Implementations <span class="bcp14">MUST NOT</span> infer a path
 ID from a tuple identifier.  Tuple details can
 be recorded with <code>quic:tuple_assigned</code> (see <span>[<a href="#QLOG-QUIC" class="cite xref">QLOG-QUIC</a>]</span>).<a href="#section-4-4" class="pilcrow">¶</a></p>
-<p id="section-4-5">The top-level <code>path_id</code> field gives tools one place to find the path ID
-across packet, recovery, and path management events. For example, the
-field stays in the same place when a <code>packet_lost</code> event omits the optional
-packet header. The base qlog schema also uses an optional top-level
-<code>tuple</code> field to associate an event with a network tuple
-(<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15#section-7.2" class="relref">Section 7.2</a> of [<a href="#QLOG-MAIN" class="cite xref">QLOG-MAIN</a>]</span>).
-<a href="#add-path-id" class="auto internal xref">Section 6</a> describes when existing QUIC events include <code>path_id</code>.<a href="#section-4-5" class="pilcrow">¶</a></p>
+<p id="section-4-5">For example, a <code>packet_lost</code> event can identify the original sending path
+even when it omits the optional packet header. The base qlog schema also
+uses an optional top-level <code>tuple</code> field to associate an event with a network tuple
+(<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-qlog-main-schema-15#section-7.2" class="relref">Section 7.2</a> of [<a href="#QLOG-MAIN" class="cite xref">QLOG-MAIN</a>]</span>).<a href="#section-4-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="mp-events">
@@ -1383,9 +1378,11 @@ changes to the paths of a connection as seen by the endpoint. Packet
 events record the frames that carry path management signals. A single
 change can involve several frames, and a local decision can precede the
 first frame that signals it.<a href="#section-5-1" class="pilcrow">¶</a></p>
-<p id="section-5-2">All the events described in this section affect a single path. The
-corresponding <code>path_id</code> <span class="bcp14">MUST</span> be included in the respective event headers,
-as specified in <a href="#path-id-def" class="auto internal xref">Section 4</a>.<a href="#section-5-2" class="pilcrow">¶</a></p>
+<p id="section-5-2">Each of these events <span class="bcp14">MUST</span> identify the affected path in <code>data.path_id</code>.
+If receiving a packet triggers the event, the top-level <code>path_id</code>
+identifies the path on which that packet arrived, as specified in
+<a href="#add-path-id" class="auto internal xref">Section 6</a>. A local decision made independently of a packet has
+only the affected Path ID in <code>data</code>.<a href="#section-5-2" class="pilcrow">¶</a></p>
 <p id="section-5-3">The event data types extend the qlog main schema as follows. The
 optional <code>error_code</code> and <code>sequence_number</code> fields use the qlog
 <code>uint64</code> type. Their values are limited to 0 through 2^62 - 1 by
@@ -1406,13 +1403,14 @@ for a new path. For an additional path, the client logs the event when it
 initiates the path and the server logs it when it accepts the attempt and
 sets up the path locally (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-3.1" class="relref">Section 3.1</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>). Validation can
 still be pending. For the initial path, the endpoint logs the event with
-<code>path_id</code> 0 when the handshake completes with multipath negotiated.
+<code>data.path_id</code> 0 when the handshake completes with multipath negotiated.
 Issuing connection IDs for future paths alone does not trigger this event.
 Migration to a new tuple retains the existing Path ID and can be logged
 with <code>quic:migration_state_updated</code>.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
 <div class="lang-cddl sourcecode" id="section-5.1-2">
 <pre>
 QUICPathCreated = {
+    path_id: uint32
     * $$quic-pathcreated-extension
 }
 </pre><a href="#section-5.1-2" class="pilcrow">¶</a>
@@ -1436,6 +1434,7 @@ path state do not produce additional abandonment events.<a href="#section-5.2-2"
 <div class="lang-cddl sourcecode" id="section-5.2-3">
 <pre>
 QUICPathAbandoned = {
+    path_id: uint32
     initiator: Initiator
     ? error_code: uint64 .le 4611686018427387903
     * $$quic-pathabandoned-extension
@@ -1464,6 +1463,7 @@ status change event (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-
 <div class="lang-cddl sourcecode" id="section-5.3-3">
 <pre>
 QUICPathStatusUpdated = {
+    path_id: uint32
     initiator: Initiator
     ? old: QUICPathStatus
     new: QUICPathStatus
@@ -1488,13 +1488,18 @@ path 0. Later the client abandons path 1 at the application's request.<a href="#
 <pre>
 [
   { "time": 12.0, "name": "quic:path_created",
-    "path_id": 1, "data": {} },
-  { "time": 18.0, "name": "quic:path_status_updated",
-    "path_id": 1, "data": { "initiator": "remote", "new": "backup",
-                            "sequence_number": 0 } },
+    "data": { "path_id": 1 } },
+  { "time": 17.9, "name": "quic:packet_received", "path_id": 0,
+    "data": {
+      "header": { "packet_type": "1RTT", "packet_number": 8 },
+      "frames": [ { "frame_type": "path_status_backup",
+                    "path_id": 1, "sequence_number": 0 } ] } },
+  { "time": 18.0, "name": "quic:path_status_updated", "path_id": 0,
+    "data": { "path_id": 1, "initiator": "remote",
+              "new": "backup", "sequence_number": 0 } },
   { "time": 97.0, "name": "quic:path_abandoned",
-    "path_id": 1, "data": { "initiator": "local",
-                            "error_code": 62 } }
+    "data": { "path_id": 1, "initiator": "local",
+              "error_code": 62 } }
 ]
 </pre><a href="#section-5.4-2" class="pilcrow">¶</a>
 </div>
@@ -1507,29 +1512,28 @@ path 0. Later the client abandons path 1 at the application's request.<a href="#
       <h2 id="name-add-a-path-id-to-existing-q">
 <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-add-a-path-id-to-existing-q" class="section-name selfRef">Add a Path ID to existing QUIC events</a>
       </h2>
-<p id="section-6-1">A packet event <span class="bcp14">MUST</span> omit the top-level <code>path_id</code> unless it describes
-1-RTT packets and the handshake has completed with multipath negotiated
-(<span><a href="https://rfc-editor.org/rfc/rfc10069#section-2" class="relref">Section 2</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>). Initial, Handshake, 0-RTT, and Retry
-packet events therefore omit the field.<a href="#section-6-1" class="pilcrow">¶</a></p>
-<p id="section-6-2">Subject to this rule, implementations <span class="bcp14">MUST</span> include <code>path_id</code> when an
-event describes one known path, including path 0. They <span class="bcp14">MUST</span> omit the field
-for connection-wide events or when the path is unknown.
-Omission does not mean path 0. An implementation <span class="bcp14">MAY</span>
+<p id="section-6-1">Once the handshake completes with multipath negotiated
+(<span><a href="https://rfc-editor.org/rfc/rfc10069#section-2" class="relref">Section 2</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>), an event that describes 1-RTT packets
+on a single known path <span class="bcp14">MUST</span> include that path in the top-level <code>path_id</code>,
+including path 0. For an event that records a state change, this rule
+applies to the packet that triggered the change. Implementations <span class="bcp14">MUST</span>
+omit the field in all other cases, including for Initial, Handshake,
+0-RTT, and Retry packets and for local actions independent of any packet.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">Omission does not mean path 0. An implementation <span class="bcp14">MAY</span>
 place <code>path_id</code> in <code>common_fields</code> only when the same value applies to every
 event in that trace, following the common-field rules in <span>[<a href="#QLOG-MAIN" class="cite xref">QLOG-MAIN</a>]</span>.<a href="#section-6-2" class="pilcrow">¶</a></p>
-<p id="section-6-3">The event-level field identifies the path on which the event's packet or
-operation applies. A Path ID carried inside a frame remains a frame field and
-can identify a different path. For example, a packet sent on path 0 can carry
-a PATH_ACK frame acknowledging packets from path 1; the event has
-<code>path_id: 0</code>, while the PATH_ACK frame has <code>path_id: 1</code>.<a href="#section-6-3" class="pilcrow">¶</a></p>
-<p id="section-6-4">The field applies to the following existing events in the <code>quic</code> namespace
-when the stated path context is known:<a href="#section-6-4" class="pilcrow">¶</a></p>
+<p id="section-6-3">A logged frame <span class="bcp14">MUST</span> retain any Path ID it carries on the wire
+(<a href="#multipath-frames" class="auto internal xref">Section 8</a>). For example, when a PATH_ACK arrives on path 0
+and acknowledges packets sent on path 1, the <code>packet_received</code> event has
+<code>path_id: 0</code> and the frame in <code>data.frames</code> has <code>path_id: 1</code>.<a href="#section-6-3" class="pilcrow">¶</a></p>
+<p id="section-6-4">For the following events in the <code>quic</code> namespace, the packet path is
+determined as follows:<a href="#section-6-4" class="pilcrow">¶</a></p>
 <table class="center" id="table-1">
         <caption><a href="#table-1" class="selfRef">Table 1</a></caption>
 <thead>
           <tr>
             <th class="text-left" rowspan="1" colspan="1">Event</th>
-            <th class="text-left" rowspan="1" colspan="1">Meaning of path_id</th>
+            <th class="text-left" rowspan="1" colspan="1">Packet path</th>
           </tr>
         </thead>
         <tbody>
@@ -1561,43 +1565,7 @@ when the stated path context is known:<a href="#section-6-4" class="pilcrow">¶<
             <td class="text-left" rowspan="1" colspan="1">
               <code>packets_acked</code>
 </td>
-            <td class="text-left" rowspan="1" colspan="1">Path of the acknowledged packets, not the path carrying the ACK or PATH_ACK frame. Implementations <span class="bcp14">MUST</span> split events when acknowledged packets belong to different paths.</td>
-          </tr>
-          <tr>
-            <td class="text-left" rowspan="1" colspan="1">
-              <code>recovery_metrics_updated</code>, <code>recovery_parameters_set</code>
-</td>
-            <td class="text-left" rowspan="1" colspan="1">Path whose recovery or congestion-control values are reported.</td>
-          </tr>
-          <tr>
-            <td class="text-left" rowspan="1" colspan="1">
-              <code>congestion_state_updated</code>, <code>ecn_state_updated</code>, <code>timer_updated</code>
-</td>
-            <td class="text-left" rowspan="1" colspan="1">Path whose state or timer changed. Omit it for a connection-wide update.</td>
-          </tr>
-          <tr>
-            <td class="text-left" rowspan="1" colspan="1">
-              <code>mtu_updated</code>, <code>spin_bit_updated</code>
-</td>
-            <td class="text-left" rowspan="1" colspan="1">Path whose MTU or spin-bit state changed.</td>
-          </tr>
-          <tr>
-            <td class="text-left" rowspan="1" colspan="1">
-              <code>connection_id_updated</code>
-</td>
-            <td class="text-left" rowspan="1" colspan="1">Path associated with the connection ID being updated.</td>
-          </tr>
-          <tr>
-            <td class="text-left" rowspan="1" colspan="1">
-              <code>tuple_assigned</code>
-</td>
-            <td class="text-left" rowspan="1" colspan="1">Path only when the tuple assignment is for one specific Path ID; the tuple itself remains identified by <code>tuple_id</code>.</td>
-          </tr>
-          <tr>
-            <td class="text-left" rowspan="1" colspan="1">
-              <code>migration_state_updated</code>
-</td>
-            <td class="text-left" rowspan="1" colspan="1">Path being migrated. Its Path ID remains the same as the tuple changes during migration.</td>
+            <td class="text-left" rowspan="1" colspan="1">Receiving path of the packet carrying the ACK or PATH_ACK.</td>
           </tr>
           <tr>
             <td class="text-left" rowspan="1" colspan="1">
@@ -1607,24 +1575,43 @@ when the stated path context is known:<a href="#section-6-4" class="pilcrow">¶<
           </tr>
         </tbody>
       </table>
-<p id="section-6-6">Path-management events defined by this document <span class="bcp14">MUST</span> include <code>path_id</code> when
-they refer to one path. For a frame whose RFC 10069 definition contains a
-Path ID, the frame's <code>data</code> representation <span class="bcp14">MUST</span> also retain that frame field;
-the event-level <code>path_id</code> does not replace it.<a href="#section-6-6" class="pilcrow">¶</a></p>
-<p id="section-6-7">The field is outside <code>data</code>, so existing QUIC event data definitions do not
-need to be copied or redefined for each event. The table above specifies the
-event-by-event semantics and applicability of the common field.
-<a href="#mp-events" class="auto internal xref">Section 5</a> defines the new events. <a href="#multipath-frames" class="auto internal xref">Section 8</a>
-defines the frame encodings.<a href="#section-6-7" class="pilcrow">¶</a></p>
+<p id="section-6-6">In <code>packets_acked</code>, <code>data.path_id</code> identifies the original sending path of
+the acknowledged 1-RTT packets. Implementations <span class="bcp14">MUST</span> include it when that
+path is known and multipath has been negotiated. Otherwise, they <span class="bcp14">MUST</span>
+omit it. Implementations <span class="bcp14">MUST</span> group acknowledged packets into separate
+events if the value or presence of <code>data.path_id</code> differs between packets.
+In the PATH_ACK example above, the resulting <code>packets_acked</code> event has top-level
+<code>path_id: 0</code> and <code>data.path_id: 1</code>.<a href="#section-6-6" class="pilcrow">¶</a></p>
+<p id="section-6-7">For the state updates listed below, <code>data.path_id</code> identifies the path
+whose state is reported. Implementations <span class="bcp14">MUST</span> include it when the update
+applies to one known path and <span class="bcp14">MUST</span> omit it for connection-wide updates or
+when the affected path is unknown. For example, when a local timer for
+path 1 expires, <code>timer_updated</code> has <code>data.path_id: 1</code> and no top-level
+<code>path_id</code>.<a href="#section-6-7" class="pilcrow">¶</a></p>
+<div class="lang-cddl sourcecode" id="section-6-8">
+<pre>
+$$quic-packetsacked-extension           //= (path_id: uint32)
+$$quic-recoverymetricsupdated-extension //= (path_id: uint32)
+$$quic-recoveryparametersset-extension  //= (path_id: uint32)
+$$quic-congestionstateupdated-extension //= (path_id: uint32)
+$$quic-ecnstateupdated-extension        //= (path_id: uint32)
+$$quic-timerupdated-extension           //= (path_id: uint32)
+$$quic-mtuupdated-extension             //= (path_id: uint32)
+$$quic-spinbitupdated-extension         //= (path_id: uint32)
+$$quic-connectionidupdated-extension    //= (path_id: uint32)
+$$quic-tupleassigned-extension          //= (path_id: uint32)
+$$quic-migrationstateupdated-extension  //= (path_id: uint32)
+</pre><a href="#section-6-8" class="pilcrow">¶</a>
+</div>
 <div id="correlating-1-rtt-packet-events-across-paths">
 <section id="section-6.1">
         <h3 id="name-correlating-1-rtt-packet-ev">
 <a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-correlating-1-rtt-packet-ev" class="section-name selfRef">Correlating 1-RTT packet events across paths</a>
         </h3>
-<p id="section-6.1-1">Once the handshake completes with multipath negotiated, every event that
-identifies a specific 1-RTT packet <span class="bcp14">MUST</span> carry its event-level <code>path_id</code>,
-even on path 0. To match 1-RTT events within one connection and sending
-direction, use (<code>path_id</code>, <code>packet_number</code>) (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-1" class="relref">Section 1</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>).<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.1-1">To match send, receive, and loss events for a 1-RTT packet within one
+connection and sending direction, use the top-level <code>path_id</code> and the
+packet number (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-1" class="relref">Section 1</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>). For packet numbers in
+<code>packets_acked</code>, use <code>data.path_id</code> to select their packet number space.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
 <p id="section-6.1-2">The client logs two sends and one loss.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
 <div class="lang-json sourcecode" id="section-6.1-3">
 <pre>
