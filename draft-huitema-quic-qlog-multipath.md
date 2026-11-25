@@ -151,18 +151,12 @@ Each of these events MUST include the following field in its top-level
 MultipathEventFields = (path_id: uint32)
 ~~~
 
-`path_id` identifies the affected path within the connection. It is an
-unsigned 32-bit integer in the range 0 to 4294967295 inclusive
-({{Section 2.1 of QUIC-MULTIPATH}}).
-
-The value of `path_id` is the Path ID defined in {{QUIC-MULTIPATH}}. It is scoped to
-the QUIC connection, is shared by both directions, starts at 0 for the
-initial path, increases monotonically, and is not reused. The range is
-0..2^32-1, inclusive. The field is unsigned: negative values are invalid.
+`path_id` identifies the path ID as defined  in {{QUIC-MULTIPATH}}. It
+is scoped to the connection and represented by a `uint32` in the log.
 
 `path_id` is distinct from qlog's `tuple` / `tuple_id`. A path ID identifies a
 logical QUIC path; multiple path IDs can use the same 4-tuple, and one Path ID
-can use a new 4-tuple after migration. Implementations MUST NOT infer a Path
+can use a new 4-tuple after migration. Implementations MUST NOT infer a path
 ID from a tuple identifier.  Tuple details can
 be recorded with `quic:tuple_assigned` (see {{QLOG-QUIC}}).
 
