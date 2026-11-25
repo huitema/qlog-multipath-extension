@@ -1508,9 +1508,12 @@ path 0. Later the client abandons path 1 at the application's request.<a href="#
 <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-add-a-path-id-to-existing-q" class="section-name selfRef">Add a Path ID to existing QUIC events</a>
       </h2>
 <p id="section-6-1">A packet event <span class="bcp14">MUST</span> omit the top-level <code>path_id</code> unless it describes
-1-RTT packets and the handshake has completed with multipath negotiated
-(<span><a href="https://rfc-editor.org/rfc/rfc10069#section-2" class="relref">Section 2</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>). Initial, Handshake, 0-RTT, and Retry
-packet events therefore omit the field.<a href="#section-6-1" class="pilcrow">¶</a></p>
+1-RTT packets and the logging endpoint has both sent and received the
+<code>initial_max_path_id</code> transport parameter on this connection
+(<span><a href="https://rfc-editor.org/rfc/rfc10069#section-2" class="relref">Section 2</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>). After this exchange, a server logs
+<code>path_id</code> 0 for a 1-RTT packet it sends on the initial path, even if its
+TLS handshake is still in progress. Initial, Handshake, 0-RTT, and Retry
+packet events omit the field.<a href="#section-6-1" class="pilcrow">¶</a></p>
 <p id="section-6-2">Subject to this rule, implementations <span class="bcp14">MUST</span> include <code>path_id</code> when an
 event describes one known path, including path 0. They <span class="bcp14">MUST</span> omit the field
 for connection-wide events or when the path is unknown.
@@ -1621,7 +1624,7 @@ defines the frame encodings.<a href="#section-6-7" class="pilcrow">¶</a></p>
         <h3 id="name-correlating-1-rtt-packet-ev">
 <a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-correlating-1-rtt-packet-ev" class="section-name selfRef">Correlating 1-RTT packet events across paths</a>
         </h3>
-<p id="section-6.1-1">Once the handshake completes with multipath negotiated, every event that
+<p id="section-6.1-1">Once the endpoint has sent and received <code>initial_max_path_id</code>, every event that
 identifies a specific 1-RTT packet <span class="bcp14">MUST</span> carry its event-level <code>path_id</code>,
 even on path 0. To match 1-RTT events within one connection and sending
 direction, use (<code>path_id</code>, <code>packet_number</code>) (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-1" class="relref">Section 1</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>).<a href="#section-6.1-1" class="pilcrow">¶</a></p>

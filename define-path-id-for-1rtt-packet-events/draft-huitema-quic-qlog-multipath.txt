@@ -296,9 +296,12 @@ Table of Contents
 6.  Add a Path ID to existing QUIC events
 
    A packet event MUST omit the top-level path_id unless it describes
-   1-RTT packets and the handshake has completed with multipath
-   negotiated (Section 2 of [QUIC-MULTIPATH]).  Initial, Handshake,
-   0-RTT, and Retry packet events therefore omit the field.
+   1-RTT packets and the logging endpoint has both sent and received the
+   initial_max_path_id transport parameter on this connection (Section 2
+   of [QUIC-MULTIPATH]).  After this exchange, a server logs path_id 0
+   for a 1-RTT packet it sends on the initial path, even if its TLS
+   handshake is still in progress.  Initial, Handshake, 0-RTT, and Retry
+   packet events omit the field.
 
    Subject to this rule, implementations MUST include path_id when an
    event describes one known path, including path 0.  They MUST omit the
@@ -383,11 +386,11 @@ Table of Contents
 
 6.1.  Correlating 1-RTT packet events across paths
 
-   Once the handshake completes with multipath negotiated, every event
-   that identifies a specific 1-RTT packet MUST carry its event-level
-   path_id, even on path 0.  To match 1-RTT events within one connection
-   and sending direction, use (path_id, packet_number) (Section 1 of
-   [QUIC-MULTIPATH]).
+   Once the endpoint has sent and received initial_max_path_id, every
+   event that identifies a specific 1-RTT packet MUST carry its event-
+   level path_id, even on path 0.  To match 1-RTT events within one
+   connection and sending direction, use (path_id, packet_number)
+   (Section 1 of [QUIC-MULTIPATH]).
 
    The client logs two sends and one loss.
 
