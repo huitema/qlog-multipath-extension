@@ -140,16 +140,18 @@ exampledraft 00 of this document is identified using the URI
 
 # Adding a path identifier to event headers {#path-id-def}
 
-The top-level `path_id` identifies the path on which a packet was sent or
-received. It appears alongside `time`, `name`, and `data` in the qlog
-`Event` map ({{Section 7 of QLOG-MAIN}}). {{add-path-id}} specifies when
-to include it.
+Managing multiple paths per connection requires identifying these paths.
+Per {{QUIC-MULTIPATH}}, this is done using a path ID. This path ID
+will be added to events as specified in {{mp-events}} and {{add-path-id}}.
+Each of these events MUST include the following field in its top-level
+`Event` map alongside `time`, `name`, and `data`
+({{Section 7 of QLOG-MAIN}}).
 
 ~~~ cddl
-MultipathEventFields = (? path_id: uint32)
+MultipathEventFields = (path_id: uint32)
 ~~~
 
-`path_id` is the Path ID defined in {{QUIC-MULTIPATH}}. It
+`path_id` identifies the path ID as defined  in {{QUIC-MULTIPATH}}. It
 is scoped to the connection and represented by a `uint32` in the log.
 
 `path_id` is distinct from qlog's `tuple` / `tuple_id`. A path ID identifies a
@@ -158,10 +160,13 @@ can use a new 4-tuple after migration. Implementations MUST NOT infer a path
 ID from a tuple identifier.  Tuple details can
 be recorded with `quic:tuple_assigned` (see {{QLOG-QUIC}}).
 
-For example, a `packet_lost` event can identify the original sending path
-even when it omits the optional packet header. The base qlog schema also
-uses an optional top-level `tuple` field to associate an event with a network tuple
+The top-level `path_id` field gives tools one place to find the path ID
+across packet, recovery, and path management events. For example, the
+field stays in the same place when a `packet_lost` event omits the optional
+packet header. The base qlog schema also uses an optional top-level
+`tuple` field to associate an event with a network tuple
 ({{Section 7.2 of QLOG-MAIN}}).
+{{add-path-id}} describes when existing QUIC events include `path_id`.
 
 
 # Multipath specific events and event extensions {#mp-events}
@@ -172,11 +177,9 @@ events record the frames that carry path management signals. A single
 change can involve several frames, and a local decision can precede the
 first frame that signals it.
 
-Each of these events MUST identify the affected path in `data.path_id`.
-If receiving a packet triggers the event, the top-level `path_id`
-identifies the path on which that packet arrived, as specified in
-{{add-path-id}}. A local decision made independently of a packet has
-only the affected Path ID in `data`.
+All the events described in this section affect a single path. The
+corresponding `path_id` MUST be included in the respective event headers,
+as specified in {{path-id-def}}.
 
 The event data types extend the qlog main schema as follows. The
 optional `error_code` and `sequence_number` fields use the qlog
@@ -195,14 +198,13 @@ for a new path. For an additional path, the client logs the event when it
 initiates the path and the server logs it when it accepts the attempt and
 sets up the path locally ({{Section 3.1 of QUIC-MULTIPATH}}). Validation can
 still be pending. For the initial path, the endpoint logs the event with
-`data.path_id` 0 when the handshake completes with multipath negotiated.
+`path_id` 0 when the handshake completes with multipath negotiated.
 Issuing connection IDs for future paths alone does not trigger this event.
 Migration to a new tuple retains the existing Path ID and can be logged
 with `quic:migration_state_updated`.
 
 ~~~ cddl
 QUICPathCreated = {
-    path_id: uint32
     * $$quic-pathcreated-extension
 }
 ~~~
@@ -222,7 +224,6 @@ path state do not produce additional abandonment events.
 
 ~~~ cddl
 QUICPathAbandoned = {
-    path_id: uint32
     initiator: Initiator
     ? error_code: uint64 .le 4611686018427387903
     * $$quic-pathabandoned-extension
@@ -247,7 +248,6 @@ status change event ({{Section 4.3 of QUIC-MULTIPATH}}).
 
 ~~~ cddl
 QUICPathStatusUpdated = {
-    path_id: uint32
     initiator: Initiator
     ? old: QUICPathStatus
     new: QUICPathStatus
@@ -267,87 +267,71 @@ path 0. Later the client abandons path 1 at the application's request.
 ~~~ json
 [
   { "time": 12.0, "name": "quic:path_created",
-    "data": { "path_id": 1 } },
-  { "time": 17.9, "name": "quic:packet_received", "path_id": 0,
-    "data": {
-      "header": { "packet_type": "1RTT", "packet_number": 8 },
-      "frames": [ { "frame_type": "path_status_backup",
-                    "path_id": 1, "sequence_number": 0 } ] } },
-  { "time": 18.0, "name": "quic:path_status_updated", "path_id": 0,
-    "data": { "path_id": 1, "initiator": "remote",
-              "new": "backup", "sequence_number": 0 } },
+    "path_id": 1, "data": {} },
+  { "time": 18.0, "name": "quic:path_status_updated",
+    "path_id": 1, "data": { "initiator": "remote", "new": "backup",
+                            "sequence_number": 0 } },
   { "time": 97.0, "name": "quic:path_abandoned",
-    "data": { "path_id": 1, "initiator": "local",
-              "error_code": 62 } }
+    "path_id": 1, "data": { "initiator": "local",
+                            "error_code": 62 } }
 ]
 ~~~
 
 # Add a Path ID to existing QUIC events {#add-path-id}
 
-Once the handshake completes with multipath negotiated
-({{Section 2 of QUIC-MULTIPATH}}), an event that describes 1-RTT packets
-on a single known path MUST include that path in the top-level `path_id`,
-including path 0. For an event that records a state change, this rule
-applies to the packet that triggered the change. Implementations MUST
-omit the field in all other cases, including for Initial, Handshake,
-0-RTT, and Retry packets and for local actions independent of any packet.
+A packet event MUST omit the top-level `path_id` unless it describes
+1-RTT packets and the handshake has completed with multipath negotiated
+({{Section 2 of QUIC-MULTIPATH}}). Initial, Handshake, 0-RTT, and Retry
+packet events therefore omit the field.
 
+Subject to this rule, implementations MUST include `path_id` when an
+event describes one known path, including path 0. They MUST omit the field
+for connection-wide events or when the path is unknown.
 Omission does not mean path 0. An implementation MAY
 place `path_id` in `common_fields` only when the same value applies to every
 event in that trace, following the common-field rules in {{QLOG-MAIN}}.
 
-A logged frame MUST retain any Path ID it carries on the wire
-({{multipath-frames}}). For example, when a PATH_ACK arrives on path 0
-and acknowledges packets sent on path 1, the `packet_received` event has
-`path_id: 0` and the frame in `data.frames` has `path_id: 1`.
+The event-level field identifies the path on which the event's packet or
+operation applies. A Path ID carried inside a frame remains a frame field and
+can identify a different path. For example, a packet sent on path 0 can carry
+a PATH_ACK frame acknowledging packets from path 1; the event has
+`path_id: 0`, while the PATH_ACK frame has `path_id: 1`.
 
-For the following events in the `quic` namespace, the packet path is
-determined as follows:
+The field applies to the following existing events in the `quic` namespace
+when the stated path context is known:
 
-| Event | Packet path |
+| Event | Meaning of `path_id` |
 | --- | --- |
 | `packet_sent`, `packet_received` | Path carrying the packet. |
 | `packet_lost` | Path carrying the lost packet. |
 | `marked_for_retransmit` | Original sending path of the packet whose data is marked for retransmission (see {{cross-path-retransmission}}). |
 | `packet_dropped`, `packet_buffered` | Path associated with the packet, if it can be identified at that point. |
-| `packets_acked` | Receiving path of the packet carrying the ACK or PATH_ACK. |
+| `packets_acked` | Path of the acknowledged packets, not the path carrying the ACK or PATH_ACK frame. Implementations MUST split events when acknowledged packets belong to different paths. |
+| `recovery_metrics_updated`, `recovery_parameters_set` | Path whose recovery or congestion-control values are reported. |
+| `congestion_state_updated`, `ecn_state_updated`, `timer_updated` | Path whose state or timer changed. Omit it for a connection-wide update. |
+| `mtu_updated`, `spin_bit_updated` | Path whose MTU or spin-bit state changed. |
+| `connection_id_updated` | Path associated with the connection ID being updated. |
+| `tuple_assigned` | Path only when the tuple assignment is for one specific Path ID; the tuple itself remains identified by `tuple_id`. |
+| `migration_state_updated` | Path being migrated. Its Path ID remains the same as the tuple changes during migration. |
 | `frames_parsed`, `frames_created` | Path associated with the packet or packets. Implementations MUST split an event if its packet numbers span different paths. Omit `path_id` for frames created before a path is selected. |
 
-In `packets_acked`, `data.path_id` identifies the original sending path of
-the acknowledged 1-RTT packets. Implementations MUST include it when that
-path is known and multipath has been negotiated. Otherwise, they MUST
-omit it. Implementations MUST group acknowledged packets into separate
-events if the value or presence of `data.path_id` differs between packets.
-In the PATH_ACK example above, the resulting `packets_acked` event has top-level
-`path_id: 0` and `data.path_id: 1`.
+Path-management events defined by this document MUST include `path_id` when
+they refer to one path. For a frame whose RFC 10069 definition contains a
+Path ID, the frame's `data` representation MUST also retain that frame field;
+the event-level `path_id` does not replace it.
 
-For the state updates listed below, `data.path_id` identifies the path
-whose state is reported. Implementations MUST include it when the update
-applies to one known path and MUST omit it for connection-wide updates or
-when the affected path is unknown. For example, when a local timer for
-path 1 expires, `timer_updated` has `data.path_id: 1` and no top-level
-`path_id`.
-
-~~~ cddl
-$$quic-packetsacked-extension           //= (path_id: uint32)
-$$quic-recoverymetricsupdated-extension //= (path_id: uint32)
-$$quic-recoveryparametersset-extension  //= (path_id: uint32)
-$$quic-congestionstateupdated-extension //= (path_id: uint32)
-$$quic-ecnstateupdated-extension        //= (path_id: uint32)
-$$quic-timerupdated-extension           //= (path_id: uint32)
-$$quic-mtuupdated-extension             //= (path_id: uint32)
-$$quic-spinbitupdated-extension         //= (path_id: uint32)
-$$quic-connectionidupdated-extension    //= (path_id: uint32)
-$$quic-tupleassigned-extension          //= (path_id: uint32)
-$$quic-migrationstateupdated-extension  //= (path_id: uint32)
-~~~
+The field is outside `data`, so existing QUIC event data definitions do not
+need to be copied or redefined for each event. The table above specifies the
+event-by-event semantics and applicability of the common field.
+{{mp-events}} defines the new events. {{multipath-frames}}
+defines the frame encodings.
 
 ## Correlating 1-RTT packet events across paths
 
-To match send, receive, and loss events for a 1-RTT packet within one
-connection and sending direction, use the top-level `path_id` and the
-packet number ({{Section 1 of QUIC-MULTIPATH}}). For packet numbers in
-`packets_acked`, use `data.path_id` to select their packet number space.
+Once the handshake completes with multipath negotiated, every event that
+identifies a specific 1-RTT packet MUST carry its event-level `path_id`,
+even on path 0. To match 1-RTT events within one connection and sending
+direction, use (`path_id`, `packet_number`) ({{Section 1 of QUIC-MULTIPATH}}).
 
 The client logs two sends and one loss.
 
