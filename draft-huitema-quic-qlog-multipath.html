@@ -1451,10 +1451,9 @@ QUICPathAbandoned = {
         </h3>
 <p id="section-5.3-1"><code>quic:path_status_updated</code> is emitted when the endpoint changes the path
 usage preference it advertises (<code>initiator</code> is <code>local</code>), or records a
-change in the peer's advertised preference (<code>initiator</code> is <code>remote</code>).
-Each endpoint expresses its own preference for how its peer should use
-the path (<span><a href="https://rfc-editor.org/rfc/rfc10069#section-3.3" class="relref">Section 3.3</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>). A sender can choose how to
-schedule packets independently of the advertised preference.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+change in the peer's advertised preference
+(see <span><a href="https://rfc-editor.org/rfc/rfc10069#section-3.3" class="relref">Section 3.3</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>). In the latter case,
+<code>initiator</code> is <code>remote</code>.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
 <p id="section-5.3-2"><code>new</code> gives the updated preference. If included, <code>old</code> gives the previous
 preference for the same Path ID and initiator. Omit <code>old</code> when no previous
 preference is known. The first advertisement can precede path creation.
@@ -1796,10 +1795,8 @@ $TransportError /= "application_abandon_path" /      ; 0x3e
 <a href="#section-8.3" class="section-number selfRef">8.3. </a><a href="#name-path_status_available-and-p" class="section-name selfRef">PATH_STATUS_AVAILABLE and PATH_STATUS_BACKUP</a>
         </h3>
 <p id="section-8.3-1">The <code>frame_type</code> identifies the preference advertised for <code>path_id</code>.
-Use <code>path_status_available</code> for 0x3e77 and <code>path_status_backup</code> for 0x3e76.
-Both use the same per-path status sequence number space
-(<span><a href="https://rfc-editor.org/rfc/rfc10069#section-4.3" class="relref">Section 4.3</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>). The frame object records the received
-sequence number even when the receiver ignores an outdated advertisement.<a href="#section-8.3-1" class="pilcrow">¶</a></p>
+Use <code>path_status_available</code> for 0x3e77 and <code>path_status_backup</code> for 0x3e76
+(<span><a href="https://rfc-editor.org/rfc/rfc10069#section-4.3" class="relref">Section 4.3</a> of [<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>).<a href="#section-8.3-1" class="pilcrow">¶</a></p>
 <div class="lang-cddl sourcecode" id="section-8.3-2">
 <pre>
 PathStatusFrame = {
