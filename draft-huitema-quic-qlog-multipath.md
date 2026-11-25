@@ -279,12 +279,15 @@ path 0. Later the client abandons path 1 at the application's request.
 
 # Add a Path ID to existing QUIC events {#add-path-id}
 
-When a QUIC event describes an operation or state for one known path,
-implementations MUST include `path_id`, including when its value is 0.
-(The `path_id` field is defined in {{path-id-def}}.)
-Implementations
-MUST omit the field when the event is connection-wide or when the associated
-Path ID is not known. Omission does not mean path 0. An implementation MAY
+A packet event MUST omit the top-level `path_id` unless it describes
+1-RTT packets and the handshake has completed with multipath negotiated
+({{Section 2 of QUIC-MULTIPATH}}). Initial, Handshake, 0-RTT, and Retry
+packet events therefore omit the field.
+
+Subject to this rule, implementations MUST include `path_id` when an
+event describes one known path, including path 0. They MUST omit the field
+for connection-wide events or when the path is unknown.
+Omission does not mean path 0. An implementation MAY
 place `path_id` in `common_fields` only when the same value applies to every
 event in that trace, following the common-field rules in {{QLOG-MAIN}}.
 
@@ -315,9 +318,7 @@ when the stated path context is known:
 Path-management events defined by this document MUST include `path_id` when
 they refer to one path. For a frame whose RFC 10069 definition contains a
 Path ID, the frame's `data` representation MUST also retain that frame field;
-the event-level `path_id` does not replace it. For other QUIC events,
-implementations MUST include `path_id` when they describe a single known
-path, and MUST omit it when they are connection-wide or the path is unknown.
+the event-level `path_id` does not replace it.
 
 The field is outside `data`, so existing QUIC event data definitions do not
 need to be copied or redefined for each event. The table above specifies the
@@ -327,10 +328,10 @@ defines the frame encodings.
 
 ## Correlating 1-RTT packet events across paths
 
-Every event that identifies a specific 1-RTT packet MUST carry its
-event-level `path_id`, even on path 0. For the packet number spaces
-in {{Section 1 of QUIC-MULTIPATH}}, match 1-RTT events by
-(`path_id`, `packet_number`) within one connection and sending direction.
+Once the handshake completes with multipath negotiated, every event that
+identifies a specific 1-RTT packet MUST carry its event-level `path_id`,
+even on path 0. To match 1-RTT events within one connection and sending
+direction, use (`path_id`, `packet_number`) ({{Section 1 of QUIC-MULTIPATH}}).
 
 The client logs two sends and one loss.
 
@@ -358,8 +359,6 @@ The server logs one receive event.
 
 The server's receive event matches the client's send event for `(1, 42)`.
 The client's loss event matches its send event for `(0, 42)`.
-
-The `path_id` is set to 0 for Initial, Handshake, 0-RTT, and Retry packet events.
 
 ## Cross-path retransmission {#cross-path-retransmission}
 
