@@ -1719,9 +1719,9 @@ array of <code>quic:packet_sent</code> and <code>quic:packet_received</code>. Th
 <code>raw</code> field uses <code>RawInfo</code> from <span>[<a href="#QLOG-MAIN" class="cite xref">QLOG-MAIN</a>]</span>.<a href="#section-8-1" class="pilcrow">¶</a></p>
 <p id="section-8-2">Within a frame, <code>path_id</code> is the Path Identifier carried on the wire.
 For example, a PATH_ACK sent on path 0 can acknowledge packets on path 1.
-In that case the PATH_ACK object contains <code>"path_id": 1</code>. Path IDs and
-path ID limits are unsigned 32-bit values. QUIC variable-length integer
-fields are logged as decoded values within the limits of <span>[<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>.<a href="#section-8-2" class="pilcrow">¶</a></p>
+In that case the PATH_ACK object contains <code>"path_id": 1</code>.
+QUIC variable-length integer fields are logged as decoded values within
+the limits of <span>[<a href="#QUIC-MULTIPATH" class="cite xref">QUIC-MULTIPATH</a>]</span>.<a href="#section-8-2" class="pilcrow">¶</a></p>
 <div class="lang-cddl sourcecode" id="section-8-3">
 <pre>
 $QuicFrame /= PathAckFrame / PathAbandonFrame / PathStatusFrame /
