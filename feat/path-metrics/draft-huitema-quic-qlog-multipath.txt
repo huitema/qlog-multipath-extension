@@ -5,12 +5,12 @@
 QUIC                                                          C. Huitema
 Internet-Draft                                      Private Octopus Inc.
 Intended status: Informational                                    Y. Liu
-Expires: 28 May 2027                                        Alibaba Inc.
+Expires: 29 May 2027                                        Alibaba Inc.
                                                                 A. Bisht
                                                            Cisco Systems
                                                                N. Kurosu
                                                               Individual
-                                                        24 November 2026
+                                                        25 November 2026
 
 
                QLOG extensions for Multiple Paths in QUIC
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 28 May 2027.
+   This Internet-Draft will expire on 29 May 2027.
 
 Copyright Notice
 
@@ -331,9 +331,9 @@ Table of Contents
     +---------------------------+-------------------------------------+
     | packet_lost               | Path carrying the lost packet.      |
     +---------------------------+-------------------------------------+
-    | marked_for_retransmit     | Sending path of the packet whose    |
-    |                           | data is marked for retransmission   |
-    |                           | (Section 6.2).                      |
+    | marked_for_retransmit     | Original sending path of the packet |
+    |                           | whose data is marked for            |
+    |                           | retransmission (see Section 6.2).   |
     +---------------------------+-------------------------------------+
     | packet_dropped,           | Path associated with the packet, if |
     | packet_buffered           | it can be identified at that point. |
