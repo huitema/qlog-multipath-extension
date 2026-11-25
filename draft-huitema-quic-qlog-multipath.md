@@ -308,7 +308,7 @@ when the stated path context is known:
 | --- | --- |
 | `packet_sent`, `packet_received` | Path carrying the packet. |
 | `packet_lost` | Path carrying the lost packet. |
-| `marked_for_retransmit` | Sending path of the packet whose data is marked for retransmission ({{cross-path-retransmission}}). |
+| `marked_for_retransmit` | Original sending path of the packet whose data is marked for retransmission (see {{cross-path-retransmission}}). |
 | `packet_dropped`, `packet_buffered` | Path associated with the packet, if it can be identified at that point. |
 | `packets_acked` | Path of the acknowledged packets, not the path carrying the ACK or PATH_ACK frame. Implementations MUST split events when acknowledged packets belong to different paths. |
 | `recovery_metrics_updated`, `recovery_parameters_set` | Path whose recovery or congestion-control values are reported. |
