@@ -240,8 +240,9 @@ QUICPathAbandoned = {
 
 `quic:path_status_updated` is emitted when the endpoint changes the path
 usage preference it advertises (`initiator` is `local`), or records a
-change in the peer's advertised preference (`initiator` is `remote`);
-see {{Section 3.3 of QUIC-MULTIPATH}}.
+change in the peer's advertised preference
+(see {{Section 3.3 of QUIC-MULTIPATH}}). In the latter case,
+`initiator` is `remote`.
 
 `new` gives the updated preference. If included, `old` gives the previous
 preference for the same Path ID and initiator. Omit `old` when no previous
