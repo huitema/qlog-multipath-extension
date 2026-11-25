@@ -331,9 +331,10 @@ defines the frame encodings.
 
 ## Correlating 1-RTT packet events across paths
 
-Once the endpoint has sent and received `initial_max_path_id`, every event that
-identifies a specific 1-RTT packet MUST carry its event-level `path_id`,
-even on path 0. To match 1-RTT events within one connection and sending
+Once the logging endpoint knows that multipath support has been negotiated
+as described in {{Section 2 of QUIC-MULTIPATH}}, every event that identifies
+a specific 1-RTT packet MUST carry its event-level `path_id`, including
+on path 0. To match 1-RTT events within one connection and sending
 direction, use (`path_id`, `packet_number`) ({{Section 1 of QUIC-MULTIPATH}}).
 
 The client logs two sends and one loss.
